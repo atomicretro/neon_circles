@@ -71,6 +71,99 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./scripts/field.js":
+/*!**************************!*\
+  !*** ./scripts/field.js ***!
+  \**************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _player = __webpack_require__(/*! ./player */ "./scripts/player.js");
+
+var _player2 = _interopRequireDefault(_player);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Field = function () {
+  function Field(canvas, width, height) {
+    _classCallCheck(this, Field);
+
+    canvas.width = width;
+    canvas.height = height;
+
+    this.width = width;
+    this.height = height;
+    this.ctx = canvas.getContext("2d");
+    this.player = new _player2.default(this.ctx, width, height);
+
+    this.drawPlayer = this.drawPlayer.bind(this);
+    this.playRound = this.playRound.bind(this);
+  }
+
+  _createClass(Field, [{
+    key: 'clearAll',
+    value: function clearAll() {
+      this.ctx.clearRect(0, 0, this.width, this.height);
+    }
+  }, {
+    key: 'drawFieldBorder',
+    value: function drawFieldBorder() {
+      this.ctx.beginPath();
+      this.ctx.lineWidth = 1;
+      this.ctx.rect(0, 0, this.width, this.height);
+      this.ctx.stroke();
+    }
+  }, {
+    key: 'drawPlayerRails',
+    value: function drawPlayerRails(shape) {
+      var xCenter = this.width / 2;
+      var yCenter = this.height / 2;
+
+      switch (shape) {
+        case 'circle':
+        default:
+          this.ctx.beginPath();
+          this.ctx.arc(xCenter, yCenter, 35, 0, 2 * Math.PI, true);
+          this.ctx.strokeStyle = "black";
+          this.ctx.lineWidth = 2;
+          this.ctx.stroke();
+      }
+    }
+  }, {
+    key: 'drawPlayer',
+    value: function drawPlayer() {
+      this.player.draw();
+    }
+  }, {
+    key: 'playRound',
+    value: function playRound() {
+      this.clearAll();
+      this.drawFieldBorder();
+      this.drawPlayerRails('circle');
+
+      this.drawPlayer();
+      requestAnimationFrame(this.playRound);
+    }
+  }]);
+
+  return Field;
+}();
+
+exports.default = Field;
+
+/***/ }),
+
 /***/ "./scripts/game.js":
 /*!*************************!*\
   !*** ./scripts/game.js ***!
@@ -80,6 +173,39 @@
 
 "use strict";
 
+
+var _field = __webpack_require__(/*! ./field */ "./scripts/field.js");
+
+var _field2 = _interopRequireDefault(_field);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var startGame = function startGame(canvas) {
+  var field = new _field2.default(canvas, 800, 500);
+  field.drawPlayer();
+  field.playRound();
+};
+
+document.addEventListener("DOMContentLoaded", function () {
+  var canvas = document.getElementById("gameCanvas");
+  startGame(canvas);
+});
+
+/***/ }),
+
+/***/ "./scripts/player.js":
+/*!***************************!*\
+  !*** ./scripts/player.js ***!
+  \***************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -92,68 +218,61 @@ var ARROW_MAP = {
   37: 'left'
 };
 
-var Game = function () {
-  function Game(canvas, width, height) {
-    _classCallCheck(this, Game);
+var Player = function () {
+  function Player(ctx, fieldWidth, fieldHeight) {
+    _classCallCheck(this, Player);
 
-    canvas.width = width;
-    canvas.height = height;
-
-    this._width = width;
-    this._height = height;
-    this._ctx = canvas.getContext("2d");
-
-    this.play = this.play.bind(this);
+    this.ctx = ctx;
+    this.width = width;
+    this.height = height;
+    this.x = 0;
+    this.y = 0;
+    this.speed = 5;
+    document.addEventListener('keydown', this.keydown.bind(this));
   }
 
-  _createClass(Game, [{
-    key: 'play',
-    value: function play() {
-      this._clearAll();
-      this._drawFieldBorder();
-      this._drawPlayerRails('circle');
+  _createClass(Player, [{
+    key: 'draw',
+    value: function draw() {
+      this.ctx.beginPath();
+      this.ctx.rect(this.x, this.y, this.width, this.height);
+      this.ctx.fillStyle = 'red';
+      this.ctx.fill();
+    }
+  }, {
+    key: 'getBorders',
+    value: function getBorders() {
+      return {
+        xMin: this.x,
+        xMax: this.x + this.width,
+        yMin: this.y,
+        yMax: this.y + this.height
+      };
+    }
+  }, {
+    key: 'keydown',
+    value: function keydown(e) {
+      var arrow = ARROW_MAP[e.keyCode];
 
-      // requestAnimationFrame(this.play);
-    }
-  }, {
-    key: '_clearAll',
-    value: function _clearAll() {
-      this._ctx.clearRect(0, 0, this._width, this._height);
-    }
-  }, {
-    key: '_drawFieldBorder',
-    value: function _drawFieldBorder() {
-      this._ctx.beginPath();
-      this._ctx.lineWidth = 1;
-      this._ctx.rect(0, 0, this._width, this._height);
-      this._ctx.stroke();
-    }
-  }, {
-    key: '_drawPlayerRails',
-    value: function _drawPlayerRails(shape) {
-      var xCenter = this._width / 2;
-      var yCenter = this._height / 2;
-
-      switch (shape) {
-        case 'circle':
-        default:
-          this._ctx.beginPath();
-          this._ctx.arc(xCenter, yCenter, 35, 0, 2 * Math.PI, true);
-          this._ctx.strokeStyle = "black";
-          this._ctx.lineWidth = 2;
-          this._ctx.stroke();
+      if (arrow === 'left') {
+        this.x -= this.speed;
+      }
+      if (arrow === 'right') {
+        this.x += this.speed;
+      }
+      if (arrow === 'up') {
+        this.y += this.speed;
+      }
+      if (arrow === 'down') {
+        this.y -= this.speed;
       }
     }
   }]);
 
-  return Game;
+  return Player;
 }();
 
-document.addEventListener("DOMContentLoaded", function () {
-  var canvas = document.getElementById("gameCanvas");
-  var game = new Game(canvas, 800, 500);
-  game.play();
-});
+exports.default = Player;
 
 /***/ })
 
