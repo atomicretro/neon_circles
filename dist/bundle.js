@@ -110,9 +110,10 @@ var Game = function () {
     key: 'play',
     value: function play() {
       this._clearAll();
-      this._drawBorder();
+      this._drawFieldBorder();
+      this._drawPlayerRails('circle');
 
-      requestAnimationFrame(this.play);
+      // requestAnimationFrame(this.play);
     }
   }, {
     key: '_clearAll',
@@ -120,25 +121,28 @@ var Game = function () {
       this._ctx.clearRect(0, 0, this._width, this._height);
     }
   }, {
-    key: '_drawBorder',
-    value: function _drawBorder() {
+    key: '_drawFieldBorder',
+    value: function _drawFieldBorder() {
       this._ctx.beginPath();
+      this._ctx.lineWidth = 1;
       this._ctx.rect(0, 0, this._width, this._height);
       this._ctx.stroke();
     }
   }, {
-    key: '_makePurple',
-    value: function _makePurple() {
-      this._ctx.fillStyle = "purple";
-      this._ctx.fillRect(0, 0, 800, 500);
+    key: '_drawPlayerRails',
+    value: function _drawPlayerRails(shape) {
+      var xCenter = this._width / 2;
+      var yCenter = this._height / 2;
 
-      this._ctx.beginPath();
-      this._ctx.arc(300, 100, 20, 0, 2 * Math.PI, true);
-      this._ctx.strokeStyle = "green";
-      this._ctx.lineWidth = 5;
-      this._ctx.stroke();
-      this._ctx.fillStyle = "blue";
-      this._ctx.fill();
+      switch (shape) {
+        case 'circle':
+        default:
+          this._ctx.beginPath();
+          this._ctx.arc(xCenter, yCenter, 35, 0, 2 * Math.PI, true);
+          this._ctx.strokeStyle = "black";
+          this._ctx.lineWidth = 2;
+          this._ctx.stroke();
+      }
     }
   }]);
 
