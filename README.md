@@ -2,19 +2,22 @@
 ## A game of shapes and shooting things
 
 ### Description
-Circles (tentatively named) is a 2D, on-rails shoot-em-up (shmup) where the player is their own worst enemy (besides from all the actual enemies). Players control a ship stuck on the inside of a small circle. They cannot leave this circle, but can travel around it freely. Enemies will fly towards the player from off-screen. If an enemy touches the player, it's game over. Complicating this simple setup, players can only shoot towards the inside of the circle, forcing their bullets to pass through the circle itself to find their mark. If a player hits their own bullets -- tough luck!
+Circles (tentatively named) is a 2D, on-rails shoot-em-up (shmup) where the player is their own worst enemy (besides from all the actual enemies). Players must navigate around a small circle, shooting enemies while dodging both their own and enemy bullets. Can you survive in... THE CIRCLE!?!
+
+### Gameplay
+Players control a ship stuck on the inside of a small circle. The ship cannot leave this circle, but can travel around its inner perimeter freely. Enemies will fly towards the player from off-screen. If an enemy touches the player, it's game over. Complicating this simple setup, the player's ship is always orientated *away* from the enemies and towards the center of the circle. Players can only shoot towards the center of the circle, forcing their bullets to pass through the circle itself to hit enemies. This causes bullets to directly intersect the only path the player can take. If a player hits their own bullets -- kaboom!
 
 ### MVPs
 The base game of Circles is simple, with it's guiding philosophy being "one mechanic done well". To that end, the MVPs for this project are:
 - Fully functional game with player-controllable ship and AI enemies.
-- Two modes:
-  - "Story mode" with multiple levels of increasing difficulty.
-  - "Arcade mode" where a player fights endless enemies for a high score.
+- Intro screen explaining rules where player can choose between clockwise and counter-clockwise control schemes (and w/ bonus: where player can choose game mode)
+- An "arcade mode" where a player fights endless enemies for a high score.
 - Music and sound effects to accompany both modes.
 
 Additionally, some bonus MVPs are:
 - Different rails shapes (eg a triangle instead of a circle).
 - Graphical scene transitions between levels.
+- A "story mode" with multiple levels of increasing difficulty.
 
 The project will also have a production README.
 
@@ -29,7 +32,7 @@ The scripts that I foresee being necessary are:
 - baddie.js -- this will be the enemies the player must fight. It will be responsible for their AI and movement patterns.
 
 ### Wireframe
-![wireframes](https://github.com/atomicretro/circles/blob/master/gameplay_wireframe.png) 
+![wireframes](https://github.com/atomicretro/circles/blob/master/gameplay_wireframe.png)
 
 ### Timeline
 **Day 1:** Groundwork. Day 1 will be about planting the seeds to my success. I will set up all my necessary node modules and build out the skeletons of the three above scripts. I will learn Canvas and how to render fluid motion with it. I will learn the best ways to get user input from Javascript for game play. Goals:
@@ -44,4 +47,5 @@ The scripts that I foresee being necessary are:
 - Finish game!
 
 **Bonus:**
+- Story mode.
 - Program in enemy AI.
