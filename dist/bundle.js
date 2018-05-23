@@ -130,7 +130,7 @@ var Game = function () {
     key: '_makePurple',
     value: function _makePurple() {
       this._ctx.fillStyle = "purple";
-      this._ctx.fillRect(0, 0, 700, 500);
+      this._ctx.fillRect(0, 0, 800, 500);
 
       this._ctx.beginPath();
       this._ctx.arc(300, 100, 20, 0, 2 * Math.PI, true);
@@ -145,10 +145,11 @@ var Game = function () {
   return Game;
 }();
 
-var canvas = document.getElementById("gameCanvas");
-var game = new Game(canvas, 700, 500);
-
-document.addEventListener("DOMContentLoaded", game.play);
+document.addEventListener("DOMContentLoaded", function () {
+  var canvas = document.getElementById("gameCanvas");
+  var game = new Game(canvas, 800, 500);
+  game.play();
+});
 
 /***/ })
 
