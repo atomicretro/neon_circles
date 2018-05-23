@@ -29,7 +29,7 @@ The scripts that I foresee being necessary are:
 - baddie.js -- this will be the enemies the player must fight. It will be responsible for their AI and movement patterns.
 
 ### Wireframe
-
+![wireframes](https://github.com/atomicretro/circles/blob/master/gameplay_wireframe.png) 
 
 ### Timeline
 **Day 1:** Groundwork. Day 1 will be about planting the seeds to my success. I will set up all my necessary node modules and build out the skeletons of the three above scripts. I will learn Canvas and how to render fluid motion with it. I will learn the best ways to get user input from Javascript for game play. Goals:
