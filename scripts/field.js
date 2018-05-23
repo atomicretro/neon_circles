@@ -8,10 +8,19 @@ class Field {
     this.width = width;
     this.height = height;
     this.ctx = canvas.getContext("2d");
-    this.player = new Player(this.ctx, width, height)
+    this.player = this.createPlayer();
 
     this.drawPlayer = this.drawPlayer.bind(this);
     this.playRound = this.playRound.bind(this);
+  }
+
+  createPlayer() {
+    let startPoint = {
+      x: this.width / 2,
+      y: this.height / 2 - 30
+    }
+    let player = new Player(this.ctx, startPoint);
+    return player;
   }
 
   clearAll() {
@@ -41,6 +50,7 @@ class Field {
   }
 
   drawPlayer() {
+    // debugger
     this.player.draw()
   }
 

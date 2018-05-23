@@ -105,13 +105,23 @@ var Field = function () {
     this.width = width;
     this.height = height;
     this.ctx = canvas.getContext("2d");
-    this.player = new _player2.default(this.ctx, width, height);
+    this.player = this.createPlayer();
 
     this.drawPlayer = this.drawPlayer.bind(this);
     this.playRound = this.playRound.bind(this);
   }
 
   _createClass(Field, [{
+    key: 'createPlayer',
+    value: function createPlayer() {
+      var startPoint = {
+        x: this.width / 2,
+        y: this.height / 2 - 30
+      };
+      var player = new _player2.default(this.ctx, startPoint);
+      return player;
+    }
+  }, {
     key: 'clearAll',
     value: function clearAll() {
       this.ctx.clearRect(0, 0, this.width, this.height);
@@ -143,6 +153,7 @@ var Field = function () {
   }, {
     key: 'drawPlayer',
     value: function drawPlayer() {
+      // debugger
       this.player.draw();
     }
   }, {
@@ -219,15 +230,17 @@ var ARROW_MAP = {
 };
 
 var Player = function () {
-  function Player(ctx, fieldWidth, fieldHeight) {
+  function Player(ctx, startPoint) {
     _classCallCheck(this, Player);
 
     this.ctx = ctx;
-    this.width = width;
-    this.height = height;
-    this.x = 0;
-    this.y = 0;
+    this.width = 10;
+    this.height = 10;
+    this.x = startPoint.x;
+    this.y = startPoint.y;
     this.speed = 5;
+    this.startPoint = startPoint;
+
     document.addEventListener('keydown', this.keydown.bind(this));
   }
 
@@ -235,37 +248,18 @@ var Player = function () {
     key: 'draw',
     value: function draw() {
       this.ctx.beginPath();
-      this.ctx.rect(this.x, this.y, this.width, this.height);
-      this.ctx.fillStyle = 'red';
+      this.ctx.moveTo(this.x, this.y + 10);
+      this.ctx.lineTo(this.x + 5, this.y);
+      this.ctx.lineTo(this.x - 5, this.y);
       this.ctx.fill();
-    }
-  }, {
-    key: 'getBorders',
-    value: function getBorders() {
-      return {
-        xMin: this.x,
-        xMax: this.x + this.width,
-        yMin: this.y,
-        yMax: this.y + this.height
-      };
     }
   }, {
     key: 'keydown',
     value: function keydown(e) {
       var arrow = ARROW_MAP[e.keyCode];
 
-      if (arrow === 'left') {
-        this.x -= this.speed;
-      }
-      if (arrow === 'right') {
-        this.x += this.speed;
-      }
-      if (arrow === 'up') {
-        this.y += this.speed;
-      }
-      if (arrow === 'down') {
-        this.y -= this.speed;
-      }
+      if (arrow === 'left') this.x -= this.speed;
+      if (arrow === 'right') this.x += this.speed;
     }
   }]);
 
