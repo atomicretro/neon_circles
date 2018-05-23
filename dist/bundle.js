@@ -66,82 +66,89 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./game.js");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./scripts/game.js");
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ "./game.js":
-/*!*****************!*\
-  !*** ./game.js ***!
-  \*****************/
+/***/ "./scripts/game.js":
+/*!*************************!*\
+  !*** ./scripts/game.js ***!
+  \*************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _practice = __webpack_require__(/*! ./scripts/practice.js */ "./scripts/practice.js");
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _practice2 = _interopRequireDefault(_practice);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var myFunc = function myFunc() {
-  var canvasEl = document.getElementById("myCanvas");
-  canvasEl.width = 500;
-  canvasEl.height = 500;
-
-  var ctx = canvasEl.getContext("2d");
-  ctx.fillStyle = "purple";
-  ctx.fillRect(0, 0, 500, 500);
-
-  ctx.beginPath();
-  ctx.arc(100, 100, 20, 0, 2 * Math.PI, true);
-  ctx.strokeStyle = "green";
-  ctx.lineWidth = 5;
-  ctx.stroke();
-  ctx.fillStyle = "blue";
-  ctx.fill();
+var ARROW_MAP = {
+  40: 'up',
+  39: 'right',
+  38: 'down',
+  37: 'left'
 };
 
-document.addEventListener("DOMContentLoaded", myFunc);
+var Game = function () {
+  function Game(canvas, width, height) {
+    _classCallCheck(this, Game);
 
-/***/ }),
+    canvas.width = width;
+    canvas.height = height;
 
-/***/ "./scripts/practice.js":
-/*!*****************************!*\
-  !*** ./scripts/practice.js ***!
-  \*****************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+    this._width = width;
+    this._height = height;
+    this._ctx = canvas.getContext("2d");
 
-"use strict";
+    this.play = this.play.bind(this);
+  }
 
+  _createClass(Game, [{
+    key: 'play',
+    value: function play() {
+      this._clearAll();
+      this._drawBorder();
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
+      requestAnimationFrame(this.play);
+    }
+  }, {
+    key: '_clearAll',
+    value: function _clearAll() {
+      this._ctx.clearRect(0, 0, this._width, this._height);
+    }
+  }, {
+    key: '_drawBorder',
+    value: function _drawBorder() {
+      this._ctx.beginPath();
+      this._ctx.rect(0, 0, this._width, this._height);
+      this._ctx.stroke();
+    }
+  }, {
+    key: '_makePurple',
+    value: function _makePurple() {
+      this._ctx.fillStyle = "purple";
+      this._ctx.fillRect(0, 0, 700, 500);
 
-exports.default = function () {
-  var canvasEl = document.getElementById("myCanvas");
-  canvasEl.width = 500;
-  canvasEl.height = 500;
+      this._ctx.beginPath();
+      this._ctx.arc(300, 100, 20, 0, 2 * Math.PI, true);
+      this._ctx.strokeStyle = "green";
+      this._ctx.lineWidth = 5;
+      this._ctx.stroke();
+      this._ctx.fillStyle = "blue";
+      this._ctx.fill();
+    }
+  }]);
 
-  var ctx = canvasEl.getContext("2d");
-  ctx.fillStyle = "purple";
-  ctx.fillRect(0, 0, 500, 500);
+  return Game;
+}();
 
-  ctx.beginPath();
-  ctx.arc(300, 100, 20, 0, 2 * Math.PI, true);
-  ctx.strokeStyle = "green";
-  ctx.lineWidth = 5;
-  ctx.stroke();
-  ctx.fillStyle = "blue";
-  ctx.fill();
-};
+var canvas = document.getElementById("gameCanvas");
+var game = new Game(canvas, 700, 500);
 
-// default testFunc;
+document.addEventListener("DOMContentLoaded", game.play);
 
 /***/ })
 
