@@ -1,0 +1,32 @@
+{
+  "name": "circles",
+  "version": "1.0.0",
+  "description": "### Description Circles (tentatively named) is a 2D, on-rails shoot-em-up (shmup) where the player is their own worst enemy (besides from all the actual enemies). Players must navigate around a small circle, shooting enemies while dodging both their own and enemy bullets. Can you survive in... THE CIRCLE!?!",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "webpack --mode=production",
+    "start": "webpack --watch --mode=development"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/atomicretro/circles.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/atomicretro/circles/issues"
+  },
+  "homepage": "https://github.com/atomicretro/circles#readme",
+  "dependencies": {
+    "babel": "^6.23.0",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.4",
+    "babel-preset-env": "^1.7.0",
+    "webpack": "^4.8.3"
+  },
+  "devDependencies": {
+    "webpack-cli": "^2.1.4"
+  }
+}
