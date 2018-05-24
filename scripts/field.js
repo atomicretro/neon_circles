@@ -15,11 +15,7 @@ class Field {
   }
 
   createPlayer() {
-    let startPoint = {
-      x: this.width / 2,
-      y: this.height / 2 - 30
-    }
-    let player = new Player(this.ctx, startPoint);
+    let player = new Player(this.ctx, this.width, this.height);
     return player;
   }
 

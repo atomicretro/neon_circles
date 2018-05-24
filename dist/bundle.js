@@ -114,11 +114,7 @@ var Field = function () {
   _createClass(Field, [{
     key: 'createPlayer',
     value: function createPlayer() {
-      var startPoint = {
-        x: this.width / 2,
-        y: this.height / 2 - 30
-      };
-      var player = new _player2.default(this.ctx, startPoint);
+      var player = new _player2.default(this.ctx, this.width, this.height);
       return player;
     }
   }, {
@@ -230,36 +226,53 @@ var ARROW_MAP = {
 };
 
 var Player = function () {
-  function Player(ctx, startPoint) {
+  function Player(ctx, fieldWidth, fieldHeight) {
     _classCallCheck(this, Player);
 
     this.ctx = ctx;
+    this.fieldWidth = fieldWidth;
+    this.fieldHeight = fieldHeight;
     this.width = 10;
     this.height = 10;
-    this.x = startPoint.x;
-    this.y = startPoint.y;
-    this.speed = 5;
+    this.x = fieldWidth / 2;
+    this.y = fieldHeight / 2 - 30;
+    this.angle = 0.1 * Math.PI;
     this.startPoint = startPoint;
+
+    this.rotateX = this.rotateX.bind(this);
+    this.rotateY = this.rotateY.bind(this);
 
     document.addEventListener('keydown', this.keydown.bind(this));
   }
 
+  // draw() {
+  //   this.ctx.beginPath();
+  //   this.ctx.moveTo(this.rotateX(this.x), this.rotateY(this.y + 10));
+  //   this.ctx.lineTo(this.rotateX(this.x + 5), this.rotateY(this.y));
+  //   this.ctx.lineTo(this.rotateX(this.x - 5), this.rotateY(this.y));
+  //   this.ctx.fill();
+  // }
+  //
+  // rotateX() {
+  //   let sin = sin(angle);
+  //   let cos = cos(angle);
+  //   this.x = this.x - this.fieldWidth / 2;
+  //   this.x = this.x
+  //   xnew = p.x * c - p.y * s;
+  // }
+  //
+  // rotateY() {
+  //   let sin = sin(angle);
+  //   let cos = cos(angle);
+  // }
+
   _createClass(Player, [{
-    key: 'draw',
-    value: function draw() {
-      this.ctx.beginPath();
-      this.ctx.moveTo(this.x, this.y + 10);
-      this.ctx.lineTo(this.x + 5, this.y);
-      this.ctx.lineTo(this.x - 5, this.y);
-      this.ctx.fill();
-    }
-  }, {
     key: 'keydown',
     value: function keydown(e) {
       var arrow = ARROW_MAP[e.keyCode];
 
-      if (arrow === 'left') this.x -= this.speed;
-      if (arrow === 'right') this.x += this.speed;
+      if (arrow === 'left') this.x -= this.angle;
+      if (arrow === 'right') this.x += this.angle;
     }
   }]);
 
