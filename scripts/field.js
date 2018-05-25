@@ -9,8 +9,10 @@ class Field {
     this.height = height;
     this.ctx = canvas.getContext("2d");
     this.player = this.createPlayer();
+    this.lastTime = Date.now;
 
     this.drawPlayer = this.drawPlayer.bind(this);
+    this.render = this.render.bind(this);
     this.playRound = this.playRound.bind(this);
   }
 
@@ -27,6 +29,7 @@ class Field {
     this.ctx.beginPath();
     this.ctx.lineWidth = 1;
     this.ctx.rect(0, 0, this.width, this.height);
+    this.ctx.strokeStyle = 'black';
     this.ctx.stroke();
   }
 
@@ -46,18 +49,27 @@ class Field {
   }
 
   drawPlayer() {
-    // debugger
     this.player.draw()
   }
 
-  playRound() {
+  render() {
     this.clearAll();
     this.drawFieldBorder();
     this.drawPlayerRails('circle');
-
     this.drawPlayer();
+  }
+
+  playRound() {
+    let now = Date.now();
+    let dt = (now - this.lastTime) / 1000.0;
+
+    // update(dt);
+    this.render();
+
+    this.lastTime = now;
     requestAnimationFrame(this.playRound);
   }
 }
+
 
 export default Field;

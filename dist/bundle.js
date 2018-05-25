@@ -106,8 +106,10 @@ var Field = function () {
     this.height = height;
     this.ctx = canvas.getContext("2d");
     this.player = this.createPlayer();
+    this.lastTime = Date.now;
 
     this.drawPlayer = this.drawPlayer.bind(this);
+    this.render = this.render.bind(this);
     this.playRound = this.playRound.bind(this);
   }
 
@@ -128,6 +130,7 @@ var Field = function () {
       this.ctx.beginPath();
       this.ctx.lineWidth = 1;
       this.ctx.rect(0, 0, this.width, this.height);
+      this.ctx.strokeStyle = 'black';
       this.ctx.stroke();
     }
   }, {
@@ -149,17 +152,26 @@ var Field = function () {
   }, {
     key: 'drawPlayer',
     value: function drawPlayer() {
-      // debugger
       this.player.draw();
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      this.clearAll();
+      this.drawFieldBorder();
+      this.drawPlayerRails('circle');
+      this.drawPlayer();
     }
   }, {
     key: 'playRound',
     value: function playRound() {
-      this.clearAll();
-      this.drawFieldBorder();
-      this.drawPlayerRails('circle');
+      var now = Date.now();
+      var dt = (now - this.lastTime) / 1000.0;
 
-      this.drawPlayer();
+      // update(dt);
+      this.render();
+
+      this.lastTime = now;
       requestAnimationFrame(this.playRound);
     }
   }]);
@@ -189,7 +201,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var startGame = function startGame(canvas) {
   var field = new _field2.default(canvas, 800, 500);
-  field.drawPlayer();
+  // field.drawPlayer();
+
   field.playRound();
 };
 
@@ -232,47 +245,78 @@ var Player = function () {
     this.ctx = ctx;
     this.fieldWidth = fieldWidth;
     this.fieldHeight = fieldHeight;
+
     this.width = 10;
     this.height = 10;
-    this.x = fieldWidth / 2;
-    this.y = fieldHeight / 2 - 30;
-    this.angle = 0.1 * Math.PI;
-    this.startPoint = startPoint;
+    this.speed = 0.1;
+    this.angle = 0.5526 * Math.PI;
+    this.radius = 30;
+    this.drawPoint = this.computeDrawPoint();
 
-    this.rotateX = this.rotateX.bind(this);
-    this.rotateY = this.rotateY.bind(this);
+    this.playerImage = new Image();
+    this.playerImage.src = "assets/sprites/sprite_test_1.png";
+
+    this.computeDrawPoint = this.computeDrawPoint.bind(this);
+    this.draw = this.draw.bind(this);
+    this.rotatePlayer = this.rotatePlayer.bind(this);
+    this.keydown = this.keydown.bind(this);
 
     document.addEventListener('keydown', this.keydown.bind(this));
   }
 
-  // draw() {
-  //   this.ctx.beginPath();
-  //   this.ctx.moveTo(this.rotateX(this.x), this.rotateY(this.y + 10));
-  //   this.ctx.lineTo(this.rotateX(this.x + 5), this.rotateY(this.y));
-  //   this.ctx.lineTo(this.rotateX(this.x - 5), this.rotateY(this.y));
-  //   this.ctx.fill();
-  // }
-  //
-  // rotateX() {
-  //   let sin = sin(angle);
-  //   let cos = cos(angle);
-  //   this.x = this.x - this.fieldWidth / 2;
-  //   this.x = this.x
-  //   xnew = p.x * c - p.y * s;
-  // }
-  //
-  // rotateY() {
-  //   let sin = sin(angle);
-  //   let cos = cos(angle);
-  // }
-
   _createClass(Player, [{
+    key: 'computeDrawPoint',
+    value: function computeDrawPoint() {
+      return {
+        x: Math.cos(this.angle) * this.radius + this.fieldWidth / 2,
+        y: -Math.sin(this.angle) * this.radius + this.fieldHeight / 2
+      };
+    }
+  }, {
+    key: 'draw',
+    value: function draw() {
+      this.ctx.drawImage(this.playerImage, 0, 0, this.width, this.height, this.drawPoint.x, this.drawPoint.y, this.width, this.height);
+      // this.ctx.rotate(this.angle);
+
+      this.ctx.beginPath();
+      this.ctx.moveTo(this.fieldWidth / 2, this.fieldHeight / 2);
+      this.ctx.lineTo(this.drawPoint.x, this.drawPoint.y);
+      this.ctx.strokeStyle = 'green';
+      this.ctx.stroke();
+    }
+
+    // computeRadius() {
+    //   return Math.sqrt(
+    //     Math.pow((this.drawPoint.x - this.fieldWidth / 2), 2) +
+    //     Math.pow((this.drawPoint.y - this.fieldHeight / 2), 2)
+    //   )
+    // }
+
+    // draw() {
+    //   this.ctx.beginPath();
+    //   this.ctx.moveTo(this.rotateX(this.x), this.rotateY(this.y + 10));
+    //   this.ctx.lineTo(this.rotateX(this.x + 5), this.rotateY(this.y));
+    //   this.ctx.lineTo(this.rotateX(this.x - 5), this.rotateY(this.y));
+    //   this.ctx.fill();
+    // }
+
+  }, {
+    key: 'rotatePlayer',
+    value: function rotatePlayer() {
+      var sin = sin(angle);
+      var cos = cos(angle);
+      this.x = this.x - this.fieldWidth / 2;
+      this.x = this.x;
+      xnew = p.x * c - p.y * s;
+    }
+  }, {
     key: 'keydown',
     value: function keydown(e) {
       var arrow = ARROW_MAP[e.keyCode];
 
-      if (arrow === 'left') this.x -= this.angle;
-      if (arrow === 'right') this.x += this.angle;
+      if (arrow === 'left') this.angle += this.speed;
+      if (arrow === 'right') this.angle -= this.speed;
+      this.drawPoint = this.computeDrawPoint();
     }
   }]);
 
