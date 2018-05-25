@@ -14,8 +14,8 @@ class Player {
     this.width = 10;
     this.height = 10;
     this.speed = 0.1;
-    this.angle = 0.5526 * Math.PI;
-    this.radius = 30;
+    this.outerAngle = 0.5 * Math.PI;
+    this.radius = 20;
     this.drawPoint = this.computeDrawPoint();
 
     this.playerImage = new Image();
@@ -31,28 +31,43 @@ class Player {
 
   computeDrawPoint() {
     return ({
-      x: Math.cos(this.angle) * this.radius + (this.fieldWidth / 2),
-      y: -Math.sin(this.angle) * this.radius + (this.fieldHeight / 2)
+      x: Math.cos(this.outerAngle) * this.radius + (this.fieldWidth / 2),
+      y: -Math.sin(this.outerAngle) * this.radius + (this.fieldHeight / 2)
     })
   }
 
   draw() {
-    this.ctx.drawImage(
-      this.playerImage,
-      0,
-      0,
-      this.width,
-      this.height,
-      this.drawPoint.x,
-      this.drawPoint.y,
-      this.width,
-      this.height
+    // this.rotatePlayer();
+    this.ctx.beginPath();
+    this.ctx.moveTo(this.drawPoint.x, this.drawPoint.y);
+    this.ctx.lineTo(
+      this.drawPoint.x - 5 * Math.cos(Math.PI / 6),
+      this.drawPoint.y - 10 * Math.sin(Math.PI / 6)
     );
-    // this.ctx.rotate(this.angle);
+    this.ctx.lineTo(
+      this.drawPoint.x + 5 * Math.cos(Math.PI / 6),
+      this.drawPoint.y - 10 * Math.sin(Math.PI / 6)
+    );
+    this.ctx.strokeStyle = 'black';
+    this.ctx.fill();
+    console.log(this.outerAngle - Math.PI/2);
+
+    // this.ctx.drawImage(
+    //   this.playerImage,
+    //   0,
+    //   0,
+    //   this.width,
+    //   this.height,
+    //   this.drawPoint.x,
+    //   this.drawPoint.y,
+    //   this.width,
+    //   this.height
+    // );
 
     this.ctx.beginPath();
     this.ctx.moveTo(this.fieldWidth / 2, this.fieldHeight / 2);
     this.ctx.lineTo(this.drawPoint.x, this.drawPoint.y);
+    this.ctx.lineWidth = 1;
     this.ctx.strokeStyle = 'green';
     this.ctx.stroke();
   }
@@ -73,18 +88,17 @@ class Player {
   // }
 
   rotatePlayer() {
-    let sin = sin(angle);
-    let cos = cos(angle);
-    this.x = this.x - this.fieldWidth / 2;
-    this.x = this.x
-    xnew = p.x * c - p.y * s;
+    this.ctx.save();
+    this.ctx.translate(this.drawPoint.x, this.drawPoint.y);
+    this.ctx.rotate(this.outerAngle);
+    this.ctx.restore();
   }
 
   keydown(e) {
     let arrow = ARROW_MAP[e.keyCode];
 
-    if(arrow === 'left') this.angle += this.speed;
-    if(arrow === 'right') this.angle -= this.speed;
+    if(arrow === 'left') this.outerAngle += this.speed;
+    if(arrow === 'right') this.outerAngle -= this.speed;
     this.drawPoint = this.computeDrawPoint();
   }
 }
