@@ -242,21 +242,19 @@ var Player = function () {
 
     this.width = 10;
     this.height = 10;
+
     this.speed = 0.1;
-    this.radius = 30;
-    this.drawAngle = 1.7359;
-    this.portAngle = -1.4056;
-    this.bowAngle = Math.PI / 2;
-    this.drawPoint = this.computeDrawPoint();
+    this.radius = 30; // The 'track' the player moves along
+    this.starboardTheta = 1.7359;
+    this.starboardPoint = this.computeStarboardPoint();
+    this.portTheta = -1.4056;
     this.portPoint = this.computePortPoint();
+    this.bowTheta = Math.PI / 2;
     this.bowPoint = this.computeBowPoint();
 
     this.playerImage = new Image();
     this.playerImage.src = "assets/sprites/sprite_test_1.png";
 
-    this.computeDrawPoint = this.computeDrawPoint.bind(this);
-    this.computePortPoint = this.computePortPoint.bind(this);
-    this.computeBowPoint = this.computeBowPoint.bind(this);
     this.draw = this.draw.bind(this);
     this.keydown = this.keydown.bind(this);
 
@@ -264,34 +262,34 @@ var Player = function () {
   }
 
   _createClass(Player, [{
-    key: 'computeDrawPoint',
-    value: function computeDrawPoint() {
+    key: 'computeStarboardPoint',
+    value: function computeStarboardPoint() {
       return {
-        x: Math.cos(this.drawAngle) * this.radius + this.fieldWidth / 2,
-        y: -Math.sin(this.drawAngle) * this.radius + this.fieldHeight / 2
+        x: Math.cos(this.starboardTheta) * this.radius + this.fieldWidth / 2,
+        y: -Math.sin(this.starboardTheta) * this.radius + this.fieldHeight / 2
       };
     }
   }, {
     key: 'computePortPoint',
     value: function computePortPoint() {
       return {
-        x: Math.cos(this.portAngle) * this.radius + this.fieldWidth / 2,
-        y: Math.sin(this.portAngle) * this.radius + this.fieldHeight / 2
+        x: Math.cos(this.portTheta) * this.radius + this.fieldWidth / 2,
+        y: Math.sin(this.portTheta) * this.radius + this.fieldHeight / 2
       };
     }
   }, {
     key: 'computeBowPoint',
     value: function computeBowPoint() {
       return {
-        x: Math.cos(this.bowAngle) * -20 + this.fieldWidth / 2,
-        y: Math.sin(this.bowAngle) * -20 + this.fieldHeight / 2
+        x: Math.cos(this.bowTheta) * -20 + this.fieldWidth / 2,
+        y: Math.sin(this.bowTheta) * -20 + this.fieldHeight / 2
       };
     }
   }, {
     key: 'draw',
     value: function draw() {
       this.ctx.beginPath();
-      this.ctx.moveTo(this.drawPoint.x, this.drawPoint.y);
+      this.ctx.moveTo(this.starboardPoint.x, this.starboardPoint.y);
       this.ctx.lineTo(this.portPoint.x, this.portPoint.y);
       this.ctx.lineTo(this.bowPoint.x, this.bowPoint.y);
       this.ctx.strokeStyle = 'black';
@@ -302,18 +300,18 @@ var Player = function () {
     value: function keydown(e) {
       var arrow = ARROW_MAP[e.keyCode];
       if (arrow === 'left') {
-        this.drawAngle += this.speed;
-        this.portAngle -= this.speed;
-        this.bowAngle -= this.speed;
+        this.starboardTheta += this.speed;
+        this.portTheta -= this.speed;
+        this.bowTheta -= this.speed;
       }
 
       if (arrow === 'right') {
-        this.drawAngle -= this.speed;
-        this.portAngle += this.speed;
-        this.bowAngle += this.speed;
+        this.starboardTheta -= this.speed;
+        this.portTheta += this.speed;
+        this.bowTheta += this.speed;
       }
 
-      this.drawPoint = this.computeDrawPoint();
+      this.starboardPoint = this.computeStarboardPoint();
       this.portPoint = this.computePortPoint();
       this.bowPoint = this.computeBowPoint();
     }
