@@ -29,7 +29,6 @@ class Player {
     this.computePortPoint = this.computePortPoint.bind(this);
     this.computeBowPoint = this.computeBowPoint.bind(this);
     this.draw = this.draw.bind(this);
-    this.rotatePlayer = this.rotatePlayer.bind(this);
     this.keydown = this.keydown.bind(this);
 
     document.addEventListener('keydown', this.keydown.bind(this))
@@ -51,8 +50,8 @@ class Player {
 
   computeBowPoint() {
     return ({
-      x: Math.cos(this.bowAngle) * (this.radius)  + (this.fieldWidth / 2),
-      y: Math.sin(this.bowAngle) * (this.radius)  + (this.fieldHeight / 2)
+      x: Math.cos(this.bowAngle) * -20  + (this.fieldWidth / 2),
+      y: Math.sin(this.bowAngle) * -20  + (this.fieldHeight / 2)
     })
   }
 
@@ -63,13 +62,6 @@ class Player {
     this.ctx.lineTo(this.bowPoint.x, this.bowPoint.y);
     this.ctx.strokeStyle = 'black';
     this.ctx.fill();
-
-    this.ctx.beginPath();
-    this.ctx.moveTo(this.fieldWidth / 2, this.fieldHeight / 2);
-    this.ctx.lineTo(this.drawPoint.x, this.drawPoint.y);
-    this.ctx.lineWidth = 1;
-    this.ctx.strokeStyle = 'green';
-    this.ctx.stroke();
   }
 
   keydown(e) {
@@ -89,9 +81,6 @@ class Player {
     this.drawPoint = this.computeDrawPoint();
     this.portPoint = this.computePortPoint();
     this.bowPoint = this.computeBowPoint();
-    console.log(this.drawPoint);
-    console.log(this.portPoint);
-    console.log(this.bowPoint);
   }
 }
 
