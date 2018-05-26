@@ -1,6 +1,16 @@
 import Player from './player';
 import { BulletPool } from './bullet';
 
+const KEY_MAP = {
+  74: 'left',     // j
+  76: 'right',    // l
+  68: 'right',    // d
+  65: 'left',     // a
+  39: 'right',    // left arrow
+  37: 'left',     // right arrow
+  32: 'fire'      // space bar
+};
+
 class Field {
   constructor(bgCanvas, pcCanvas) {
     this.bgWidth = 800;
@@ -23,6 +33,9 @@ class Field {
     this.drawPlayer = this.drawPlayer.bind(this);
     this.playRound = this.playRound.bind(this);
     this.render = this.render.bind(this);
+    this.keydown = this.keydown.bind(this);
+
+    document.addEventListener('keydown', this.keydown.bind(this));
 
     console.log(this.BulletPool);
   }
@@ -67,6 +80,21 @@ class Field {
     this.drawFieldBorder();
     this.drawPlayerRails('circle');
     this.drawPlayer();
+  }
+
+  keydown(e) {
+    let arrow = KEY_MAP[e.keyCode];
+    if(arrow === 'left') {
+      this.player.starboardTheta += this.player.speed;
+      this.player.portTheta -= this.player.speed;
+      this.player.bowTheta -= this.player.speed;
+    }
+
+    if(arrow === 'right') {
+      this.player.starboardTheta -= this.player.speed;
+      this.player.portTheta += this.player.speed;
+      this.player.bowTheta += this.player.speed;
+    }
   }
 
   drawPlayer() {

@@ -1,13 +1,3 @@
-const KEY_MAP = {
-  74: 'left',     // j
-  76: 'right',    // l
-  68: 'right',    // d
-  65: 'left',     // a
-  39: 'right',    // left arrow
-  37: 'left',     // right arrow
-  32: 'fire'      // space bar
-};
-
 class Player {
   constructor(ctx, fieldWidth, fieldHeight) {
     this.ctx = ctx;
@@ -30,9 +20,6 @@ class Player {
     this.playerImage.src = "assets/sprites/sprite_test_1.png";
 
     this.draw = this.draw.bind(this);
-    this.keydown = this.keydown.bind(this);
-
-    document.addEventListener('keydown', this.keydown.bind(this))
   }
 
   computeStarboardVertex() {
@@ -57,31 +44,16 @@ class Player {
   }
 
   draw() {
+    this.starboardVertex = this.computeStarboardVertex();
+    this.portVertex = this.computePortVertex();
+    this.bowVertex = this.computeBowVertex();
+
     this.ctx.beginPath();
     this.ctx.moveTo(this.starboardVertex.x, this.starboardVertex.y);
     this.ctx.lineTo(this.portVertex.x, this.portVertex.y);
     this.ctx.lineTo(this.bowVertex.x, this.bowVertex.y);
     this.ctx.strokeStyle = 'black';
     this.ctx.fill();
-  }
-
-  keydown(e) {
-    let arrow = KEY_MAP[e.keyCode];
-    if(arrow === 'left') {
-      this.starboardTheta += this.speed;
-      this.portTheta -= this.speed;
-      this.bowTheta -= this.speed;
-    }
-
-    if(arrow === 'right') {
-      this.starboardTheta -= this.speed;
-      this.portTheta += this.speed;
-      this.bowTheta += this.speed;
-    }
-
-    this.starboardVertex = this.computeStarboardVertex();
-    this.portVertex = this.computePortVertex();
-    this.bowVertex = this.computeBowVertex();
   }
 }
 

@@ -196,6 +196,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var KEY_MAP = {
+  74: 'left', // j
+  76: 'right', // l
+  68: 'right', // d
+  65: 'left', // a
+  39: 'right', // left arrow
+  37: 'left', // right arrow
+  32: 'fire' // space bar
+};
+
 var Field = function () {
   function Field(bgCanvas, pcCanvas) {
     _classCallCheck(this, Field);
@@ -220,6 +230,9 @@ var Field = function () {
     this.drawPlayer = this.drawPlayer.bind(this);
     this.playRound = this.playRound.bind(this);
     this.render = this.render.bind(this);
+    this.keydown = this.keydown.bind(this);
+
+    document.addEventListener('keydown', this.keydown.bind(this));
 
     console.log(this.BulletPool);
   }
@@ -269,6 +282,22 @@ var Field = function () {
       this.drawFieldBorder();
       this.drawPlayerRails('circle');
       this.drawPlayer();
+    }
+  }, {
+    key: 'keydown',
+    value: function keydown(e) {
+      var arrow = KEY_MAP[e.keyCode];
+      if (arrow === 'left') {
+        this.player.starboardTheta += this.player.speed;
+        this.player.portTheta -= this.player.speed;
+        this.player.bowTheta -= this.player.speed;
+      }
+
+      if (arrow === 'right') {
+        this.player.starboardTheta -= this.player.speed;
+        this.player.portTheta += this.player.speed;
+        this.player.bowTheta += this.player.speed;
+      }
     }
   }, {
     key: 'drawPlayer',
@@ -342,16 +371,6 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var KEY_MAP = {
-  74: 'left', // j
-  76: 'right', // l
-  68: 'right', // d
-  65: 'left', // a
-  39: 'right', // left arrow
-  37: 'left', // right arrow
-  32: 'fire' // space bar
-};
-
 var Player = function () {
   function Player(ctx, fieldWidth, fieldHeight) {
     _classCallCheck(this, Player);
@@ -376,13 +395,10 @@ var Player = function () {
     this.playerImage.src = "assets/sprites/sprite_test_1.png";
 
     this.draw = this.draw.bind(this);
-    this.keydown = this.keydown.bind(this);
-
-    document.addEventListener('keydown', this.keydown.bind(this));
   }
 
   _createClass(Player, [{
-    key: 'computeStarboardVertex',
+    key: "computeStarboardVertex",
     value: function computeStarboardVertex() {
       return {
         x: Math.cos(this.starboardTheta) * this.radius + this.fieldWidth / 2,
@@ -390,7 +406,7 @@ var Player = function () {
       };
     }
   }, {
-    key: 'computePortVertex',
+    key: "computePortVertex",
     value: function computePortVertex() {
       return {
         x: Math.cos(this.portTheta) * this.radius + this.fieldWidth / 2,
@@ -398,7 +414,7 @@ var Player = function () {
       };
     }
   }, {
-    key: 'computeBowVertex',
+    key: "computeBowVertex",
     value: function computeBowVertex() {
       return {
         x: Math.cos(this.bowTheta) * -20 + this.fieldWidth / 2,
@@ -406,34 +422,18 @@ var Player = function () {
       };
     }
   }, {
-    key: 'draw',
+    key: "draw",
     value: function draw() {
+      this.starboardVertex = this.computeStarboardVertex();
+      this.portVertex = this.computePortVertex();
+      this.bowVertex = this.computeBowVertex();
+
       this.ctx.beginPath();
       this.ctx.moveTo(this.starboardVertex.x, this.starboardVertex.y);
       this.ctx.lineTo(this.portVertex.x, this.portVertex.y);
       this.ctx.lineTo(this.bowVertex.x, this.bowVertex.y);
       this.ctx.strokeStyle = 'black';
       this.ctx.fill();
-    }
-  }, {
-    key: 'keydown',
-    value: function keydown(e) {
-      var arrow = KEY_MAP[e.keyCode];
-      if (arrow === 'left') {
-        this.starboardTheta += this.speed;
-        this.portTheta -= this.speed;
-        this.bowTheta -= this.speed;
-      }
-
-      if (arrow === 'right') {
-        this.starboardTheta -= this.speed;
-        this.portTheta += this.speed;
-        this.bowTheta += this.speed;
-      }
-
-      this.starboardVertex = this.computeStarboardVertex();
-      this.portVertex = this.computePortVertex();
-      this.bowVertex = this.computeBowVertex();
     }
   }]);
 
