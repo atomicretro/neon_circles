@@ -87,13 +87,17 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _utilities = __webpack_require__(/*! ./utilities */ "./scripts/utilities.js");
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var BulletPool = exports.BulletPool = function () {
-  function BulletPool(size) {
+var BulletPool = function () {
+  function BulletPool(size, context, ImageStore) {
     _classCallCheck(this, BulletPool);
 
     this.size = size;
+    this.context = context;
+    this.ImageStore = ImageStore;
     this.pool = [];
 
     for (var i = 0; i < size; i++) {
@@ -103,18 +107,18 @@ var BulletPool = exports.BulletPool = function () {
   }
 
   _createClass(BulletPool, [{
-    key: "get",
-    value: function get() {
+    key: 'get',
+    value: function get(x, y, speed) {
       if (!this.pool[this.size - 1].spawned) {
         this.pool[this.size - 1].spawn(x, y, speed);
         this.pool.unshift(this.pool.pop());
       }
     }
   }, {
-    key: "draw",
+    key: 'draw',
     value: function draw() {
       for (var i = 0; i < this.size; i++) {
-        if (this.pool[i].spawned && this.pool[i].draw) {
+        if (this.pool[i].spawned && this.pool[i].draw(this.context, this.ImageStore)) {
           this.pool[i].clear();
           this.pool.push(this.pool.splice(i, 1)[0]);
         } else {
@@ -127,9 +131,10 @@ var BulletPool = exports.BulletPool = function () {
   return BulletPool;
 }();
 
+exports.default = BulletPool;
 ;
 
-var Bullet = exports.Bullet = function () {
+var Bullet = function () {
   function Bullet() {
     _classCallCheck(this, Bullet);
 
@@ -142,7 +147,7 @@ var Bullet = exports.Bullet = function () {
   }
 
   _createClass(Bullet, [{
-    key: "spawn",
+    key: 'spawn',
     value: function spawn(x, y, speed) {
       this.x = x;
       this.y = y;
@@ -150,16 +155,25 @@ var Bullet = exports.Bullet = function () {
       this.spawned = true;
     }
   }, {
-    key: "draw",
-    value: function draw(context) {
+    key: 'draw',
+    value: function draw(context, ImageStore) {
       context.clearRect(this.x, this.y, this.width, this.height);
       this.y -= this.speed;
       this.x -= this.speed;
       if (this.y <= 0 - this.height) {
         return true;
       } else {
-        context.drawImage(imageStore.bullet, this.x, this.y);
+        // debugger
+        context.drawImage(ImageStore.bullet, this.x, this.y);
       };
+    }
+  }, {
+    key: 'clear',
+    value: function clear() {
+      this.x = 0;
+      this.y = 0;
+      this.speed = 0;
+      this.spawned = false;
     }
   }]);
 
@@ -167,6 +181,8 @@ var Bullet = exports.Bullet = function () {
 }();
 
 ;
+
+// Bullet.prototype = new Drawable();
 
 /***/ }),
 
@@ -191,6 +207,10 @@ var _player = __webpack_require__(/*! ./player */ "./scripts/player.js");
 var _player2 = _interopRequireDefault(_player);
 
 var _bullet = __webpack_require__(/*! ./bullet */ "./scripts/bullet.js");
+
+var _bullet2 = _interopRequireDefault(_bullet);
+
+var _utilities = __webpack_require__(/*! ./utilities */ "./scripts/utilities.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -224,7 +244,8 @@ var Field = function () {
     this.pcContext = pcCanvas.getContext("2d");
 
     this.player = new _player2.default(this.pcContext, this.pcWidth, this.pcHeight);
-    this.BulletPool = new _bullet.BulletPool(5);
+    this.ImageStore = new _utilities.ImageStore();
+    this.BulletPool = new _bullet2.default(5, this.bgContext, this.ImageStore);
     this.lastTime = Date.now;
 
     this.drawPlayer = this.drawPlayer.bind(this);
@@ -282,22 +303,14 @@ var Field = function () {
       this.drawFieldBorder();
       this.drawPlayerRails('circle');
       this.drawPlayer();
+      this.BulletPool.draw();
     }
   }, {
     key: 'keydown',
     value: function keydown(e) {
-      var arrow = KEY_MAP[e.keyCode];
-      if (arrow === 'left') {
-        this.player.starboardTheta += this.player.speed;
-        this.player.portTheta -= this.player.speed;
-        this.player.bowTheta -= this.player.speed;
-      }
-
-      if (arrow === 'right') {
-        this.player.starboardTheta -= this.player.speed;
-        this.player.portTheta += this.player.speed;
-        this.player.bowTheta += this.player.speed;
-      }
+      var key = KEY_MAP[e.keyCode];
+      if (key === 'left' || key === 'right') this.player.move(key);
+      if (key === 'fire') this.player.fire(this.BulletPool);
     }
   }, {
     key: 'drawPlayer',
@@ -398,7 +411,7 @@ var Player = function () {
   }
 
   _createClass(Player, [{
-    key: "computeStarboardVertex",
+    key: 'computeStarboardVertex',
     value: function computeStarboardVertex() {
       return {
         x: Math.cos(this.starboardTheta) * this.radius + this.fieldWidth / 2,
@@ -406,7 +419,7 @@ var Player = function () {
       };
     }
   }, {
-    key: "computePortVertex",
+    key: 'computePortVertex',
     value: function computePortVertex() {
       return {
         x: Math.cos(this.portTheta) * this.radius + this.fieldWidth / 2,
@@ -414,7 +427,7 @@ var Player = function () {
       };
     }
   }, {
-    key: "computeBowVertex",
+    key: 'computeBowVertex',
     value: function computeBowVertex() {
       return {
         x: Math.cos(this.bowTheta) * -20 + this.fieldWidth / 2,
@@ -422,7 +435,26 @@ var Player = function () {
       };
     }
   }, {
-    key: "draw",
+    key: 'move',
+    value: function move(direction) {
+      if (direction === 'left') {
+        this.starboardTheta += this.speed;
+        this.portTheta -= this.speed;
+        this.bowTheta -= this.speed;
+      } else if (direction === 'right') {
+        this.starboardTheta -= this.speed;
+        this.portTheta += this.speed;
+        this.bowTheta += this.speed;
+      }
+    }
+  }, {
+    key: 'fire',
+    value: function fire(BulletPool) {
+      debugger;
+      BulletPool.get(this.bowVertex.x + 349, this.bowVertex.y + 135, 2);
+    }
+  }, {
+    key: 'draw',
     value: function draw() {
       this.starboardVertex = this.computeStarboardVertex();
       this.portVertex = this.computePortVertex();
@@ -441,6 +473,45 @@ var Player = function () {
 }();
 
 exports.default = Player;
+
+/***/ }),
+
+/***/ "./scripts/utilities.js":
+/*!******************************!*\
+  !*** ./scripts/utilities.js ***!
+  \******************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Drawable = exports.Drawable = function Drawable(x, y, width, height) {
+  _classCallCheck(this, Drawable);
+
+  this.x = x;
+  this.y = y;
+  this.width = width;
+  this.height = height;
+};
+
+var ImageStore = exports.ImageStore = function ImageStore() {
+  _classCallCheck(this, ImageStore);
+
+  this.bullet = new Image();
+
+  // this.bullet.onload = () => {
+  //   alert(myCanvas.toDataURL('image/jpeg'));
+  // }
+
+  this.bullet.src = 'assets/sprites/bullet.png';
+};
 
 /***/ })
 

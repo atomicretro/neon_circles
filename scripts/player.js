@@ -43,6 +43,23 @@ class Player {
     })
   }
 
+  move(direction) {
+    if(direction === 'left') {
+      this.starboardTheta += this.speed;
+      this.portTheta -= this.speed;
+      this.bowTheta -= this.speed;
+    } else if(direction === 'right') {
+      this.starboardTheta -= this.speed;
+      this.portTheta += this.speed;
+      this.bowTheta += this.speed;
+    }
+  }
+
+  fire(BulletPool) {
+    debugger
+    BulletPool.get(this.bowVertex.x + 349, this.bowVertex.y + 135, 2);
+  }
+
   draw() {
     this.starboardVertex = this.computeStarboardVertex();
     this.portVertex = this.computePortVertex();

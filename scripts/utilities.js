@@ -7,9 +7,13 @@ export class Drawable {
   }
 }
 
-export class imageStore {
+export class ImageStore {
   constructor() {
     this.bullet = new Image();
+
+    // this.bullet.onload = () => {
+    //   alert(myCanvas.toDataURL('image/jpeg'));
+    // }
 
     this.bullet.src = 'assets/sprites/bullet.png'
   }

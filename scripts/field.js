@@ -1,5 +1,6 @@
 import Player from './player';
-import { BulletPool } from './bullet';
+import BulletPool from './bullet';
+import { ImageStore } from './utilities';
 
 const KEY_MAP = {
   74: 'left',     // j
@@ -27,7 +28,8 @@ class Field {
     this.pcContext = pcCanvas.getContext("2d");
 
     this.player = new Player(this.pcContext, this.pcWidth, this.pcHeight);
-    this.BulletPool = new BulletPool(5);
+    this.ImageStore = new ImageStore();
+    this.BulletPool = new BulletPool(5, this.bgContext, this.ImageStore);
     this.lastTime = Date.now;
 
     this.drawPlayer = this.drawPlayer.bind(this);
@@ -80,21 +82,13 @@ class Field {
     this.drawFieldBorder();
     this.drawPlayerRails('circle');
     this.drawPlayer();
+    this.BulletPool.draw();
   }
 
   keydown(e) {
-    let arrow = KEY_MAP[e.keyCode];
-    if(arrow === 'left') {
-      this.player.starboardTheta += this.player.speed;
-      this.player.portTheta -= this.player.speed;
-      this.player.bowTheta -= this.player.speed;
-    }
-
-    if(arrow === 'right') {
-      this.player.starboardTheta -= this.player.speed;
-      this.player.portTheta += this.player.speed;
-      this.player.bowTheta += this.player.speed;
-    }
+    let key = KEY_MAP[e.keyCode];
+    if(key === 'left' || key === 'right') this.player.move(key);
+    if(key === 'fire') this.player.fire(this.BulletPool);
   }
 
   drawPlayer() {
