@@ -162,27 +162,21 @@ var Field = function () {
       this.bgContext.rect(0, 0, this.bgWidth, this.bgHeight);
       this.bgContext.strokeStyle = 'black';
       this.bgContext.stroke();
-
-      this.pcContext.beginPath();
-      this.pcContext.lineWidth = 1;
-      this.pcContext.rect(0, 0, this.pcWidth, this.pcHeight);
-      this.pcContext.strokeStyle = 'black';
-      this.pcContext.stroke();
     }
   }, {
     key: 'drawPlayerRails',
     value: function drawPlayerRails(shape) {
-      var xCenter = this.bgWidth / 2;
-      var yCenter = this.bgHeight / 2;
+      var xCenter = this.pcWidth / 2;
+      var yCenter = this.pcHeight / 2;
 
       switch (shape) {
         case 'circle':
         default:
-          this.bgContext.beginPath();
-          this.bgContext.arc(xCenter, yCenter, 35, 0, 2 * Math.PI, true);
-          this.bgContext.strokeStyle = "black";
-          this.bgContext.lineWidth = 2;
-          this.bgContext.stroke();
+          this.pcContext.beginPath();
+          this.pcContext.arc(xCenter, yCenter, 35, 0, 2 * Math.PI, true);
+          this.pcContext.strokeStyle = "black";
+          this.pcContext.lineWidth = 2;
+          this.pcContext.stroke();
       }
     }
   }, {
@@ -200,7 +194,8 @@ var Field = function () {
   }, {
     key: 'render',
     value: function render() {
-      this.clearAll();
+      this.clearBGContext();
+      this.clearPCContext();
       this.drawFieldBorder();
       this.drawPlayerRails('circle');
       this.drawPlayer();
@@ -211,9 +206,14 @@ var Field = function () {
       this.player.draw();
     }
   }, {
-    key: 'clearAll',
-    value: function clearAll() {
+    key: 'clearBGContext',
+    value: function clearBGContext() {
       this.bgContext.clearRect(0, 0, this.bgWidth, this.bgHeight);
+    }
+  }, {
+    key: 'clearPCContext',
+    value: function clearPCContext() {
+      this.pcContext.clearRect(0, 0, this.pcWidth, this.pcHeight);
     }
   }]);
 

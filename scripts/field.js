@@ -33,26 +33,20 @@ class Field {
     this.bgContext.rect(0, 0, this.bgWidth, this.bgHeight);
     this.bgContext.strokeStyle = 'black';
     this.bgContext.stroke();
-
-    this.pcContext.beginPath();
-    this.pcContext.lineWidth = 1;
-    this.pcContext.rect(0, 0, this.pcWidth, this.pcHeight);
-    this.pcContext.strokeStyle = 'black';
-    this.pcContext.stroke();
   }
 
   drawPlayerRails(shape) {
-    let xCenter = this.bgWidth / 2;
-    let yCenter = this.bgHeight / 2;
+    let xCenter = this.pcWidth / 2;
+    let yCenter = this.pcHeight / 2;
 
     switch (shape) {
       case 'circle':
       default:
-      this.bgContext.beginPath();
-      this.bgContext.arc(xCenter, yCenter, 35, 0, 2 * Math.PI, true);
-      this.bgContext.strokeStyle = "black";
-      this.bgContext.lineWidth = 2;
-      this.bgContext.stroke();
+      this.pcContext.beginPath();
+      this.pcContext.arc(xCenter, yCenter, 35, 0, 2 * Math.PI, true);
+      this.pcContext.strokeStyle = "black";
+      this.pcContext.lineWidth = 2;
+      this.pcContext.stroke();
     }
   }
 
@@ -68,7 +62,8 @@ class Field {
   }
 
   render() {
-    this.clearAll();
+    this.clearBGContext();
+    this.clearPCContext();
     this.drawFieldBorder();
     this.drawPlayerRails('circle');
     this.drawPlayer();
@@ -78,8 +73,12 @@ class Field {
     this.player.draw()
   }
 
-  clearAll() {
+  clearBGContext() {
     this.bgContext.clearRect(0, 0, this.bgWidth, this.bgHeight);
+  }
+
+  clearPCContext() {
+    this.pcContext.clearRect(0, 0, this.pcWidth, this.pcHeight);
   }
 }
 
