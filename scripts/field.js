@@ -1,5 +1,5 @@
 import Player from './player';
-import { bulletPool } from './bullet';
+import { BulletPool } from './bullet';
 
 class Field {
   constructor(bgCanvas, pcCanvas) {
@@ -17,14 +17,14 @@ class Field {
     this.pcContext = pcCanvas.getContext("2d");
 
     this.player = new Player(this.pcContext, this.pcWidth, this.pcHeight);
-    this.bulletPool = new bulletPool(5);
+    this.BulletPool = new BulletPool(5);
     this.lastTime = Date.now;
 
     this.drawPlayer = this.drawPlayer.bind(this);
     this.playRound = this.playRound.bind(this);
     this.render = this.render.bind(this);
 
-    console.log(this.bulletPool);
+    console.log(this.BulletPool);
   }
 
   drawFieldBorder() {
