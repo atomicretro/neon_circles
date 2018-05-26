@@ -71,6 +71,35 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./scripts/bullet.js":
+/*!***************************!*\
+  !*** ./scripts/bullet.js ***!
+  \***************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var bulletPool = exports.bulletPool = function bulletPool(maxSize) {
+  _classCallCheck(this, bulletPool);
+
+  this.size = maxSize;
+  this.pool = [];
+};
+
+var bullet = exports.bullet = function bullet() {
+  _classCallCheck(this, bullet);
+};
+
+/***/ }),
+
 /***/ "./scripts/field.js":
 /*!**************************!*\
   !*** ./scripts/field.js ***!
@@ -91,51 +120,69 @@ var _player = __webpack_require__(/*! ./player */ "./scripts/player.js");
 
 var _player2 = _interopRequireDefault(_player);
 
+var _bullet = __webpack_require__(/*! ./bullet */ "./scripts/bullet.js");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Field = function () {
-  function Field(canvas, width, height) {
+  function Field(bgCanvas, pcCanvas) {
     _classCallCheck(this, Field);
 
-    canvas.width = width;
-    canvas.height = height;
+    this.bgWidth = 800;
+    this.bgHeight = 500;
+    this.pcWidth = 100;
+    this.pcHeight = 100;
 
-    this.width = width;
-    this.height = height;
-    this.ctx = canvas.getContext("2d");
-    this.player = new _player2.default(this.ctx, width, height);
+    bgCanvas.width = this.bgWidth;
+    bgCanvas.height = this.bgHeight;
+    pcCanvas.width = this.pcWidth;
+    pcCanvas.height = this.pcHeight;
+
+    this.bgContext = bgCanvas.getContext("2d");
+    this.pcContext = pcCanvas.getContext("2d");
+
+    this.player = new _player2.default(this.pcContext, this.pcWidth, this.pcHeight);
+    this.bulletPool = new _bullet.bulletPool(5);
     this.lastTime = Date.now;
 
     this.drawPlayer = this.drawPlayer.bind(this);
-    this.render = this.render.bind(this);
     this.playRound = this.playRound.bind(this);
+    this.render = this.render.bind(this);
+
+    console.log(this.bulletPool);
   }
 
   _createClass(Field, [{
     key: 'drawFieldBorder',
     value: function drawFieldBorder() {
-      this.ctx.beginPath();
-      this.ctx.lineWidth = 1;
-      this.ctx.rect(0, 0, this.width, this.height);
-      this.ctx.strokeStyle = 'black';
-      this.ctx.stroke();
+      this.bgContext.beginPath();
+      this.bgContext.lineWidth = 1;
+      this.bgContext.rect(0, 0, this.bgWidth, this.bgHeight);
+      this.bgContext.strokeStyle = 'black';
+      this.bgContext.stroke();
+
+      this.pcContext.beginPath();
+      this.pcContext.lineWidth = 1;
+      this.pcContext.rect(0, 0, this.pcWidth, this.pcHeight);
+      this.pcContext.strokeStyle = 'black';
+      this.pcContext.stroke();
     }
   }, {
     key: 'drawPlayerRails',
     value: function drawPlayerRails(shape) {
-      var xCenter = this.width / 2;
-      var yCenter = this.height / 2;
+      var xCenter = this.bgWidth / 2;
+      var yCenter = this.bgHeight / 2;
 
       switch (shape) {
         case 'circle':
         default:
-          this.ctx.beginPath();
-          this.ctx.arc(xCenter, yCenter, 35, 0, 2 * Math.PI, true);
-          this.ctx.strokeStyle = "black";
-          this.ctx.lineWidth = 2;
-          this.ctx.stroke();
+          this.bgContext.beginPath();
+          this.bgContext.arc(xCenter, yCenter, 35, 0, 2 * Math.PI, true);
+          this.bgContext.strokeStyle = "black";
+          this.bgContext.lineWidth = 2;
+          this.bgContext.stroke();
       }
     }
   }, {
@@ -166,7 +213,7 @@ var Field = function () {
   }, {
     key: 'clearAll',
     value: function clearAll() {
-      this.ctx.clearRect(0, 0, this.width, this.height);
+      this.bgContext.clearRect(0, 0, this.bgWidth, this.bgHeight);
     }
   }]);
 
@@ -193,16 +240,16 @@ var _field2 = _interopRequireDefault(_field);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var startGame = function startGame(canvas) {
-  var field = new _field2.default(canvas, 800, 500);
-  // field.drawPlayer();
+var startGame = function startGame(backgroundCanvas, playerCanvas) {
+  var field = new _field2.default(backgroundCanvas, playerCanvas);
 
   field.playRound();
 };
 
 document.addEventListener("DOMContentLoaded", function () {
-  var canvas = document.getElementById("gameCanvas");
-  startGame(canvas);
+  var backgroundCanvas = document.getElementById("backgroundCanvas");
+  var playerCanvas = document.getElementById("playerCanvas");
+  startGame(backgroundCanvas, playerCanvas);
 });
 
 /***/ }),
@@ -225,11 +272,14 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var ARROW_MAP = {
-  40: 'up',
-  39: 'right',
-  38: 'down',
-  37: 'left'
+var KEY_MAP = {
+  74: 'left', // j
+  76: 'right', // l
+  68: 'right', // d
+  65: 'left', // a
+  39: 'right', // left arrow
+  37: 'left', // right arrow
+  32: 'fire' // space bar
 };
 
 var Player = function () {
@@ -246,11 +296,11 @@ var Player = function () {
     this.speed = 0.1;
     this.radius = 30; // The 'track' the player moves along
     this.starboardTheta = 1.7359;
-    this.starboardPoint = this.computeStarboardPoint();
+    this.starboardVertex = this.computeStarboardVertex();
     this.portTheta = -1.4056;
-    this.portPoint = this.computePortPoint();
+    this.portVertex = this.computePortVertex();
     this.bowTheta = Math.PI / 2;
-    this.bowPoint = this.computeBowPoint();
+    this.bowVertex = this.computeBowVertex();
 
     this.playerImage = new Image();
     this.playerImage.src = "assets/sprites/sprite_test_1.png";
@@ -262,24 +312,24 @@ var Player = function () {
   }
 
   _createClass(Player, [{
-    key: 'computeStarboardPoint',
-    value: function computeStarboardPoint() {
+    key: 'computeStarboardVertex',
+    value: function computeStarboardVertex() {
       return {
         x: Math.cos(this.starboardTheta) * this.radius + this.fieldWidth / 2,
         y: -Math.sin(this.starboardTheta) * this.radius + this.fieldHeight / 2
       };
     }
   }, {
-    key: 'computePortPoint',
-    value: function computePortPoint() {
+    key: 'computePortVertex',
+    value: function computePortVertex() {
       return {
         x: Math.cos(this.portTheta) * this.radius + this.fieldWidth / 2,
         y: Math.sin(this.portTheta) * this.radius + this.fieldHeight / 2
       };
     }
   }, {
-    key: 'computeBowPoint',
-    value: function computeBowPoint() {
+    key: 'computeBowVertex',
+    value: function computeBowVertex() {
       return {
         x: Math.cos(this.bowTheta) * -20 + this.fieldWidth / 2,
         y: Math.sin(this.bowTheta) * -20 + this.fieldHeight / 2
@@ -289,16 +339,16 @@ var Player = function () {
     key: 'draw',
     value: function draw() {
       this.ctx.beginPath();
-      this.ctx.moveTo(this.starboardPoint.x, this.starboardPoint.y);
-      this.ctx.lineTo(this.portPoint.x, this.portPoint.y);
-      this.ctx.lineTo(this.bowPoint.x, this.bowPoint.y);
+      this.ctx.moveTo(this.starboardVertex.x, this.starboardVertex.y);
+      this.ctx.lineTo(this.portVertex.x, this.portVertex.y);
+      this.ctx.lineTo(this.bowVertex.x, this.bowVertex.y);
       this.ctx.strokeStyle = 'black';
       this.ctx.fill();
     }
   }, {
     key: 'keydown',
     value: function keydown(e) {
-      var arrow = ARROW_MAP[e.keyCode];
+      var arrow = KEY_MAP[e.keyCode];
       if (arrow === 'left') {
         this.starboardTheta += this.speed;
         this.portTheta -= this.speed;
@@ -311,9 +361,9 @@ var Player = function () {
         this.bowTheta += this.speed;
       }
 
-      this.starboardPoint = this.computeStarboardPoint();
-      this.portPoint = this.computePortPoint();
-      this.bowPoint = this.computeBowPoint();
+      this.starboardVertex = this.computeStarboardVertex();
+      this.portVertex = this.computePortVertex();
+      this.bowVertex = this.computeBowVertex();
     }
   }]);
 

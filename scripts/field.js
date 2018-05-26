@@ -1,41 +1,58 @@
 import Player from './player';
+import { bulletPool } from './bullet';
 
 class Field {
-  constructor(canvas, width, height) {
-    canvas.width = width;
-    canvas.height = height;
+  constructor(bgCanvas, pcCanvas) {
+    this.bgWidth = 800;
+    this.bgHeight = 500;
+    this.pcWidth = 100;
+    this.pcHeight = 100;
 
-    this.width = width;
-    this.height = height;
-    this.ctx = canvas.getContext("2d");
-    this.player = new Player(this.ctx, width, height);
+    bgCanvas.width = this.bgWidth;
+    bgCanvas.height = this.bgHeight;
+    pcCanvas.width = this.pcWidth;
+    pcCanvas.height = this.pcHeight;
+
+    this.bgContext = bgCanvas.getContext("2d");
+    this.pcContext = pcCanvas.getContext("2d");
+
+    this.player = new Player(this.pcContext, this.pcWidth, this.pcHeight);
+    this.bulletPool = new bulletPool(5);
     this.lastTime = Date.now;
 
     this.drawPlayer = this.drawPlayer.bind(this);
-    this.render = this.render.bind(this);
     this.playRound = this.playRound.bind(this);
+    this.render = this.render.bind(this);
+
+    console.log(this.bulletPool);
   }
 
   drawFieldBorder() {
-    this.ctx.beginPath();
-    this.ctx.lineWidth = 1;
-    this.ctx.rect(0, 0, this.width, this.height);
-    this.ctx.strokeStyle = 'black';
-    this.ctx.stroke();
+    this.bgContext.beginPath();
+    this.bgContext.lineWidth = 1;
+    this.bgContext.rect(0, 0, this.bgWidth, this.bgHeight);
+    this.bgContext.strokeStyle = 'black';
+    this.bgContext.stroke();
+
+    this.pcContext.beginPath();
+    this.pcContext.lineWidth = 1;
+    this.pcContext.rect(0, 0, this.pcWidth, this.pcHeight);
+    this.pcContext.strokeStyle = 'black';
+    this.pcContext.stroke();
   }
 
   drawPlayerRails(shape) {
-    let xCenter = this.width / 2;
-    let yCenter = this.height / 2;
+    let xCenter = this.bgWidth / 2;
+    let yCenter = this.bgHeight / 2;
 
     switch (shape) {
       case 'circle':
       default:
-      this.ctx.beginPath();
-      this.ctx.arc(xCenter, yCenter, 35, 0, 2 * Math.PI, true);
-      this.ctx.strokeStyle = "black";
-      this.ctx.lineWidth = 2;
-      this.ctx.stroke();
+      this.bgContext.beginPath();
+      this.bgContext.arc(xCenter, yCenter, 35, 0, 2 * Math.PI, true);
+      this.bgContext.strokeStyle = "black";
+      this.bgContext.lineWidth = 2;
+      this.bgContext.stroke();
     }
   }
 
@@ -62,7 +79,7 @@ class Field {
   }
 
   clearAll() {
-    this.ctx.clearRect(0, 0, this.width, this.height);
+    this.bgContext.clearRect(0, 0, this.bgWidth, this.bgHeight);
   }
 }
 

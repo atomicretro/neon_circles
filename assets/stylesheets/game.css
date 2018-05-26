@@ -1,5 +1,22 @@
-canvas {
+.game-area {
+  position: relative;
+  height: 500px;
+  width: 800px;;
   display: block;
   margin: auto;
   padding: 0;
+}
+
+/* #backgroundCanvas {
+  display: block;
+  margin: auto;
+  padding: 0;
+} */
+
+#playerCanvas {
+  display: block;
+  position: absolute;
+  top: 200;
+  left: 350;
+  z-index: 2;
 }
