@@ -13,9 +13,9 @@ export default class BulletPool {
     }
   }
 
-  get(theta, x, y, speed) {
+  get(theta, speed) {
     if(!this.pool[this.size - 1].spawned) {
-      this.pool[this.size - 1].spawn(theta, x, y, speed);
+      this.pool[this.size - 1].spawn(theta, speed);
       this.pool.unshift(this.pool.pop());
     }
   }
@@ -45,7 +45,7 @@ class Bullet {
     this.width = 10;
   }
 
-  spawn(theta, x, y, speed) {
+  spawn(theta, speed) {
     this.pathAngle = theta;
     this.startPoint = this.computePoint(this.startOffset);
     this.endPoint = this.computePoint(this.endOffset);
@@ -54,7 +54,7 @@ class Bullet {
   }
 
   draw(context) {
-    context.clearRect(this.x, this.y, this.width, this.height);
+    // context.clearRect(this.x, this.y, this.width, this.height); optimize later
     this.startOffset -= this.speed;
     this.endOffset -= this.speed;
     this.startPoint = this.computePoint(this.startOffset);

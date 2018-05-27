@@ -15,7 +15,6 @@ class Player {
     this.portVertex = this.computePortVertex();
     this.bowTheta = Math.PI / 2;
     this.bowVertex = this.computeBowVertex();
-    this.bulletPoint = this.computeBulletPoint();
 
     this.playerImage = new Image();
     this.playerImage.src = "assets/sprites/sprite_test_1.png";
@@ -25,29 +24,22 @@ class Player {
 
   computeStarboardVertex() {
     return ({
-      x: Math.cos(this.starboardTheta) * this.radius + (this.fieldWidth / 2),
-      y: -Math.sin(this.starboardTheta) * this.radius + (this.fieldHeight / 2)
+      x: Math.cos(this.starboardTheta) * this.radius + this.fieldWidth / 2,
+      y: -Math.sin(this.starboardTheta) * this.radius + this.fieldHeight / 2
     })
   }
 
   computePortVertex() {
     return ({
-      x: (Math.cos(this.portTheta) * this.radius)  + (this.fieldWidth / 2),
-      y: (Math.sin(this.portTheta) * this.radius)  + (this.fieldHeight / 2)
+      x: Math.cos(this.portTheta) * this.radius  + this.fieldWidth / 2,
+      y: Math.sin(this.portTheta) * this.radius  + this.fieldHeight / 2
     })
   }
 
   computeBowVertex() {
     return ({
-      x: (Math.cos(this.bowTheta) * -20)  + (this.fieldWidth / 2),
-      y: (Math.sin(this.bowTheta) * -20)  + (this.fieldHeight / 2)
-    })
-  }
-
-  computeBulletPoint() {
-    return ({
-      x: (Math.cos(this.bowTheta) * -20)  + 400,
-      y: (Math.sin(this.bowTheta) * -20)  + 250
+      x: Math.cos(this.bowTheta) * -20  + this.fieldWidth / 2,
+      y: Math.sin(this.bowTheta) * -20  + this.fieldHeight / 2
     })
   }
 
@@ -64,10 +56,8 @@ class Player {
   }
 
   fire(BulletPool) {
-    console.log(`bowVertex.x ${this.bowVertex.x}`);
-    console.log(`bowVertex.y ${this.bowVertex.y}`);
-    this.bulletPoint = this.computeBulletPoint();
-    BulletPool.get(this.bowTheta, this.bulletPoint.x, this.bulletPoint.y, 2);
+    let bulletSpeed = 2;
+    BulletPool.get(this.bowTheta, bulletSpeed);
   }
 
   draw() {

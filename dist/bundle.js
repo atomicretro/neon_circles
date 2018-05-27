@@ -108,9 +108,9 @@ var BulletPool = function () {
 
   _createClass(BulletPool, [{
     key: 'get',
-    value: function get(theta, x, y, speed) {
+    value: function get(theta, speed) {
       if (!this.pool[this.size - 1].spawned) {
-        this.pool[this.size - 1].spawn(theta, x, y, speed);
+        this.pool[this.size - 1].spawn(theta, speed);
         this.pool.unshift(this.pool.pop());
       }
     }
@@ -151,7 +151,7 @@ var Bullet = function () {
 
   _createClass(Bullet, [{
     key: 'spawn',
-    value: function spawn(theta, x, y, speed) {
+    value: function spawn(theta, speed) {
       this.pathAngle = theta;
       this.startPoint = this.computePoint(this.startOffset);
       this.endPoint = this.computePoint(this.endOffset);
@@ -161,7 +161,7 @@ var Bullet = function () {
   }, {
     key: 'draw',
     value: function draw(context) {
-      context.clearRect(this.x, this.y, this.width, this.height);
+      // context.clearRect(this.x, this.y, this.width, this.height); optimize later
       this.startOffset -= this.speed;
       this.endOffset -= this.speed;
       this.startPoint = this.computePoint(this.startOffset);
@@ -379,16 +379,16 @@ var _field2 = _interopRequireDefault(_field);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var startGame = function startGame(backgroundCanvas, playerCanvas) {
-  var field = new _field2.default(backgroundCanvas, playerCanvas);
+var startGame = function startGame(foregroundCanvas, playerCanvas) {
+  var field = new _field2.default(foregroundCanvas, playerCanvas);
 
   field.playRound();
 };
 
 document.addEventListener("DOMContentLoaded", function () {
-  var backgroundCanvas = document.getElementById("backgroundCanvas");
+  var foregroundCanvas = document.getElementById("foregroundCanvas");
   var playerCanvas = document.getElementById("playerCanvas");
-  startGame(backgroundCanvas, playerCanvas);
+  startGame(foregroundCanvas, playerCanvas);
 });
 
 /***/ }),
@@ -430,7 +430,6 @@ var Player = function () {
     this.portVertex = this.computePortVertex();
     this.bowTheta = Math.PI / 2;
     this.bowVertex = this.computeBowVertex();
-    this.bulletPoint = this.computeBulletPoint();
 
     this.playerImage = new Image();
     this.playerImage.src = "assets/sprites/sprite_test_1.png";
@@ -463,14 +462,6 @@ var Player = function () {
       };
     }
   }, {
-    key: 'computeBulletPoint',
-    value: function computeBulletPoint() {
-      return {
-        x: Math.cos(this.bowTheta) * -20 + 400,
-        y: Math.sin(this.bowTheta) * -20 + 250
-      };
-    }
-  }, {
     key: 'move',
     value: function move(direction) {
       if (direction === 'left') {
@@ -486,10 +477,8 @@ var Player = function () {
   }, {
     key: 'fire',
     value: function fire(BulletPool) {
-      console.log('bowVertex.x ' + this.bowVertex.x);
-      console.log('bowVertex.y ' + this.bowVertex.y);
-      this.bulletPoint = this.computeBulletPoint();
-      BulletPool.get(this.bowTheta, this.bulletPoint.x, this.bulletPoint.y, 2);
+      var bulletSpeed = 2;
+      BulletPool.get(this.bowTheta, bulletSpeed);
     }
   }, {
     key: 'draw',

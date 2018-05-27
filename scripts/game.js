@@ -1,13 +1,13 @@
 import Field from './field';
 
-const startGame = (backgroundCanvas, playerCanvas) => {
-  let field = new Field(backgroundCanvas, playerCanvas);
+const startGame = (foregroundCanvas, playerCanvas) => {
+  let field = new Field(foregroundCanvas, playerCanvas);
 
   field.playRound();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  let backgroundCanvas = document.getElementById("backgroundCanvas");
+  let foregroundCanvas = document.getElementById("foregroundCanvas");
   let playerCanvas = document.getElementById("playerCanvas");
-  startGame(backgroundCanvas, playerCanvas);
+  startGame(foregroundCanvas, playerCanvas);
 });
