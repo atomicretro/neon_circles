@@ -48,6 +48,12 @@ class Field {
     this.bgContext.rect(0, 0, this.bgWidth, this.bgHeight);
     this.bgContext.strokeStyle = 'black';
     this.bgContext.stroke();
+
+    this.pcContext.beginPath();
+    this.pcContext.lineWidth = 1;
+    this.pcContext.rect(0, 0, this.pcWidth, this.pcHeight);
+    this.pcContext.strokeStyle = 'black';
+    this.pcContext.stroke();
   }
 
   drawPlayerRails(shape) {

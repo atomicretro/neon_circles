@@ -108,9 +108,9 @@ var BulletPool = function () {
 
   _createClass(BulletPool, [{
     key: 'get',
-    value: function get(x, y, speed) {
+    value: function get(x, y, theta, speed) {
       if (!this.pool[this.size - 1].spawned) {
-        this.pool[this.size - 1].spawn(x, y, speed);
+        this.pool[this.size - 1].spawn(x, y, theta, speed);
         this.pool.unshift(this.pool.pop());
       }
     }
@@ -138,8 +138,9 @@ var Bullet = function () {
   function Bullet() {
     _classCallCheck(this, Bullet);
 
-    this.x = 0;
-    this.y = 0;
+    this.startPoint = { x: 0, y: 0 };
+    this.endPoint = { x: 0, y: 0 };
+    this.pathAngle = 0;
     this.speed = 0;
     this.spawned = false;
     this.height = 20;
@@ -148,23 +149,44 @@ var Bullet = function () {
 
   _createClass(Bullet, [{
     key: 'spawn',
-    value: function spawn(x, y, speed) {
-      this.x = x;
-      this.y = y;
-      this.speed = speed;
+    value: function spawn(x, y, theta, speed) {
+      this.startPoint = this.computeStartPoint();
+      this.endPoint = this.computeEndPoint();
+      this.pathAngle = theta;
+      this.speed = 0;
       this.spawned = true;
     }
   }, {
     key: 'draw',
-    value: function draw(context, ImageStore) {
+    value: function draw(context) {
       context.clearRect(this.x, this.y, this.width, this.height);
-      this.y -= this.speed;
-      this.x -= this.speed;
+      // this.startPoint = this.computeStartPoint();
+      this.endPoint = this.computeEndPoint();
       if (this.y <= 0 - this.height) {
         return true;
       } else {
-        // debugger
-        context.drawImage(ImageStore.bullet, this.x, this.y);
+        console.log(this.endPoint);
+        context.beginPath();
+        context.lineWidth = 2;
+        context.moveTo(this.startPoint.x, this.startPoint.y);
+        context.lineTo(this.endPoint.x, this.endPoint.y);
+        context.stroke();
+      };
+    }
+  }, {
+    key: 'computeStartPoint',
+    value: function computeStartPoint() {
+      return {
+        x: Math.cos(this.pathAngle) * -20 + 400,
+        y: Math.sin(this.pathAngle) * -20 + 250
+      };
+    }
+  }, {
+    key: 'computeEndPoint',
+    value: function computeEndPoint() {
+      return {
+        x: Math.cos(this.pathAngle) * -20 + 400,
+        y: Math.sin(this.pathAngle) * -20 + 255
       };
     }
   }, {
@@ -266,6 +288,12 @@ var Field = function () {
       this.bgContext.rect(0, 0, this.bgWidth, this.bgHeight);
       this.bgContext.strokeStyle = 'black';
       this.bgContext.stroke();
+
+      this.pcContext.beginPath();
+      this.pcContext.lineWidth = 1;
+      this.pcContext.rect(0, 0, this.pcWidth, this.pcHeight);
+      this.pcContext.strokeStyle = 'black';
+      this.pcContext.stroke();
     }
   }, {
     key: 'drawPlayerRails',
@@ -403,6 +431,7 @@ var Player = function () {
     this.portVertex = this.computePortVertex();
     this.bowTheta = Math.PI / 2;
     this.bowVertex = this.computeBowVertex();
+    this.bulletPoint = this.computeBulletPoint();
 
     this.playerImage = new Image();
     this.playerImage.src = "assets/sprites/sprite_test_1.png";
@@ -435,6 +464,14 @@ var Player = function () {
       };
     }
   }, {
+    key: 'computeBulletPoint',
+    value: function computeBulletPoint() {
+      return {
+        x: Math.cos(this.bowTheta) * -20 + 400,
+        y: Math.sin(this.bowTheta) * -20 + 250
+      };
+    }
+  }, {
     key: 'move',
     value: function move(direction) {
       if (direction === 'left') {
@@ -450,8 +487,10 @@ var Player = function () {
   }, {
     key: 'fire',
     value: function fire(BulletPool) {
-      debugger;
-      BulletPool.get(this.bowVertex.x + 349, this.bowVertex.y + 135, 2);
+      console.log('bowVertex.x ' + this.bowVertex.x);
+      console.log('bowVertex.y ' + this.bowVertex.y);
+      this.bulletPoint = this.computeBulletPoint();
+      BulletPool.get(this.bulletPoint.x, this.bulletPoint.y, this.bowTheta, 2);
     }
   }, {
     key: 'draw',

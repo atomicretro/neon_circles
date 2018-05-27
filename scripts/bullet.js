@@ -13,9 +13,9 @@ export default class BulletPool {
     }
   }
 
-  get(x, y, speed) {
+  get(x, y, theta, speed) {
     if(!this.pool[this.size - 1].spawned) {
-      this.pool[this.size - 1].spawn(x, y, speed);
+      this.pool[this.size - 1].spawn(x, y, theta, speed);
       this.pool.unshift(this.pool.pop());
     }
   }
@@ -34,31 +34,51 @@ export default class BulletPool {
 
 class Bullet {
   constructor() {
-    this.x = 0;
-    this.y = 0;
+    this.startPoint = {x: 0, y: 0}
+    this.endPoint = {x: 0, y: 0}
+    this.pathAngle = 0;
     this.speed = 0;
     this.spawned = false;
     this.height = 20;
     this.width = 20;
   }
 
-  spawn(x, y, speed) {
-    this.x = x;
-    this.y = y;
-    this.speed = speed;
+  spawn(x, y, theta, speed) {
+    this.startPoint = this.computeStartPoint();
+    this.endPoint = this.computeEndPoint();
+    this.pathAngle = theta;
+    this.speed = 0;
     this.spawned = true;
   }
 
-  draw(context, ImageStore) {
+  draw(context) {
     context.clearRect(this.x, this.y, this.width, this.height);
-    this.y -= this.speed;
-    this.x -= this.speed;
+    // this.startPoint = this.computeStartPoint();
+    this.endPoint = this.computeEndPoint();
     if (this.y <= 0 - this.height) {
       return true;
     } else {
-      // debugger
-      context.drawImage(ImageStore.bullet, this.x, this.y);
+      console.log(this.endPoint);
+      context.beginPath();
+      context.lineWidth = 2;
+      context.moveTo(this.startPoint.x, this.startPoint.y);
+      context.lineTo(this.endPoint.x, this.endPoint.y);
+      context.stroke();
     };
+  }
+
+  computeStartPoint() {
+    return ({
+      x: Math.cos(this.pathAngle) * - 20  + 400,
+      y: Math.sin(this.pathAngle) * - 20  + 250
+    })
+  }
+
+  computeEndPoint() {
+    return ({
+      x: Math.cos(this.pathAngle) * - 20  + 400,
+      y: Math.sin(this.pathAngle) * - 20  + 255
+    })
   }
 
   clear() {
