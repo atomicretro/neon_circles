@@ -108,9 +108,9 @@ var BulletPool = function () {
 
   _createClass(BulletPool, [{
     key: 'get',
-    value: function get(x, y, theta, speed) {
+    value: function get(theta, x, y, speed) {
       if (!this.pool[this.size - 1].spawned) {
-        this.pool[this.size - 1].spawn(x, y, theta, speed);
+        this.pool[this.size - 1].spawn(theta, x, y, speed);
         this.pool.unshift(this.pool.pop());
       }
     }
@@ -138,34 +138,38 @@ var Bullet = function () {
   function Bullet() {
     _classCallCheck(this, Bullet);
 
-    this.startPoint = { x: 0, y: 0 };
-    this.endPoint = { x: 0, y: 0 };
     this.pathAngle = 0;
+    this.startOffset = 18;
+    this.startPoint = { x: 0, y: 0 };
+    this.endOffset = 8;
+    this.endPoint = { x: 0, y: 0 };
     this.speed = 0;
     this.spawned = false;
-    this.height = 20;
-    this.width = 20;
+    this.height = 10;
+    this.width = 10;
   }
 
   _createClass(Bullet, [{
     key: 'spawn',
-    value: function spawn(x, y, theta, speed) {
-      this.startPoint = this.computeStartPoint();
-      this.endPoint = this.computeEndPoint();
+    value: function spawn(theta, x, y, speed) {
       this.pathAngle = theta;
-      this.speed = 0;
+      this.startPoint = this.computePoint(this.startOffset);
+      this.endPoint = this.computePoint(this.endOffset);
+      this.speed = speed;
       this.spawned = true;
     }
   }, {
     key: 'draw',
     value: function draw(context) {
       context.clearRect(this.x, this.y, this.width, this.height);
-      // this.startPoint = this.computeStartPoint();
-      this.endPoint = this.computeEndPoint();
+      this.startOffset -= this.speed;
+      this.endOffset -= this.speed;
+      this.startPoint = this.computePoint(this.startOffset);
+      this.endPoint = this.computePoint(this.endOffset);
+
       if (this.y <= 0 - this.height) {
         return true;
       } else {
-        console.log(this.endPoint);
         context.beginPath();
         context.lineWidth = 2;
         context.moveTo(this.startPoint.x, this.startPoint.y);
@@ -174,26 +178,21 @@ var Bullet = function () {
       };
     }
   }, {
-    key: 'computeStartPoint',
-    value: function computeStartPoint() {
+    key: 'computePoint',
+    value: function computePoint(offset) {
       return {
-        x: Math.cos(this.pathAngle) * -20 + 400,
-        y: Math.sin(this.pathAngle) * -20 + 250
-      };
-    }
-  }, {
-    key: 'computeEndPoint',
-    value: function computeEndPoint() {
-      return {
-        x: Math.cos(this.pathAngle) * -20 + 400,
-        y: Math.sin(this.pathAngle) * -20 + 255
+        x: Math.cos(this.pathAngle) * -offset + 400,
+        y: Math.sin(this.pathAngle) * -offset + 250
       };
     }
   }, {
     key: 'clear',
     value: function clear() {
-      this.x = 0;
-      this.y = 0;
+      this.pathAngle = 0;
+      this.startOffset = 18;
+      this.startPoint = { x: 0, y: 0 };
+      this.endOffset = 8;
+      this.endPoint = { x: 0, y: 0 };
       this.speed = 0;
       this.spawned = false;
     }
@@ -490,7 +489,7 @@ var Player = function () {
       console.log('bowVertex.x ' + this.bowVertex.x);
       console.log('bowVertex.y ' + this.bowVertex.y);
       this.bulletPoint = this.computeBulletPoint();
-      BulletPool.get(this.bulletPoint.x, this.bulletPoint.y, this.bowTheta, 2);
+      BulletPool.get(this.bowTheta, this.bulletPoint.x, this.bulletPoint.y, 2);
     }
   }, {
     key: 'draw',

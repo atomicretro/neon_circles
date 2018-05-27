@@ -67,7 +67,7 @@ class Player {
     console.log(`bowVertex.x ${this.bowVertex.x}`);
     console.log(`bowVertex.y ${this.bowVertex.y}`);
     this.bulletPoint = this.computeBulletPoint();
-    BulletPool.get(this.bulletPoint.x, this.bulletPoint.y, this.bowTheta, 2);
+    BulletPool.get(this.bowTheta, this.bulletPoint.x, this.bulletPoint.y, 2);
   }
 
   draw() {

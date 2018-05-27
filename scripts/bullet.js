@@ -13,9 +13,9 @@ export default class BulletPool {
     }
   }
 
-  get(x, y, theta, speed) {
+  get(theta, x, y, speed) {
     if(!this.pool[this.size - 1].spawned) {
-      this.pool[this.size - 1].spawn(x, y, theta, speed);
+      this.pool[this.size - 1].spawn(theta, x, y, speed);
       this.pool.unshift(this.pool.pop());
     }
   }
@@ -34,31 +34,35 @@ export default class BulletPool {
 
 class Bullet {
   constructor() {
-    this.startPoint = {x: 0, y: 0}
-    this.endPoint = {x: 0, y: 0}
     this.pathAngle = 0;
+    this.startOffset = 18;
+    this.startPoint = {x: 0, y: 0}
+    this.endOffset = 8;
+    this.endPoint = {x: 0, y: 0}
     this.speed = 0;
     this.spawned = false;
-    this.height = 20;
-    this.width = 20;
+    this.height = 10;
+    this.width = 10;
   }
 
-  spawn(x, y, theta, speed) {
-    this.startPoint = this.computeStartPoint();
-    this.endPoint = this.computeEndPoint();
+  spawn(theta, x, y, speed) {
     this.pathAngle = theta;
-    this.speed = 0;
+    this.startPoint = this.computePoint(this.startOffset);
+    this.endPoint = this.computePoint(this.endOffset);
+    this.speed = speed;
     this.spawned = true;
   }
 
   draw(context) {
     context.clearRect(this.x, this.y, this.width, this.height);
-    // this.startPoint = this.computeStartPoint();
-    this.endPoint = this.computeEndPoint();
+    this.startOffset -= this.speed;
+    this.endOffset -= this.speed;
+    this.startPoint = this.computePoint(this.startOffset);
+    this.endPoint = this.computePoint(this.endOffset);
+
     if (this.y <= 0 - this.height) {
       return true;
     } else {
-      console.log(this.endPoint);
       context.beginPath();
       context.lineWidth = 2;
       context.moveTo(this.startPoint.x, this.startPoint.y);
@@ -67,23 +71,19 @@ class Bullet {
     };
   }
 
-  computeStartPoint() {
+  computePoint(offset) {
     return ({
-      x: Math.cos(this.pathAngle) * - 20  + 400,
-      y: Math.sin(this.pathAngle) * - 20  + 250
-    })
-  }
-
-  computeEndPoint() {
-    return ({
-      x: Math.cos(this.pathAngle) * - 20  + 400,
-      y: Math.sin(this.pathAngle) * - 20  + 255
+      x: Math.cos(this.pathAngle) * -offset  + 400,
+      y: Math.sin(this.pathAngle) * -offset  + 250
     })
   }
 
   clear() {
-    this.x = 0;
-    this.y = 0;
+    this.pathAngle = 0;
+    this.startOffset = 18;
+    this.startPoint = {x: 0, y: 0}
+    this.endOffset = 8;
+    this.endPoint = {x: 0, y: 0}
     this.speed = 0;
     this.spawned = false;
   }
