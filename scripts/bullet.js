@@ -8,7 +8,7 @@ export default class BulletPool {
     this.pool = [];
 
     for (let i = 0; i < size; i++) {
-      let bullet = new Bullet();
+      let bullet = new Bullet('playerBullet');
       this.pool.push(bullet);
     }
   }
@@ -23,7 +23,7 @@ export default class BulletPool {
   draw() {
     for (let i = 0; i < this.size; i++) {
       if(this.pool[i].spawned && this.pool[i].draw(this.context, this.ImageStore)) {
-        this.pool[i].clear();
+        this.pool[i].setDefaultValues();
         this.pool.push((this.pool.splice(i,1))[0]);
       } else {
         break;
@@ -33,59 +33,69 @@ export default class BulletPool {
 };
 
 class Bullet {
-  constructor() {
-    this.pathAngle = 0;
-    this.startOffset = 18;
-    this.startPoint = {x: 0, y: 0}
-    this.endOffset = 8;
-    this.endPoint = {x: 0, y: 0}
-    this.speed = 0;
-    this.spawned = false;
-    this.height = 10;
-    this.width = 10;
+  constructor(type) {
+    this.type = type;
+    this.setDefaultValues();
   }
 
   spawn(theta, speed) {
     this.pathAngle = theta;
-    this.startPoint = this.computePoint(this.startOffset);
-    this.endPoint = this.computePoint(this.endOffset);
+    this.startPoint = this.computePoint(this.startRadius);
+    this.endPoint = this.computePoint(this.endRadius);
     this.speed = speed;
     this.spawned = true;
   }
 
   draw(context) {
     // context.clearRect(this.x, this.y, this.width, this.height); optimize later
-    this.startOffset -= this.speed;
-    this.endOffset -= this.speed;
-    this.startPoint = this.computePoint(this.startOffset);
-    this.endPoint = this.computePoint(this.endOffset);
+    this.startRadius -= this.speed;
+    this.endRadius -= this.speed;
+    this.startPoint = this.computePoint(this.startRadius);
+    this.endPoint = this.computePoint(this.endRadius);
 
-    if (this.y <= 0 - this.height) {
-      return true;
-    } else {
+    if (
+      (this.startPoint.y > -10 || this.endPoint.y > -10) &&
+      (this.startPoint.y < 510 || this.endPoint.y < 510) &&
+      (this.startPoint.x > -10 || this.endPoint.x > -10) &&
+      (this.startPoint.x < 810 || this.endPoint.x < 810)
+    ) {
       context.beginPath();
       context.lineWidth = 2;
       context.moveTo(this.startPoint.x, this.startPoint.y);
       context.lineTo(this.endPoint.x, this.endPoint.y);
       context.stroke();
+    } else {
+      return true;
     };
   }
 
   computePoint(offset) {
     return ({
-      x: Math.cos(this.pathAngle) * -offset  + 400,
-      y: Math.sin(this.pathAngle) * -offset  + 250
+      x: Math.cos(this.pathAngle) * -offset  + this.xOffset,
+      y: Math.sin(this.pathAngle) * -offset  + this.yOffset
     })
   }
 
-  clear() {
+  setDefaultValues() {
+    if (this.type === 'playerBullet') {
+      this.startRadius = 18;
+      this.endRadius = 8;
+      this.xOffset = 400;
+      this.yOffset = 250;
+    } else {
+      this.startRadius = 0;
+      this.endRadius = 0;
+      this.xOffset = 0;
+      this.yOffset = 0;
+    }
+
     this.pathAngle = 0;
-    this.startOffset = 18;
     this.startPoint = {x: 0, y: 0}
-    this.endOffset = 8;
     this.endPoint = {x: 0, y: 0}
     this.speed = 0;
     this.spawned = false;
+    this.height = 10;
+    this.width = 10;
   }
 };
 
