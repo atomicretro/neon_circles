@@ -500,6 +500,8 @@ var Player = function () {
 
     this.speed = 0.1;
     this.radius = 30; // The 'track' the player moves along
+    this.fireCooldown = 15;
+    this.fireCharge = 0;
     this.starboardTheta = 1.7359;
     this.starboardVertex = this.computeStarboardVertex();
     this.portTheta = -1.4056;
@@ -538,6 +540,7 @@ var Player = function () {
   }, {
     key: 'move',
     value: function move(keyStatus) {
+      this.fireCharge++; // increments once every frame
       if (keyStatus.left) {
         this.starboardTheta += this.speed;
         this.portTheta -= this.speed;
@@ -548,11 +551,12 @@ var Player = function () {
         this.bowTheta += this.speed;
       }
 
-      if (keyStatus.fire) this.fire();
+      if (keyStatus.fire && this.fireCharge >= this.fireCooldown) this.fire();
     }
   }, {
     key: 'fire',
     value: function fire() {
+      this.fireCharge = 0;
       var bulletSpeed = 2;
       this.BulletPool.get(this.bowTheta, bulletSpeed);
     }
