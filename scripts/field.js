@@ -137,12 +137,36 @@ class Field {
     let spawnedPCBullets = this.pcBulletPool.pool.filter(
       (bullet) => bullet.spawned )
 
-    // for (let badIdx = 0; badIdx < spawnedBaddies.length; badIdx++) {
-    //   for (var bulIdx = 0; bulIdx < spawnedPCBullets.length; bulIdx++) {
-    //     debugger
-    //   }
-    // }
-    //
+    for (let badIdx = 0; badIdx < spawnedBaddies.length; badIdx++) {
+      let baddie = spawnedBaddies[badIdx];
+      for (var bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
+        let bullet = spawnedPCBullets[bullIdx];
+        let badX = baddie.drawPoint.x;
+        let badY = baddie.drawPoint.y;
+        if(
+          this.pcBulletStartHits(baddie, badX, badY, bullet.startPoint) ||
+          this.pcBulletEndHits(baddie, badX, badY, bullet.endPoint)
+        ) {
+          console.log('hit!');
+        };
+      }
+    }
+  }
+
+  pcBulletStartHits(baddie, badX, badY, bullet) {
+    return (
+      (badX <= bullet.x && bullet.x <= badX + baddie.width) &&
+      (badY <= bullet.y && bullet.y <= badY + baddie.height)
+    )
+  }
+
+  pcBulletEndHits(baddie, badX, badY, bullet) {
+    return (
+      (badX <= bullet.x && bullet.x <= badX + baddie.width) &&
+      (badY <= bullet.y && bullet.y <= badY + baddie.height)
+    )
+  }
+
     // spawnedBaddies.forEach((baddie) => {
     //   spawnedPCBullets.forEach((bullet) => {
     //     if bullet.startPoint.x
@@ -170,7 +194,7 @@ class Field {
     //   })
     //
     // })
-  }
+  // }
 
   clearFGContext() {
     this.fgContext.clearRect(0, 0, this.fgWidth, this.fgHeight);

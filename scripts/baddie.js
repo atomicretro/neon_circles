@@ -5,7 +5,7 @@ export default class BaddiePool extends ObjectPool {
     super(size, ctx);
 
     for (let i = 0; i < size; i++) {
-      let baddie = new Baddie(ctx, 'demon', ImageStore);
+      let baddie = new Baddie(ctx, 'redDemon', ImageStore);
       this.pool.push(baddie);
     }
   }
@@ -17,11 +17,13 @@ class Baddie {
     this.type = type;
     this.setDefaultValues();
     let storedAsset = ImageStore[type];
+    this.width = storedAsset.width;
+    this.height = storedAsset.height;
     this.sprite = new Sprite(
       ctx,
       storedAsset.image,
-      storedAsset.width,
-      storedAsset.height,
+      this.width,
+      this.height,
       storedAsset.srcX,
       storedAsset.srcY
     );

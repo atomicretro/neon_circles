@@ -104,7 +104,7 @@ var BaddiePool = function (_ObjectPool) {
     var _this = _possibleConstructorReturn(this, (BaddiePool.__proto__ || Object.getPrototypeOf(BaddiePool)).call(this, size, ctx));
 
     for (var i = 0; i < size; i++) {
-      var baddie = new Baddie(ctx, 'demon', ImageStore);
+      var baddie = new Baddie(ctx, 'redDemon', ImageStore);
       _this.pool.push(baddie);
     }
     return _this;
@@ -123,7 +123,9 @@ var Baddie = function () {
     this.type = type;
     this.setDefaultValues();
     var storedAsset = ImageStore[type];
-    this.sprite = new _utilities.Sprite(ctx, storedAsset.image, storedAsset.width, storedAsset.height, storedAsset.srcX, storedAsset.srcY);
+    this.width = storedAsset.width;
+    this.height = storedAsset.height;
+    this.sprite = new _utilities.Sprite(ctx, storedAsset.image, this.width, this.height, storedAsset.srcX, storedAsset.srcY);
   }
 
   _createClass(Baddie, [{
@@ -469,40 +471,58 @@ var Field = function () {
         return bullet.spawned;
       });
 
-      // for (let badIdx = 0; badIdx < spawnedBaddies.length; badIdx++) {
-      //   for (var bulIdx = 0; bulIdx < spawnedPCBullets.length; bulIdx++) {
-      //     debugger
-      //   }
-      // }
-      //
-      // spawnedBaddies.forEach((baddie) => {
-      //   spawnedPCBullets.forEach((bullet) => {
-      //     if bullet.startPoint.x
-      //     let bulletStart
-      //   })
-      // })
-
-      // debugger
-      // this.BaddiePool.pool.forEach((baddie) => {
-      //   debugger
-      //   let badX = baddie.drawPoint.x;
-      //   let badY = baddie.drawPoint.y;
-      //   this.pcBulletPool.pool.forEach((bullet) => {
-      //     debugger
-      //     console.log(`bullet ${bullet.startPoint.x}`);
-      //     console.log(`baddie ${baddie.drawPoint.x}`);
-      //     if(
-      //       (bullet.startPoint.x <= badX && bullet.startPoint.x >= badX + 20) ||
-      //       (bullet.endPoint.x <= badX && bullet.endPoint.x >= badX + 20) ||
-      //       (bullet.startPoint.y <= badY && bullet.startPoint.y >= badY + 30) ||
-      //       (bullet.endPoint.y <= badY && bullet.startPoint.y >= badY + 30)
-      //     ) {
-      //       console.log('hit!');
-      //     }
-      //   })
-      //
-      // })
+      for (var badIdx = 0; badIdx < spawnedBaddies.length; badIdx++) {
+        var baddie = spawnedBaddies[badIdx];
+        for (var bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
+          var bullet = spawnedPCBullets[bullIdx];
+          var badX = baddie.drawPoint.x;
+          var badY = baddie.drawPoint.y;
+          if (this.pcBulletStartHits(baddie, badX, badY, bullet.startPoint) || this.pcBulletEndHits(baddie, badX, badY, bullet.endPoint)) {
+            console.log('hit!');
+          };
+        }
+      }
     }
+  }, {
+    key: 'pcBulletStartHits',
+    value: function pcBulletStartHits(baddie, badX, badY, bullet) {
+      return badX <= bullet.x && bullet.x <= badX + baddie.width && badY <= bullet.y && bullet.y <= badY + baddie.height;
+    }
+  }, {
+    key: 'pcBulletEndHits',
+    value: function pcBulletEndHits(baddie, badX, badY, bullet) {
+      return badX <= bullet.x && bullet.x <= badX + baddie.width && badY <= bullet.y && bullet.y <= badY + baddie.height;
+    }
+
+    // spawnedBaddies.forEach((baddie) => {
+    //   spawnedPCBullets.forEach((bullet) => {
+    //     if bullet.startPoint.x
+    //     let bulletStart
+    //   })
+    // })
+
+    // debugger
+    // this.BaddiePool.pool.forEach((baddie) => {
+    //   debugger
+    //   let badX = baddie.drawPoint.x;
+    //   let badY = baddie.drawPoint.y;
+    //   this.pcBulletPool.pool.forEach((bullet) => {
+    //     debugger
+    //     console.log(`bullet ${bullet.startPoint.x}`);
+    //     console.log(`baddie ${baddie.drawPoint.x}`);
+    //     if(
+    //       (bullet.startPoint.x <= badX && bullet.startPoint.x >= badX + 20) ||
+    //       (bullet.endPoint.x <= badX && bullet.endPoint.x >= badX + 20) ||
+    //       (bullet.startPoint.y <= badY && bullet.startPoint.y >= badY + 30) ||
+    //       (bullet.endPoint.y <= badY && bullet.startPoint.y >= badY + 30)
+    //     ) {
+    //       console.log('hit!');
+    //     }
+    //   })
+    //
+    // })
+    // }
+
   }, {
     key: 'clearFGContext',
     value: function clearFGContext() {
@@ -754,7 +774,7 @@ var ImageStore = exports.ImageStore = function ImageStore() {
   _classCallCheck(this, ImageStore);
 
   this.bullet = { image: new Image() };
-  this.demon = {
+  this.redDemon = {
     image: new Image(),
     width: 21,
     height: 30,
@@ -768,7 +788,7 @@ var ImageStore = exports.ImageStore = function ImageStore() {
     // }
 
   };this.bullet.image.src = 'assets/sprites/bullet.png';
-  this.demon.image.src = 'assets/sprites/demon_test.png';
+  this.redDemon.image.src = 'assets/sprites/demon_test.png';
 }
 
 // imageLoaded() {

@@ -55,7 +55,7 @@ export class Sprite {
 export class ImageStore {
   constructor() {
     this.bullet = { image: new Image() }
-    this.demon = {
+    this.redDemon = {
       image: new Image(),
       width: 21,
       height: 30,
@@ -70,7 +70,7 @@ export class ImageStore {
     // }
 
     this.bullet.image.src = 'assets/sprites/bullet.png';
-    this.demon.image.src = 'assets/sprites/demon_test.png';
+    this.redDemon.image.src = 'assets/sprites/demon_test.png';
 
   }
 
