@@ -35,7 +35,8 @@ class Field {
 
     this.ImageStore = new ImageStore();
     this.BaddiePool = new BaddiePool(1, this.fgContext, this.ImageStore);
-    this.pcBulletPool = new BulletPool(5, this.fgContext); //give to player?
+    this.badBulletPool = new BulletPool(20, this.fgContext);
+    this.pcBulletPool = new BulletPool(8, this.fgContext);
     this.player = new Player(
       this.pcContext, this.pcWidth, this.pcHeight, this.pcBulletPool
     );
@@ -45,6 +46,7 @@ class Field {
     this.playRound = this.playRound.bind(this);
     this.render = this.render.bind(this);
     this.keydown = this.keydown.bind(this);
+    this.checkBaddieCollision = this.checkBaddieCollision.bind(this);
 
     document.addEventListener('keydown', this.keydown.bind(this));
     document.addEventListener('keyup', this.keyup.bind(this));
@@ -90,14 +92,15 @@ class Field {
     requestAnimationFrame(this.playRound);
   }
 
-  render() {
+  render()  {
     this.clearFGContext();
     this.clearPCContext();
     this.drawFieldBorder();
     this.drawPlayerRails('circle');
+    this.checkBaddieCollision();
     this.drawPlayer();
     this.pcBulletPool.draw();
-    this.BaddiePool.get(Math.PI / 2, 0.01);
+    this.BaddiePool.get(Math.PI / 2, 0.005);
     this.BaddiePool.draw();
   }
 
@@ -122,13 +125,60 @@ class Field {
     this.player.draw();
   }
 
+  // checkPlayerCollision() {
+  //   this.badBulletPool.forEach((bullet) => console.log(bullet))
+  // let spawnedBadBullets = this.badBulletPool.pool.filter(
+  //   (bullet) => bullet.spawned )
+  // }
+
+  checkBaddieCollision() {
+    let spawnedBaddies = this.BaddiePool.pool.filter(
+      (baddie) => baddie.spawned )
+    let spawnedPCBullets = this.pcBulletPool.pool.filter(
+      (bullet) => bullet.spawned )
+
+    // for (let badIdx = 0; badIdx < spawnedBaddies.length; badIdx++) {
+    //   for (var bulIdx = 0; bulIdx < spawnedPCBullets.length; bulIdx++) {
+    //     debugger
+    //   }
+    // }
+    //
+    // spawnedBaddies.forEach((baddie) => {
+    //   spawnedPCBullets.forEach((bullet) => {
+    //     if bullet.startPoint.x
+    //     let bulletStart
+    //   })
+    // })
+
+    // debugger
+    // this.BaddiePool.pool.forEach((baddie) => {
+    //   debugger
+    //   let badX = baddie.drawPoint.x;
+    //   let badY = baddie.drawPoint.y;
+    //   this.pcBulletPool.pool.forEach((bullet) => {
+    //     debugger
+    //     console.log(`bullet ${bullet.startPoint.x}`);
+    //     console.log(`baddie ${baddie.drawPoint.x}`);
+    //     if(
+    //       (bullet.startPoint.x <= badX && bullet.startPoint.x >= badX + 20) ||
+    //       (bullet.endPoint.x <= badX && bullet.endPoint.x >= badX + 20) ||
+    //       (bullet.startPoint.y <= badY && bullet.startPoint.y >= badY + 30) ||
+    //       (bullet.endPoint.y <= badY && bullet.startPoint.y >= badY + 30)
+    //     ) {
+    //       console.log('hit!');
+    //     }
+    //   })
+    //
+    // })
+  }
+
   clearFGContext() {
     this.fgContext.clearRect(0, 0, this.fgWidth, this.fgHeight);
-  }
+  } // implement dirty rectangles on each sprite?
 
   clearPCContext() {
     this.pcContext.clearRect(0, 0, this.pcWidth, this.pcHeight);
-  }
+  } // implement dirty rectangles on each sprite?
 }
 
 
