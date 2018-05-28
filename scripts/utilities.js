@@ -37,8 +37,8 @@ export class Sprite {
 
     this.context.drawImage(
       this.image,
-      1,
-      1,
+      drawX,
+      drawY,
       this.srcWidth,
       this.srcHeight,
       // drawX,

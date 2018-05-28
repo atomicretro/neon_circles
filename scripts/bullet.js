@@ -47,10 +47,10 @@ class Bullet {
     };
   }
 
-  computePoint(offset) {
+  computePoint(radius) {
     return ({
-      x: Math.cos(this.pathAngle) * -offset  + this.xOffset,
-      y: Math.sin(this.pathAngle) * -offset  + this.yOffset
+      x: Math.cos(this.pathAngle) * -radius  + this.xOffset,
+      y: Math.sin(this.pathAngle) * -radius  + this.yOffset
     })
   }
 

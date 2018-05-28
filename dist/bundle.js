@@ -127,23 +127,36 @@ var Baddie = function () {
 
   _createClass(Baddie, [{
     key: 'spawn',
-    value: function spawn(x, y, radius) {
+    value: function spawn(theta, speed) {
+      this.theta = theta;
+      this.drawPoint = this.computeDrawPoint();
+      this.speed = speed;
       this.spawned = true;
     }
   }, {
     key: 'draw',
     value: function draw() {
+      this.theta -= this.speed;
+      this.drawPoint = this.computeDrawPoint();
       this.ctx.clearRect(this.x, this.y, this.width, this.height);
       this.sprite.draw(this.drawPoint.x, this.drawPoint.y);
-      console.log(this.drawPoint);
+    }
+  }, {
+    key: 'computeDrawPoint',
+    value: function computeDrawPoint() {
+      return {
+        x: Math.cos(this.theta) * -this.radius + 390,
+        y: Math.sin(this.theta) * -this.radius + 232
+      };
     }
   }, {
     key: 'setDefaultValues',
     value: function setDefaultValues() {
       this.chanceToFire = 0.01;
       this.spawned = false;
-      this.drawPoint = { x: 400, y: -50 };
-      this.speed = 5;
+      this.drawPoint = { x: 400, y: 250 };
+      this.speed = 0.1;
+      this.radius = 300; // The 'track' the baddie moves along
     }
   }]);
 
@@ -235,10 +248,10 @@ var Bullet = function () {
     }
   }, {
     key: 'computePoint',
-    value: function computePoint(offset) {
+    value: function computePoint(radius) {
       return {
-        x: Math.cos(this.pathAngle) * -offset + this.xOffset,
-        y: Math.sin(this.pathAngle) * -offset + this.yOffset
+        x: Math.cos(this.pathAngle) * -radius + this.xOffset,
+        y: Math.sin(this.pathAngle) * -radius + this.yOffset
       };
     }
   }, {
@@ -342,7 +355,7 @@ var Field = function () {
     this.pcContext = pcCanvas.getContext("2d");
 
     this.ImageStore = new _utilities.ImageStore();
-    this.BaddiePool = new _baddie2.default(5, this.fgContext, this.ImageStore);
+    this.BaddiePool = new _baddie2.default(1, this.fgContext, this.ImageStore);
     this.pcBulletPool = new _bullet2.default(5, this.fgContext); //give to player?
     this.player = new _player2.default(this.pcContext, this.pcWidth, this.pcHeight, this.pcBulletPool);
     this.lastTime = Date.now;
@@ -408,7 +421,7 @@ var Field = function () {
       this.drawPlayerRails('circle');
       this.drawPlayer();
       this.pcBulletPool.draw();
-      this.BaddiePool.get();
+      this.BaddiePool.get(Math.PI / 2, 0.01);
       this.BaddiePool.draw();
     }
   }, {
@@ -668,7 +681,7 @@ var Sprite = exports.Sprite = function () {
     key: 'draw',
     value: function draw(drawX, drawY) {
 
-      this.context.drawImage(this.image, 1, 1, this.srcWidth, this.srcHeight
+      this.context.drawImage(this.image, drawX, drawY, this.srcWidth, this.srcHeight
       // drawX,
       // drawY,
       // 21,

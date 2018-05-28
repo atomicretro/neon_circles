@@ -34,7 +34,7 @@ class Field {
     this.pcContext = pcCanvas.getContext("2d");
 
     this.ImageStore = new ImageStore();
-    this.BaddiePool = new BaddiePool(5, this.fgContext, this.ImageStore);
+    this.BaddiePool = new BaddiePool(1, this.fgContext, this.ImageStore);
     this.pcBulletPool = new BulletPool(5, this.fgContext); //give to player?
     this.player = new Player(
       this.pcContext, this.pcWidth, this.pcHeight, this.pcBulletPool
@@ -97,7 +97,7 @@ class Field {
     this.drawPlayerRails('circle');
     this.drawPlayer();
     this.pcBulletPool.draw();
-    this.BaddiePool.get();
+    this.BaddiePool.get(Math.PI / 2, 0.01);
     this.BaddiePool.draw();
   }
 
