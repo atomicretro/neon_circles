@@ -34,8 +34,8 @@ class Field {
     this.pcContext = pcCanvas.getContext("2d");
 
     this.ImageStore = new ImageStore();
-    this.BaddiePool = new BaddiePool(5, this.fgContext);
-    this.pcBulletPool = new BulletPool(5, this.fgContext);
+    this.BaddiePool = new BaddiePool(5, this.fgContext, this.ImageStore);
+    this.pcBulletPool = new BulletPool(5, this.fgContext); //give to player?
     this.player = new Player(
       this.pcContext, this.pcWidth, this.pcHeight, this.pcBulletPool
     );
@@ -57,11 +57,11 @@ class Field {
     this.fgContext.strokeStyle = 'black';
     this.fgContext.stroke();
 
-    this.pcContext.beginPath();
-    this.pcContext.lineWidth = 1;
-    this.pcContext.rect(0, 0, this.pcWidth, this.pcHeight);
-    this.pcContext.strokeStyle = 'black';
-    this.pcContext.stroke();
+    // this.pcContext.beginPath();
+    // this.pcContext.lineWidth = 1;
+    // this.pcContext.rect(0, 0, this.pcWidth, this.pcHeight);
+    // this.pcContext.strokeStyle = 'black';
+    // this.pcContext.stroke();
   }
 
   drawPlayerRails(shape) {
@@ -97,6 +97,8 @@ class Field {
     this.drawPlayerRails('circle');
     this.drawPlayer();
     this.pcBulletPool.draw();
+    this.BaddiePool.get();
+    this.BaddiePool.draw();
   }
 
   keydown(e) {

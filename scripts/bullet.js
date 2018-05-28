@@ -1,18 +1,19 @@
-import { Drawable, ObjectPool } from './utilities';
+import { Sprite, ObjectPool } from './utilities';
 
 export default class BulletPool extends ObjectPool {
-  constructor(size, context) {
-    super(size, context);
+  constructor(size, ctx) {
+    super(size);
 
     for (let i = 0; i < size; i++) {
-      let bullet = new Bullet('playerBullet');
+      let bullet = new Bullet(ctx, 'playerBullet');
       this.pool.push(bullet);
     }
   }
 }
 
 class Bullet {
-  constructor(type) {
+  constructor(ctx, type) {
+    this.ctx = ctx;
     this.type = type;
     this.setDefaultValues();
   }
@@ -25,8 +26,8 @@ class Bullet {
     this.spawned = true;
   }
 
-  draw(context) {
-    // context.clearRect(this.x, this.y, this.width, this.height); optimize later
+  draw() {
+    // ctx.clearRect(this.x, this.y, this.width, this.height); optimize later
     this.startRadius -= this.speed;
     this.endRadius -= this.speed;
     this.startPoint = this.computePoint(this.startRadius);
@@ -36,11 +37,11 @@ class Bullet {
         (this.startPoint.y < 501 || this.endPoint.y < 501) &&
         (this.startPoint.x > -1 || this.endPoint.x > -1) &&
         (this.startPoint.x < 801 || this.endPoint.x < 801)) {
-      context.beginPath();
-      context.lineWidth = 2;
-      context.moveTo(this.startPoint.x, this.startPoint.y);
-      context.lineTo(this.endPoint.x, this.endPoint.y);
-      context.stroke();
+      this.ctx.beginPath();
+      this.ctx.lineWidth = 2;
+      this.ctx.moveTo(this.startPoint.x, this.startPoint.y);
+      this.ctx.lineTo(this.endPoint.x, this.endPoint.y);
+      this.ctx.stroke();
     } else {
       return true;
     };
@@ -76,4 +77,4 @@ class Bullet {
   }
 };
 
-// Bullet.prototype = new Drawable();
+// Bullet.prototype = new Sprite();

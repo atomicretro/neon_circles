@@ -1,8 +1,6 @@
 export class ObjectPool {
-  constructor(size, context, ImageStore) {
+  constructor(size) {
     this.size = size;
-    this.context = context;
-    this.ImageStore = ImageStore;
     this.pool = [];
   }
 
@@ -16,7 +14,7 @@ export class ObjectPool {
   draw() {
     for (let i = 0; i < this.size; i++) {
       if(this.pool[i].spawned) {
-        if(this.pool[i].draw(this.context, this.ImageStore)) {
+        if(this.pool[i].draw()) {
           this.pool[i].setDefaultValues();
           this.pool.push((this.pool.splice(i,1))[0]);
         }
@@ -27,19 +25,34 @@ export class ObjectPool {
   }
 };
 
-export class Drawable {
-  constructor(x, y, width, height) {
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
+export class Sprite {
+  constructor(context, image, srcWidth, srcHeight) {
+    this.context = context;
+    this.image = image;
+    this.srcWidth = srcWidth;
+    this.srcHeight = srcHeight;
+  }
+
+  draw(drawX, drawY) {
+
+    this.context.drawImage(
+      this.image,
+      1,
+      1,
+      this.srcWidth,
+      this.srcHeight,
+      // drawX,
+      // drawY,
+      // 21,
+      // 30
+    )
   }
 }
 
 export class ImageStore {
   constructor() {
-    this.bulletSheet = new Image();
-    this.demonSheet = new Image();
+    this.bullet = new Image();
+    this.demon = new Image();
     // this.numImages = 2;
     // this.numLoaded = 0;
     //
@@ -47,8 +60,9 @@ export class ImageStore {
     //   this.imageLoaded();
     // }
 
-    this.bulletSheet.src = 'assets/sprites/bullet.png';
-    this.demonSheet.src = 'assets/sprites/demon_sheet.png';
+    this.bullet.src = 'assets/sprites/bullet.png';
+    this.demon.src = 'assets/sprites/demon_test.png';
+
   }
 
   // imageLoaded() {
