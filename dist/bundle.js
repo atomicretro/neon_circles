@@ -91,52 +91,29 @@ var _utilities = __webpack_require__(/*! ./utilities */ "./scripts/utilities.js"
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var BulletPool = function () {
-  function BulletPool(size, context, ImageStore) {
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var BulletPool = function (_ObjectPool) {
+  _inherits(BulletPool, _ObjectPool);
+
+  function BulletPool(size, context) {
     _classCallCheck(this, BulletPool);
 
-    this.size = size;
-    this.context = context;
-    this.ImageStore = ImageStore;
-    this.pool = [];
+    var _this = _possibleConstructorReturn(this, (BulletPool.__proto__ || Object.getPrototypeOf(BulletPool)).call(this, size, context));
 
     for (var i = 0; i < size; i++) {
       var bullet = new Bullet('playerBullet');
-      this.pool.push(bullet);
+      _this.pool.push(bullet);
     }
+    return _this;
   }
 
-  _createClass(BulletPool, [{
-    key: 'get',
-    value: function get(theta, speed) {
-      if (!this.pool[this.size - 1].spawned) {
-        this.pool[this.size - 1].spawn(theta, speed);
-        debugger;
-        this.pool.unshift(this.pool.pop());
-        debugger;
-      }
-    }
-  }, {
-    key: 'draw',
-    value: function draw() {
-      for (var i = 0; i < this.size; i++) {
-        if (this.pool[i].spawned) {
-          if (this.pool[i].draw(this.context, this.ImageStore)) {
-            this.pool[i].setDefaultValues();
-            this.pool.push(this.pool.splice(i, 1)[0]);
-          }
-        } else {
-          break;
-        }
-      }
-    }
-  }]);
-
   return BulletPool;
-}();
+}(_utilities.ObjectPool);
 
 exports.default = BulletPool;
-;
 
 var Bullet = function () {
   function Bullet(type) {
@@ -523,7 +500,48 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var ObjectPool = exports.ObjectPool = function () {
+  function ObjectPool(size, context, ImageStore) {
+    _classCallCheck(this, ObjectPool);
+
+    this.size = size;
+    this.context = context;
+    this.ImageStore = ImageStore;
+    this.pool = [];
+  }
+
+  _createClass(ObjectPool, [{
+    key: 'get',
+    value: function get(theta, speed) {
+      if (!this.pool[this.size - 1].spawned) {
+        this.pool[this.size - 1].spawn(theta, speed);
+        this.pool.unshift(this.pool.pop());
+      }
+    }
+  }, {
+    key: 'draw',
+    value: function draw() {
+      for (var i = 0; i < this.size; i++) {
+        if (this.pool[i].spawned) {
+          if (this.pool[i].draw(this.context, this.ImageStore)) {
+            this.pool[i].setDefaultValues();
+            this.pool.push(this.pool.splice(i, 1)[0]);
+          }
+        } else {
+          break;
+        }
+      }
+    }
+  }]);
+
+  return ObjectPool;
+}();
+
+;
 
 var Drawable = exports.Drawable = function Drawable(x, y, width, height) {
   _classCallCheck(this, Drawable);

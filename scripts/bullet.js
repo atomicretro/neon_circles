@@ -1,40 +1,15 @@
-import { Drawable } from './utilities';
+import { Drawable, ObjectPool } from './utilities';
 
-export default class BulletPool {
-  constructor(size, context, ImageStore) {
-    this.size = size;
-    this.context = context;
-    this.ImageStore = ImageStore;
-    this.pool = [];
-
+export default class BulletPool extends ObjectPool {
+  constructor(size, context) {
+    super(size, context);
+    
     for (let i = 0; i < size; i++) {
       let bullet = new Bullet('playerBullet');
       this.pool.push(bullet);
     }
   }
-
-  get(theta, speed) {
-    if(!this.pool[this.size - 1].spawned) {
-      this.pool[this.size - 1].spawn(theta, speed);
-      debugger
-      this.pool.unshift(this.pool.pop());
-      debugger
-    }
-  }
-
-  draw() {
-    for (let i = 0; i < this.size; i++) {
-      if(this.pool[i].spawned) {
-        if(this.pool[i].draw(this.context, this.ImageStore)) {
-          this.pool[i].setDefaultValues();
-          this.pool.push((this.pool.splice(i,1))[0]);
-        }
-      } else {
-        break;
-      }
-    }
-  }
-};
+}
 
 class Bullet {
   constructor(type) {
