@@ -37,10 +37,14 @@ class Baddie {
   }
 
   draw() {
-    this.theta -= this.speed;
-    this.drawPoint = this.computeDrawPoint();
-    this.ctx.clearRect(this.x, this.y, this.width, this.height);
-    this.sprite.draw(this.drawPoint.x, this.drawPoint.y);
+    if(this.isHit) {
+      return true;
+    } else {
+      this.theta -= this.speed;
+      this.drawPoint = this.computeDrawPoint();
+      this.ctx.clearRect(this.x, this.y, this.width, this.height);
+      this.sprite.draw(this.drawPoint.x, this.drawPoint.y);
+    }
   }
 
   computeDrawPoint() {
@@ -50,7 +54,12 @@ class Baddie {
     })
   }
 
+  isHit() {
+
+  }
+
   setDefaultValues() {
+    this.isHit = false;
     this.chanceToFire = 0.01;
     this.spawned = false;
     this.drawPoint = {x: 400, y: 250};

@@ -1,14 +1,14 @@
 class Player {
-  constructor(ctx, fieldWidth, fieldHeight, BulletPool) {
+  constructor(ctx, pcFieldWidth, pcFieldHeight, BulletPool) {
     this.ctx = ctx;
-    this.fieldWidth = fieldWidth;
-    this.fieldHeight = fieldHeight;
+    this.pcFieldWidth = pcFieldWidth;
+    this.pcFieldHeight = pcFieldHeight;
     this.BulletPool = BulletPool;
 
     this.width = 10;
     this.height = 10;
 
-    this.speed = 0.1;
+    this.speed = 0.15;
     this.radius = 30; // The 'track' the player moves along
     this.fireCooldown = 15;
     this.fireCharge = 0;
@@ -18,6 +18,7 @@ class Player {
     this.portVertex = this.computePortVertex();
     this.bowTheta = Math.PI / 2;
     this.bowVertex = this.computeBowVertex();
+    this.hitboxCenter = this.computeHitboxCenter();
 
     this.draw = this.draw.bind(this);
     this.fire = this.fire.bind(this);
@@ -25,22 +26,29 @@ class Player {
 
   computeStarboardVertex() {
     return ({
-      x: Math.cos(this.starboardTheta) * this.radius + this.fieldWidth / 2,
-      y: -Math.sin(this.starboardTheta) * this.radius + this.fieldHeight / 2
+      x: Math.cos(this.starboardTheta) * this.radius + this.pcFieldWidth / 2,
+      y: -Math.sin(this.starboardTheta) * this.radius + this.pcFieldHeight / 2
     })
   }
 
   computePortVertex() {
     return ({
-      x: Math.cos(this.portTheta) * this.radius  + this.fieldWidth / 2,
-      y: Math.sin(this.portTheta) * this.radius  + this.fieldHeight / 2
+      x: Math.cos(this.portTheta) * this.radius  + this.pcFieldWidth / 2,
+      y: Math.sin(this.portTheta) * this.radius  + this.pcFieldHeight / 2
     })
   }
 
   computeBowVertex() {
     return ({
-      x: Math.cos(this.bowTheta) * -20  + this.fieldWidth / 2,
-      y: Math.sin(this.bowTheta) * -20  + this.fieldHeight / 2
+      x: Math.cos(this.bowTheta) * -20  + this.pcFieldWidth / 2,
+      y: Math.sin(this.bowTheta) * -20  + this.pcFieldHeight / 2
+    })
+  }
+
+  computeHitboxCenter() {
+    return ({
+      x: Math.cos(this.bowTheta) * -25  + this.pcFieldWidth / 2,
+      y: Math.sin(this.bowTheta) * -25  + this.pcFieldHeight / 2
     })
   }
 
@@ -61,7 +69,7 @@ class Player {
 
   fire() {
     this.fireCharge = 0;
-    let bulletSpeed = 2;
+    let bulletSpeed = 0.5;
     this.BulletPool.get(this.bowTheta, bulletSpeed);
   }
 
@@ -69,6 +77,7 @@ class Player {
     this.starboardVertex = this.computeStarboardVertex();
     this.portVertex = this.computePortVertex();
     this.bowVertex = this.computeBowVertex();
+    this.hitboxCenter = this.computeHitboxCenter();
 
     this.ctx.beginPath();
     this.ctx.moveTo(this.starboardVertex.x, this.starboardVertex.y);
@@ -76,6 +85,10 @@ class Player {
     this.ctx.lineTo(this.bowVertex.x, this.bowVertex.y);
     this.ctx.strokeStyle = 'black';
     this.ctx.fill();
+  }
+
+  isHit() {
+    console.log('ouch!');
   }
 }
 

@@ -46,6 +46,8 @@ class Field {
     this.playRound = this.playRound.bind(this);
     this.render = this.render.bind(this);
     this.keydown = this.keydown.bind(this);
+    this.checkCollisions = this.checkCollisions.bind(this);
+    this.checkPlayerCollision = this.checkPlayerCollision.bind(this);
     this.checkBaddieCollision = this.checkBaddieCollision.bind(this);
 
     document.addEventListener('keydown', this.keydown.bind(this));
@@ -97,7 +99,7 @@ class Field {
     this.clearPCContext();
     this.drawFieldBorder();
     this.drawPlayerRails('circle');
-    this.checkBaddieCollision();
+    this.checkCollisions();
     this.drawPlayer();
     this.pcBulletPool.draw();
     this.BaddiePool.get(Math.PI / 2, 0.005);
@@ -125,45 +127,71 @@ class Field {
     this.player.draw();
   }
 
-  // checkPlayerCollision() {
-  //   this.badBulletPool.forEach((bullet) => console.log(bullet))
-  // let spawnedBadBullets = this.badBulletPool.pool.filter(
-  //   (bullet) => bullet.spawned )
-  // }
-
-  checkBaddieCollision() {
-    let spawnedBaddies = this.BaddiePool.pool.filter(
-      (baddie) => baddie.spawned )
+  checkCollisions() {
     let spawnedPCBullets = this.pcBulletPool.pool.filter(
       (bullet) => bullet.spawned )
+    this.checkPlayerCollision(spawnedPCBullets);
+    this.checkBaddieCollision(spawnedPCBullets);
+  }
+
+  checkPlayerCollision(spawnedPCBullets) {
+    let spawnedBadBullets = this.badBulletPool.pool.filter(
+      (bullet) => bullet.spawned )
+
+    let hitbox = {
+      x: this.player.hitboxCenter.x,
+      y: this.player.hitboxCenter.y,
+      radius: 6
+    }
+
+    // this.pcContext.arc(hitbox.x, hitbox.y, 5, 0, 2 * Math.PI, true);
+
+    for (var bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
+      let bullet = spawnedPCBullets[bullIdx];
+      if(
+        this.pcBulletHitsPC(this.player, hitbox, bullet.startPoint) ||
+        this.pcBulletHitsPC(this.player, hitbox, bullet.endPoint)
+      ) {
+        this.player.isHit();
+      };
+    }
+  }
+
+  pcBulletHitsPC(player, hitbox, bullet) {
+    hitbox.x = hitbox.x - player.pcFieldWidth / 2 + this.fgWidth / 2;
+    hitbox.y = hitbox.y - player.pcFieldHeight / 2 + this.fgHeight / 2;
+    let distanceFromHitboxToBullet =
+      Math.sqrt(Math.pow(hitbox.x - bullet.x, 2)) +
+      Math.sqrt(Math.pow(hitbox.y - bullet.y, 2));
+
+    return (
+      distanceFromHitboxToBullet <= hitbox.radius
+    )
+  }
+
+  checkBaddieCollision(spawnedPCBullets) {
+    let spawnedBaddies = this.BaddiePool.pool.filter(
+      (baddie) => baddie.spawned )
 
     for (let badIdx = 0; badIdx < spawnedBaddies.length; badIdx++) {
       let baddie = spawnedBaddies[badIdx];
-      for (var bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
+      for (let bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
         let bullet = spawnedPCBullets[bullIdx];
-        let badX = baddie.drawPoint.x;
-        let badY = baddie.drawPoint.y;
+        let drawPoint = baddie.drawPoint;
         if(
-          this.pcBulletStartHits(baddie, badX, badY, bullet.startPoint) ||
-          this.pcBulletEndHits(baddie, badX, badY, bullet.endPoint)
+          this.pcBulletHitsBaddie(baddie, drawPoint, bullet.startPoint) ||
+          this.pcBulletHitsBaddie(baddie, drawPoint, bullet.endPoint)
         ) {
-          console.log('hit!');
+          baddie.isHit = true;
         };
       }
     }
   }
 
-  pcBulletStartHits(baddie, badX, badY, bullet) {
+  pcBulletHitsBaddie(baddie, drawPoint, bullet) {
     return (
-      (badX <= bullet.x && bullet.x <= badX + baddie.width) &&
-      (badY <= bullet.y && bullet.y <= badY + baddie.height)
-    )
-  }
-
-  pcBulletEndHits(baddie, badX, badY, bullet) {
-    return (
-      (badX <= bullet.x && bullet.x <= badX + baddie.width) &&
-      (badY <= bullet.y && bullet.y <= badY + baddie.height)
+      (drawPoint.x <= bullet.x && bullet.x <= drawPoint.x + baddie.width) &&
+      (drawPoint.y <= bullet.y && bullet.y <= drawPoint.y + baddie.height)
     )
   }
 

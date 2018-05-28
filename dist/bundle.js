@@ -139,10 +139,14 @@ var Baddie = function () {
   }, {
     key: 'draw',
     value: function draw() {
-      this.theta -= this.speed;
-      this.drawPoint = this.computeDrawPoint();
-      this.ctx.clearRect(this.x, this.y, this.width, this.height);
-      this.sprite.draw(this.drawPoint.x, this.drawPoint.y);
+      if (this.isHit) {
+        return true;
+      } else {
+        this.theta -= this.speed;
+        this.drawPoint = this.computeDrawPoint();
+        this.ctx.clearRect(this.x, this.y, this.width, this.height);
+        this.sprite.draw(this.drawPoint.x, this.drawPoint.y);
+      }
     }
   }, {
     key: 'computeDrawPoint',
@@ -153,8 +157,12 @@ var Baddie = function () {
       };
     }
   }, {
+    key: 'isHit',
+    value: function isHit() {}
+  }, {
     key: 'setDefaultValues',
     value: function setDefaultValues() {
+      this.isHit = false;
       this.chanceToFire = 0.01;
       this.spawned = false;
       this.drawPoint = { x: 400, y: 250 };
@@ -368,6 +376,8 @@ var Field = function () {
     this.playRound = this.playRound.bind(this);
     this.render = this.render.bind(this);
     this.keydown = this.keydown.bind(this);
+    this.checkCollisions = this.checkCollisions.bind(this);
+    this.checkPlayerCollision = this.checkPlayerCollision.bind(this);
     this.checkBaddieCollision = this.checkBaddieCollision.bind(this);
 
     document.addEventListener('keydown', this.keydown.bind(this));
@@ -424,7 +434,7 @@ var Field = function () {
       this.clearPCContext();
       this.drawFieldBorder();
       this.drawPlayerRails('circle');
-      this.checkBaddieCollision();
+      this.checkCollisions();
       this.drawPlayer();
       this.pcBulletPool.draw();
       this.BaddiePool.get(Math.PI / 2, 0.005);
@@ -454,44 +464,67 @@ var Field = function () {
       this.player.move(KEY_STATUS);
       this.player.draw();
     }
-
-    // checkPlayerCollision() {
-    //   this.badBulletPool.forEach((bullet) => console.log(bullet))
-    // let spawnedBadBullets = this.badBulletPool.pool.filter(
-    //   (bullet) => bullet.spawned )
-    // }
-
   }, {
-    key: 'checkBaddieCollision',
-    value: function checkBaddieCollision() {
-      var spawnedBaddies = this.BaddiePool.pool.filter(function (baddie) {
-        return baddie.spawned;
-      });
+    key: 'checkCollisions',
+    value: function checkCollisions() {
       var spawnedPCBullets = this.pcBulletPool.pool.filter(function (bullet) {
         return bullet.spawned;
+      });
+      this.checkPlayerCollision(spawnedPCBullets);
+      this.checkBaddieCollision(spawnedPCBullets);
+    }
+  }, {
+    key: 'checkPlayerCollision',
+    value: function checkPlayerCollision(spawnedPCBullets) {
+      var spawnedBadBullets = this.badBulletPool.pool.filter(function (bullet) {
+        return bullet.spawned;
+      });
+
+      var hitbox = {
+        x: this.player.hitboxCenter.x,
+        y: this.player.hitboxCenter.y,
+        radius: 6
+
+        // this.pcContext.arc(hitbox.x, hitbox.y, 5, 0, 2 * Math.PI, true);
+
+      };for (var bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
+        var bullet = spawnedPCBullets[bullIdx];
+        if (this.pcBulletHitsPC(this.player, hitbox, bullet.startPoint) || this.pcBulletHitsPC(this.player, hitbox, bullet.endPoint)) {
+          this.player.isHit();
+        };
+      }
+    }
+  }, {
+    key: 'pcBulletHitsPC',
+    value: function pcBulletHitsPC(player, hitbox, bullet) {
+      hitbox.x = hitbox.x - player.pcFieldWidth / 2 + this.fgWidth / 2;
+      hitbox.y = hitbox.y - player.pcFieldHeight / 2 + this.fgHeight / 2;
+      var distanceFromHitboxToBullet = Math.sqrt(Math.pow(hitbox.x - bullet.x, 2)) + Math.sqrt(Math.pow(hitbox.y - bullet.y, 2));
+
+      return distanceFromHitboxToBullet <= hitbox.radius;
+    }
+  }, {
+    key: 'checkBaddieCollision',
+    value: function checkBaddieCollision(spawnedPCBullets) {
+      var spawnedBaddies = this.BaddiePool.pool.filter(function (baddie) {
+        return baddie.spawned;
       });
 
       for (var badIdx = 0; badIdx < spawnedBaddies.length; badIdx++) {
         var baddie = spawnedBaddies[badIdx];
         for (var bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
           var bullet = spawnedPCBullets[bullIdx];
-          var badX = baddie.drawPoint.x;
-          var badY = baddie.drawPoint.y;
-          if (this.pcBulletStartHits(baddie, badX, badY, bullet.startPoint) || this.pcBulletEndHits(baddie, badX, badY, bullet.endPoint)) {
-            console.log('hit!');
+          var drawPoint = baddie.drawPoint;
+          if (this.pcBulletHitsBaddie(baddie, drawPoint, bullet.startPoint) || this.pcBulletHitsBaddie(baddie, drawPoint, bullet.endPoint)) {
+            baddie.isHit = true;
           };
         }
       }
     }
   }, {
-    key: 'pcBulletStartHits',
-    value: function pcBulletStartHits(baddie, badX, badY, bullet) {
-      return badX <= bullet.x && bullet.x <= badX + baddie.width && badY <= bullet.y && bullet.y <= badY + baddie.height;
-    }
-  }, {
-    key: 'pcBulletEndHits',
-    value: function pcBulletEndHits(baddie, badX, badY, bullet) {
-      return badX <= bullet.x && bullet.x <= badX + baddie.width && badY <= bullet.y && bullet.y <= badY + baddie.height;
+    key: 'pcBulletHitsBaddie',
+    value: function pcBulletHitsBaddie(baddie, drawPoint, bullet) {
+      return drawPoint.x <= bullet.x && bullet.x <= drawPoint.x + baddie.width && drawPoint.y <= bullet.y && bullet.y <= drawPoint.y + baddie.height;
     }
 
     // spawnedBaddies.forEach((baddie) => {
@@ -593,18 +626,18 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Player = function () {
-  function Player(ctx, fieldWidth, fieldHeight, BulletPool) {
+  function Player(ctx, pcFieldWidth, pcFieldHeight, BulletPool) {
     _classCallCheck(this, Player);
 
     this.ctx = ctx;
-    this.fieldWidth = fieldWidth;
-    this.fieldHeight = fieldHeight;
+    this.pcFieldWidth = pcFieldWidth;
+    this.pcFieldHeight = pcFieldHeight;
     this.BulletPool = BulletPool;
 
     this.width = 10;
     this.height = 10;
 
-    this.speed = 0.1;
+    this.speed = 0.15;
     this.radius = 30; // The 'track' the player moves along
     this.fireCooldown = 15;
     this.fireCharge = 0;
@@ -614,6 +647,7 @@ var Player = function () {
     this.portVertex = this.computePortVertex();
     this.bowTheta = Math.PI / 2;
     this.bowVertex = this.computeBowVertex();
+    this.hitboxCenter = this.computeHitboxCenter();
 
     this.draw = this.draw.bind(this);
     this.fire = this.fire.bind(this);
@@ -623,24 +657,32 @@ var Player = function () {
     key: 'computeStarboardVertex',
     value: function computeStarboardVertex() {
       return {
-        x: Math.cos(this.starboardTheta) * this.radius + this.fieldWidth / 2,
-        y: -Math.sin(this.starboardTheta) * this.radius + this.fieldHeight / 2
+        x: Math.cos(this.starboardTheta) * this.radius + this.pcFieldWidth / 2,
+        y: -Math.sin(this.starboardTheta) * this.radius + this.pcFieldHeight / 2
       };
     }
   }, {
     key: 'computePortVertex',
     value: function computePortVertex() {
       return {
-        x: Math.cos(this.portTheta) * this.radius + this.fieldWidth / 2,
-        y: Math.sin(this.portTheta) * this.radius + this.fieldHeight / 2
+        x: Math.cos(this.portTheta) * this.radius + this.pcFieldWidth / 2,
+        y: Math.sin(this.portTheta) * this.radius + this.pcFieldHeight / 2
       };
     }
   }, {
     key: 'computeBowVertex',
     value: function computeBowVertex() {
       return {
-        x: Math.cos(this.bowTheta) * -20 + this.fieldWidth / 2,
-        y: Math.sin(this.bowTheta) * -20 + this.fieldHeight / 2
+        x: Math.cos(this.bowTheta) * -20 + this.pcFieldWidth / 2,
+        y: Math.sin(this.bowTheta) * -20 + this.pcFieldHeight / 2
+      };
+    }
+  }, {
+    key: 'computeHitboxCenter',
+    value: function computeHitboxCenter() {
+      return {
+        x: Math.cos(this.bowTheta) * -25 + this.pcFieldWidth / 2,
+        y: Math.sin(this.bowTheta) * -25 + this.pcFieldHeight / 2
       };
     }
   }, {
@@ -663,7 +705,7 @@ var Player = function () {
     key: 'fire',
     value: function fire() {
       this.fireCharge = 0;
-      var bulletSpeed = 2;
+      var bulletSpeed = 0.5;
       this.BulletPool.get(this.bowTheta, bulletSpeed);
     }
   }, {
@@ -672,6 +714,7 @@ var Player = function () {
       this.starboardVertex = this.computeStarboardVertex();
       this.portVertex = this.computePortVertex();
       this.bowVertex = this.computeBowVertex();
+      this.hitboxCenter = this.computeHitboxCenter();
 
       this.ctx.beginPath();
       this.ctx.moveTo(this.starboardVertex.x, this.starboardVertex.y);
@@ -679,6 +722,11 @@ var Player = function () {
       this.ctx.lineTo(this.bowVertex.x, this.bowVertex.y);
       this.ctx.strokeStyle = 'black';
       this.ctx.fill();
+    }
+  }, {
+    key: 'isHit',
+    value: function isHit() {
+      console.log('ouch!');
     }
   }]);
 
