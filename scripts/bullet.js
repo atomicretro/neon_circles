@@ -3,7 +3,7 @@ import { Drawable, ObjectPool } from './utilities';
 export default class BulletPool extends ObjectPool {
   constructor(size, context) {
     super(size, context);
-    
+
     for (let i = 0; i < size; i++) {
       let bullet = new Bullet('playerBullet');
       this.pool.push(bullet);
@@ -71,8 +71,8 @@ class Bullet {
     this.endPoint = {x: 0, y: 0}
     this.speed = 0;
     this.spawned = false;
-    this.height = 10;
-    this.width = 10;
+    // this.height = 10;
+    // this.width = 10;
   }
 };
 

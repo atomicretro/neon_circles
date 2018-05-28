@@ -1,8 +1,9 @@
 class Player {
-  constructor(ctx, fieldWidth, fieldHeight) {
+  constructor(ctx, fieldWidth, fieldHeight, BulletPool) {
     this.ctx = ctx;
     this.fieldWidth = fieldWidth;
     this.fieldHeight = fieldHeight;
+    this.BulletPool = BulletPool;
 
     this.width = 10;
     this.height = 10;
@@ -17,6 +18,7 @@ class Player {
     this.bowVertex = this.computeBowVertex();
 
     this.draw = this.draw.bind(this);
+    this.fire = this.fire.bind(this);
   }
 
   computeStarboardVertex() {
@@ -40,21 +42,23 @@ class Player {
     })
   }
 
-  move(direction) {
-    if(direction === 'left') {
+  move(keyStatus) {
+    if(keyStatus.left) {
       this.starboardTheta += this.speed;
       this.portTheta -= this.speed;
       this.bowTheta -= this.speed;
-    } else if(direction === 'right') {
+    } else if(keyStatus.right) {
       this.starboardTheta -= this.speed;
       this.portTheta += this.speed;
       this.bowTheta += this.speed;
     }
+
+    if(keyStatus.fire) this.fire();
   }
 
-  fire(BulletPool) {
+  fire() {
     let bulletSpeed = 2;
-    BulletPool.get(this.bowTheta, bulletSpeed);
+    this.BulletPool.get(this.bowTheta, bulletSpeed);
   }
 
   draw() {

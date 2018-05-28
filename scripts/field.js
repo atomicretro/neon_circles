@@ -1,6 +1,7 @@
 import Player from './player';
-import BulletPool from './bullet';
 import { ImageStore } from './utilities';
+import BaddiePool from './baddie';
+import BulletPool from './bullet';
 
 const KEY_MAP = {
   74: 'left',     // j
@@ -12,24 +13,32 @@ const KEY_MAP = {
   32: 'fire'      // space bar
 };
 
+const KEY_STATUS = {};
+for (let code in KEY_MAP) {
+  KEY_STATUS[ KEY_MAP[ code ]] = false;
+}
+
 class Field {
-  constructor(bgCanvas, pcCanvas) {
-    this.bgWidth = 800;
-    this.bgHeight = 500;
+  constructor(fgCanvas, pcCanvas) {
+    this.fgWidth = 800;
+    this.fgHeight = 500;
     this.pcWidth = 100;
     this.pcHeight = 100;
 
-    bgCanvas.width = this.bgWidth;
-    bgCanvas.height = this.bgHeight;
+    fgCanvas.width = this.fgWidth;
+    fgCanvas.height = this.fgHeight;
     pcCanvas.width = this.pcWidth;
     pcCanvas.height = this.pcHeight;
 
-    this.bgContext = bgCanvas.getContext("2d");
+    this.fgContext = fgCanvas.getContext("2d");
     this.pcContext = pcCanvas.getContext("2d");
 
-    this.player = new Player(this.pcContext, this.pcWidth, this.pcHeight);
     this.ImageStore = new ImageStore();
-    this.BulletPool = new BulletPool(5, this.bgContext, this.ImageStore);
+    this.BaddiePool = new BaddiePool(5, this.fgContext);
+    this.pcBulletPool = new BulletPool(5, this.fgContext);
+    this.player = new Player(
+      this.pcContext, this.pcWidth, this.pcHeight, this.pcBulletPool
+    );
     this.lastTime = Date.now;
 
     this.drawPlayer = this.drawPlayer.bind(this);
@@ -38,16 +47,15 @@ class Field {
     this.keydown = this.keydown.bind(this);
 
     document.addEventListener('keydown', this.keydown.bind(this));
-
-    console.log(this.BulletPool);
+    document.addEventListener('keyup', this.keyup.bind(this));
   }
 
   drawFieldBorder() {
-    this.bgContext.beginPath();
-    this.bgContext.lineWidth = 1;
-    this.bgContext.rect(0, 0, this.bgWidth, this.bgHeight);
-    this.bgContext.strokeStyle = 'black';
-    this.bgContext.stroke();
+    this.fgContext.beginPath();
+    this.fgContext.lineWidth = 1;
+    this.fgContext.rect(0, 0, this.fgWidth, this.fgHeight);
+    this.fgContext.strokeStyle = 'black';
+    this.fgContext.stroke();
 
     this.pcContext.beginPath();
     this.pcContext.lineWidth = 1;
@@ -83,26 +91,37 @@ class Field {
   }
 
   render() {
-    this.clearBGContext();
+    this.clearFGContext();
     this.clearPCContext();
     this.drawFieldBorder();
     this.drawPlayerRails('circle');
     this.drawPlayer();
-    this.BulletPool.draw();
+    this.pcBulletPool.draw();
   }
 
   keydown(e) {
-    let key = KEY_MAP[e.keyCode];
-    if(key === 'left' || key === 'right') this.player.move(key);
-    if(key === 'fire') this.player.fire(this.BulletPool);
+    let keyCode = e.which || e.keyCode || 0;
+    if (KEY_MAP[keyCode]) {
+      e.preventDefault();
+      KEY_STATUS[KEY_MAP[keyCode]] = true;
+    }
+  }
+
+  keyup(e) {
+    let keyCode = e.which || e.keyCode || 0;
+    if (KEY_MAP[keyCode]) {
+      e.preventDefault();
+      KEY_STATUS[KEY_MAP[keyCode]] = false;
+    }
   }
 
   drawPlayer() {
-    this.player.draw()
+    this.player.move(KEY_STATUS);
+    this.player.draw();
   }
 
-  clearBGContext() {
-    this.bgContext.clearRect(0, 0, this.bgWidth, this.bgHeight);
+  clearFGContext() {
+    this.fgContext.clearRect(0, 0, this.fgWidth, this.fgHeight);
   }
 
   clearPCContext() {

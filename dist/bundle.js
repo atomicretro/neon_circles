@@ -71,6 +71,74 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./scripts/baddie.js":
+/*!***************************!*\
+  !*** ./scripts/baddie.js ***!
+  \***************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _utilities = __webpack_require__(/*! ./utilities */ "./scripts/utilities.js");
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var BaddiePool = function (_ObjectPool) {
+  _inherits(BaddiePool, _ObjectPool);
+
+  function BaddiePool(size, context) {
+    _classCallCheck(this, BaddiePool);
+
+    var _this = _possibleConstructorReturn(this, (BaddiePool.__proto__ || Object.getPrototypeOf(BaddiePool)).call(this, size, context));
+
+    for (var i = 0; i < size; i++) {
+      var baddie = new Baddie('demon');
+      _this.pool.push(baddie);
+    }
+    return _this;
+  }
+
+  return BaddiePool;
+}(_utilities.ObjectPool);
+
+exports.default = BaddiePool;
+
+var Baddie = function () {
+  function Baddie(type) {
+    _classCallCheck(this, Baddie);
+
+    this.type = type;
+    this.setDefaultValues();
+  }
+
+  _createClass(Baddie, [{
+    key: 'spawn',
+    value: function spawn(x, y, radius) {}
+  }, {
+    key: 'setDefaultValues',
+    value: function setDefaultValues() {
+      this.chanceToFire = 0.01;
+      this.spawned = false;
+    }
+  }]);
+
+  return Baddie;
+}();
+
+/***/ }),
+
 /***/ "./scripts/bullet.js":
 /*!***************************!*\
   !*** ./scripts/bullet.js ***!
@@ -179,8 +247,8 @@ var Bullet = function () {
       this.endPoint = { x: 0, y: 0 };
       this.speed = 0;
       this.spawned = false;
-      this.height = 10;
-      this.width = 10;
+      // this.height = 10;
+      // this.width = 10;
     }
   }]);
 
@@ -213,11 +281,15 @@ var _player = __webpack_require__(/*! ./player */ "./scripts/player.js");
 
 var _player2 = _interopRequireDefault(_player);
 
+var _utilities = __webpack_require__(/*! ./utilities */ "./scripts/utilities.js");
+
+var _baddie = __webpack_require__(/*! ./baddie */ "./scripts/baddie.js");
+
+var _baddie2 = _interopRequireDefault(_baddie);
+
 var _bullet = __webpack_require__(/*! ./bullet */ "./scripts/bullet.js");
 
 var _bullet2 = _interopRequireDefault(_bullet);
-
-var _utilities = __webpack_require__(/*! ./utilities */ "./scripts/utilities.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -233,26 +305,32 @@ var KEY_MAP = {
   32: 'fire' // space bar
 };
 
+var KEY_STATUS = {};
+for (var code in KEY_MAP) {
+  KEY_STATUS[KEY_MAP[code]] = false;
+}
+
 var Field = function () {
-  function Field(bgCanvas, pcCanvas) {
+  function Field(fgCanvas, pcCanvas) {
     _classCallCheck(this, Field);
 
-    this.bgWidth = 800;
-    this.bgHeight = 500;
+    this.fgWidth = 800;
+    this.fgHeight = 500;
     this.pcWidth = 100;
     this.pcHeight = 100;
 
-    bgCanvas.width = this.bgWidth;
-    bgCanvas.height = this.bgHeight;
+    fgCanvas.width = this.fgWidth;
+    fgCanvas.height = this.fgHeight;
     pcCanvas.width = this.pcWidth;
     pcCanvas.height = this.pcHeight;
 
-    this.bgContext = bgCanvas.getContext("2d");
+    this.fgContext = fgCanvas.getContext("2d");
     this.pcContext = pcCanvas.getContext("2d");
 
-    this.player = new _player2.default(this.pcContext, this.pcWidth, this.pcHeight);
     this.ImageStore = new _utilities.ImageStore();
-    this.BulletPool = new _bullet2.default(5, this.bgContext, this.ImageStore);
+    this.BaddiePool = new _baddie2.default(5, this.fgContext);
+    this.pcBulletPool = new _bullet2.default(5, this.fgContext);
+    this.player = new _player2.default(this.pcContext, this.pcWidth, this.pcHeight, this.pcBulletPool);
     this.lastTime = Date.now;
 
     this.drawPlayer = this.drawPlayer.bind(this);
@@ -261,18 +339,17 @@ var Field = function () {
     this.keydown = this.keydown.bind(this);
 
     document.addEventListener('keydown', this.keydown.bind(this));
-
-    console.log(this.BulletPool);
+    document.addEventListener('keyup', this.keyup.bind(this));
   }
 
   _createClass(Field, [{
     key: 'drawFieldBorder',
     value: function drawFieldBorder() {
-      this.bgContext.beginPath();
-      this.bgContext.lineWidth = 1;
-      this.bgContext.rect(0, 0, this.bgWidth, this.bgHeight);
-      this.bgContext.strokeStyle = 'black';
-      this.bgContext.stroke();
+      this.fgContext.beginPath();
+      this.fgContext.lineWidth = 1;
+      this.fgContext.rect(0, 0, this.fgWidth, this.fgHeight);
+      this.fgContext.strokeStyle = 'black';
+      this.fgContext.stroke();
 
       this.pcContext.beginPath();
       this.pcContext.lineWidth = 1;
@@ -311,29 +388,41 @@ var Field = function () {
   }, {
     key: 'render',
     value: function render() {
-      this.clearBGContext();
+      this.clearFGContext();
       this.clearPCContext();
       this.drawFieldBorder();
       this.drawPlayerRails('circle');
       this.drawPlayer();
-      this.BulletPool.draw();
+      this.pcBulletPool.draw();
     }
   }, {
     key: 'keydown',
     value: function keydown(e) {
-      var key = KEY_MAP[e.keyCode];
-      if (key === 'left' || key === 'right') this.player.move(key);
-      if (key === 'fire') this.player.fire(this.BulletPool);
+      var keyCode = e.which || e.keyCode || 0;
+      if (KEY_MAP[keyCode]) {
+        e.preventDefault();
+        KEY_STATUS[KEY_MAP[keyCode]] = true;
+      }
+    }
+  }, {
+    key: 'keyup',
+    value: function keyup(e) {
+      var keyCode = e.which || e.keyCode || 0;
+      if (KEY_MAP[keyCode]) {
+        e.preventDefault();
+        KEY_STATUS[KEY_MAP[keyCode]] = false;
+      }
     }
   }, {
     key: 'drawPlayer',
     value: function drawPlayer() {
+      this.player.move(KEY_STATUS);
       this.player.draw();
     }
   }, {
-    key: 'clearBGContext',
-    value: function clearBGContext() {
-      this.bgContext.clearRect(0, 0, this.bgWidth, this.bgHeight);
+    key: 'clearFGContext',
+    value: function clearFGContext() {
+      this.fgContext.clearRect(0, 0, this.fgWidth, this.fgHeight);
     }
   }, {
     key: 'clearPCContext',
@@ -398,12 +487,13 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Player = function () {
-  function Player(ctx, fieldWidth, fieldHeight) {
+  function Player(ctx, fieldWidth, fieldHeight, BulletPool) {
     _classCallCheck(this, Player);
 
     this.ctx = ctx;
     this.fieldWidth = fieldWidth;
     this.fieldHeight = fieldHeight;
+    this.BulletPool = BulletPool;
 
     this.width = 10;
     this.height = 10;
@@ -418,6 +508,7 @@ var Player = function () {
     this.bowVertex = this.computeBowVertex();
 
     this.draw = this.draw.bind(this);
+    this.fire = this.fire.bind(this);
   }
 
   _createClass(Player, [{
@@ -446,22 +537,24 @@ var Player = function () {
     }
   }, {
     key: 'move',
-    value: function move(direction) {
-      if (direction === 'left') {
+    value: function move(keyStatus) {
+      if (keyStatus.left) {
         this.starboardTheta += this.speed;
         this.portTheta -= this.speed;
         this.bowTheta -= this.speed;
-      } else if (direction === 'right') {
+      } else if (keyStatus.right) {
         this.starboardTheta -= this.speed;
         this.portTheta += this.speed;
         this.bowTheta += this.speed;
       }
+
+      if (keyStatus.fire) this.fire();
     }
   }, {
     key: 'fire',
-    value: function fire(BulletPool) {
+    value: function fire() {
       var bulletSpeed = 2;
-      BulletPool.get(this.bowTheta, bulletSpeed);
+      this.BulletPool.get(this.bowTheta, bulletSpeed);
     }
   }, {
     key: 'draw',
