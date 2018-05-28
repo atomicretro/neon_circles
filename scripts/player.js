@@ -16,9 +16,6 @@ class Player {
     this.bowTheta = Math.PI / 2;
     this.bowVertex = this.computeBowVertex();
 
-    this.playerImage = new Image();
-    this.playerImage.src = "assets/sprites/sprite_test_1.png";
-
     this.draw = this.draw.bind(this);
   }
 

@@ -9,12 +9,21 @@ export class Drawable {
 
 export class ImageStore {
   constructor() {
-    this.bullet = new Image();
-
+    this.bulletSheet = new Image();
+    this.demonSheet = new Image();
+    // this.numImages = 2;
+    // this.numLoaded = 0;
+    //
     // this.bullet.onload = () => {
-    //   alert(myCanvas.toDataURL('image/jpeg'));
+    //   this.imageLoaded();
     // }
 
-    this.bullet.src = 'assets/sprites/bullet.png'
+    this.bulletSheet.src = 'assets/sprites/bullet.png';
+    this.demonSheet.src = 'assets/sprites/demon_sheet.png';
   }
+
+  // imageLoaded() {
+  //   this.numLoaded++;
+  //   if(this.numLoaded === this.numImages) game.playRound();
+  // }
 }

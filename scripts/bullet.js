@@ -16,15 +16,19 @@ export default class BulletPool {
   get(theta, speed) {
     if(!this.pool[this.size - 1].spawned) {
       this.pool[this.size - 1].spawn(theta, speed);
+      debugger
       this.pool.unshift(this.pool.pop());
+      debugger
     }
   }
 
   draw() {
     for (let i = 0; i < this.size; i++) {
-      if(this.pool[i].spawned && this.pool[i].draw(this.context, this.ImageStore)) {
-        this.pool[i].setDefaultValues();
-        this.pool.push((this.pool.splice(i,1))[0]);
+      if(this.pool[i].spawned) {
+        if(this.pool[i].draw(this.context, this.ImageStore)) {
+          this.pool[i].setDefaultValues();
+          this.pool.push((this.pool.splice(i,1))[0]);
+        }
       } else {
         break;
       }
@@ -53,12 +57,10 @@ class Bullet {
     this.startPoint = this.computePoint(this.startRadius);
     this.endPoint = this.computePoint(this.endRadius);
 
-    if (
-      (this.startPoint.y > -10 || this.endPoint.y > -10) &&
-      (this.startPoint.y < 510 || this.endPoint.y < 510) &&
-      (this.startPoint.x > -10 || this.endPoint.x > -10) &&
-      (this.startPoint.x < 810 || this.endPoint.x < 810)
-    ) {
+    if ((this.startPoint.y > -1 || this.endPoint.y > -1) &&
+        (this.startPoint.y < 501 || this.endPoint.y < 501) &&
+        (this.startPoint.x > -1 || this.endPoint.x > -1) &&
+        (this.startPoint.x < 801 || this.endPoint.x < 801)) {
       context.beginPath();
       context.lineWidth = 2;
       context.moveTo(this.startPoint.x, this.startPoint.y);
