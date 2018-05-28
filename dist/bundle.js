@@ -122,7 +122,8 @@ var Baddie = function () {
     this.ctx = ctx;
     this.type = type;
     this.setDefaultValues();
-    this.sprite = new _utilities.Sprite(ctx, ImageStore[type], 21, 30);
+    var storedAsset = ImageStore[type];
+    this.sprite = new _utilities.Sprite(ctx, storedAsset.image, storedAsset.width, storedAsset.height, storedAsset.srcX, storedAsset.srcY);
   }
 
   _createClass(Baddie, [{
@@ -356,7 +357,8 @@ var Field = function () {
 
     this.ImageStore = new _utilities.ImageStore();
     this.BaddiePool = new _baddie2.default(1, this.fgContext, this.ImageStore);
-    this.pcBulletPool = new _bullet2.default(5, this.fgContext); //give to player?
+    this.badBulletPool = new _bullet2.default(20, this.fgContext);
+    this.pcBulletPool = new _bullet2.default(8, this.fgContext);
     this.player = new _player2.default(this.pcContext, this.pcWidth, this.pcHeight, this.pcBulletPool);
     this.lastTime = Date.now;
 
@@ -364,6 +366,7 @@ var Field = function () {
     this.playRound = this.playRound.bind(this);
     this.render = this.render.bind(this);
     this.keydown = this.keydown.bind(this);
+    this.checkBaddieCollision = this.checkBaddieCollision.bind(this);
 
     document.addEventListener('keydown', this.keydown.bind(this));
     document.addEventListener('keyup', this.keyup.bind(this));
@@ -419,9 +422,10 @@ var Field = function () {
       this.clearPCContext();
       this.drawFieldBorder();
       this.drawPlayerRails('circle');
+      this.checkBaddieCollision();
       this.drawPlayer();
       this.pcBulletPool.draw();
-      this.BaddiePool.get(Math.PI / 2, 0.01);
+      this.BaddiePool.get(Math.PI / 2, 0.005);
       this.BaddiePool.draw();
     }
   }, {
@@ -448,16 +452,69 @@ var Field = function () {
       this.player.move(KEY_STATUS);
       this.player.draw();
     }
+
+    // checkPlayerCollision() {
+    //   this.badBulletPool.forEach((bullet) => console.log(bullet))
+    // let spawnedBadBullets = this.badBulletPool.pool.filter(
+    //   (bullet) => bullet.spawned )
+    // }
+
+  }, {
+    key: 'checkBaddieCollision',
+    value: function checkBaddieCollision() {
+      var spawnedBaddies = this.BaddiePool.pool.filter(function (baddie) {
+        return baddie.spawned;
+      });
+      var spawnedPCBullets = this.pcBulletPool.pool.filter(function (bullet) {
+        return bullet.spawned;
+      });
+
+      // for (let badIdx = 0; badIdx < spawnedBaddies.length; badIdx++) {
+      //   for (var bulIdx = 0; bulIdx < spawnedPCBullets.length; bulIdx++) {
+      //     debugger
+      //   }
+      // }
+      //
+      // spawnedBaddies.forEach((baddie) => {
+      //   spawnedPCBullets.forEach((bullet) => {
+      //     if bullet.startPoint.x
+      //     let bulletStart
+      //   })
+      // })
+
+      // debugger
+      // this.BaddiePool.pool.forEach((baddie) => {
+      //   debugger
+      //   let badX = baddie.drawPoint.x;
+      //   let badY = baddie.drawPoint.y;
+      //   this.pcBulletPool.pool.forEach((bullet) => {
+      //     debugger
+      //     console.log(`bullet ${bullet.startPoint.x}`);
+      //     console.log(`baddie ${baddie.drawPoint.x}`);
+      //     if(
+      //       (bullet.startPoint.x <= badX && bullet.startPoint.x >= badX + 20) ||
+      //       (bullet.endPoint.x <= badX && bullet.endPoint.x >= badX + 20) ||
+      //       (bullet.startPoint.y <= badY && bullet.startPoint.y >= badY + 30) ||
+      //       (bullet.endPoint.y <= badY && bullet.startPoint.y >= badY + 30)
+      //     ) {
+      //       console.log('hit!');
+      //     }
+      //   })
+      //
+      // })
+    }
   }, {
     key: 'clearFGContext',
     value: function clearFGContext() {
       this.fgContext.clearRect(0, 0, this.fgWidth, this.fgHeight);
-    }
+    } // implement dirty rectangles on each sprite?
+
   }, {
     key: 'clearPCContext',
     value: function clearPCContext() {
       this.pcContext.clearRect(0, 0, this.pcWidth, this.pcHeight);
-    }
+    } // implement dirty rectangles on each sprite?
+
   }]);
 
   return Field;
@@ -668,24 +725,24 @@ var ObjectPool = exports.ObjectPool = function () {
 ;
 
 var Sprite = exports.Sprite = function () {
-  function Sprite(context, image, srcWidth, srcHeight) {
+  function Sprite(context, image, srcWidth, srcHeight, srcX, srcY) {
     _classCallCheck(this, Sprite);
 
     this.context = context;
     this.image = image;
+    this.srcX = srcX;
+    this.srcY = srcY;
     this.srcWidth = srcWidth;
     this.srcHeight = srcHeight;
+
+    this.draw = this.draw.bind(this);
   }
 
   _createClass(Sprite, [{
     key: 'draw',
-    value: function draw(drawX, drawY) {
-
-      this.context.drawImage(this.image, drawX, drawY, this.srcWidth, this.srcHeight
-      // drawX,
-      // drawY,
-      // 21,
-      // 30
+    value: function draw(drawPointX, drawPointY) {
+      this.context.drawImage(this.image, this.srcX, this.srcY, this.srcWidth, this.srcHeight, drawPointX, drawPointY, this.srcWidth, // drawn image width, same as src
+      this.srcHeight // drawn image height, same as src
       );
     }
   }]);
@@ -696,17 +753,22 @@ var Sprite = exports.Sprite = function () {
 var ImageStore = exports.ImageStore = function ImageStore() {
   _classCallCheck(this, ImageStore);
 
-  this.bullet = new Image();
-  this.demon = new Image();
-  // this.numImages = 2;
-  // this.numLoaded = 0;
-  //
-  // this.bullet.onload = () => {
-  //   this.imageLoaded();
-  // }
+  this.bullet = { image: new Image() };
+  this.demon = {
+    image: new Image(),
+    width: 21,
+    height: 30,
+    srcX: 0,
+    srcY: 0
+    // this.numImages = 2;
+    // this.numLoaded = 0;
+    //
+    // this.bullet.onload = () => {
+    //   this.imageLoaded();
+    // }
 
-  this.bullet.src = 'assets/sprites/bullet.png';
-  this.demon.src = 'assets/sprites/demon_test.png';
+  };this.bullet.image.src = 'assets/sprites/bullet.png';
+  this.demon.image.src = 'assets/sprites/demon_test.png';
 }
 
 // imageLoaded() {

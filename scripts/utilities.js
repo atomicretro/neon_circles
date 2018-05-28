@@ -26,33 +26,42 @@ export class ObjectPool {
 };
 
 export class Sprite {
-  constructor(context, image, srcWidth, srcHeight) {
+  constructor(context, image, srcWidth, srcHeight, srcX, srcY) {
     this.context = context;
     this.image = image;
+    this.srcX = srcX;
+    this.srcY = srcY;
     this.srcWidth = srcWidth;
     this.srcHeight = srcHeight;
+
+    this.draw = this.draw.bind(this);
   }
 
-  draw(drawX, drawY) {
-
+  draw(drawPointX, drawPointY) {
     this.context.drawImage(
       this.image,
-      drawX,
-      drawY,
+      this.srcX,
+      this.srcY,
       this.srcWidth,
       this.srcHeight,
-      // drawX,
-      // drawY,
-      // 21,
-      // 30
+      drawPointX,
+      drawPointY,
+      this.srcWidth,  // drawn image width, same as src
+      this.srcHeight  // drawn image height, same as src
     )
   }
 }
 
 export class ImageStore {
   constructor() {
-    this.bullet = new Image();
-    this.demon = new Image();
+    this.bullet = { image: new Image() }
+    this.demon = {
+      image: new Image(),
+      width: 21,
+      height: 30,
+      srcX: 0,
+      srcY: 0
+    }
     // this.numImages = 2;
     // this.numLoaded = 0;
     //
@@ -60,8 +69,8 @@ export class ImageStore {
     //   this.imageLoaded();
     // }
 
-    this.bullet.src = 'assets/sprites/bullet.png';
-    this.demon.src = 'assets/sprites/demon_test.png';
+    this.bullet.image.src = 'assets/sprites/bullet.png';
+    this.demon.image.src = 'assets/sprites/demon_test.png';
 
   }
 

@@ -16,8 +16,15 @@ class Baddie {
     this.ctx = ctx;
     this.type = type;
     this.setDefaultValues();
-    this.sprite = new Sprite(ctx, ImageStore[type], 21, 30);
-
+    let storedAsset = ImageStore[type];
+    this.sprite = new Sprite(
+      ctx,
+      storedAsset.image,
+      storedAsset.width,
+      storedAsset.height,
+      storedAsset.srcX,
+      storedAsset.srcY
+    );
   }
 
   spawn(theta, speed) {
