@@ -1,8 +1,9 @@
 import { Sprite, ObjectPool } from './utilities';
 
 export default class BaddiePool extends ObjectPool {
-  constructor(size, ctx, ImageStore) {
+  constructor(size, ctx, ImageStore, BulletPool) {
     super(size, ctx);
+    this.BulletPool = BulletPool;
 
     for (let i = 0; i < size; i++) {
       let baddie = new Baddie(ctx, 'redDemon', ImageStore);
@@ -36,7 +37,7 @@ class Baddie {
     this.spawned = true;
   }
 
-  draw() {
+  draw(BulletPool) {
     if(this.isHit) {
       return true;
     } else {
@@ -44,6 +45,9 @@ class Baddie {
       this.drawPoint = this.computeDrawPoint();
       this.ctx.clearRect(this.x, this.y, this.width, this.height);
       this.sprite.draw(this.drawPoint.x, this.drawPoint.y);
+
+      this.chanceToFire = Math.floor(Math.random() * 101)
+      this.fire(BulletPool);
     }
   }
 
@@ -54,13 +58,16 @@ class Baddie {
     })
   }
 
-  isHit() {
-
+  fire(BulletPool) {
+    console.log('baddie.fire');
+    let bulletSpeed = 0.5;
+    BulletPool.get(this.theta, bulletSpeed);
   }
 
   setDefaultValues() {
     this.isHit = false;
-    this.chanceToFire = 0.01;
+    this.chanceToFire = 0;
+    this.fireThreshold = 0.01;
     this.spawned = false;
     this.drawPoint = {x: 400, y: 250};
     this.speed = 0.1;

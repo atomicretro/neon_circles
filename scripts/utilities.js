@@ -5,6 +5,7 @@ export class ObjectPool {
   }
 
   get(theta, speed) {
+    // debugger
     if(!this.pool[this.size - 1].spawned) {
       this.pool[this.size - 1].spawn(theta, speed);
       this.pool.unshift(this.pool.pop());
@@ -14,7 +15,7 @@ export class ObjectPool {
   draw() {
     for (let i = 0; i < this.size; i++) {
       if(this.pool[i].spawned) {
-        if(this.pool[i].draw()) {
+        if(this.pool[i].draw(this.BulletPool)) {
           this.pool[i].setDefaultValues();
           this.pool.push((this.pool.splice(i,1))[0]);
         }

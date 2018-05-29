@@ -98,10 +98,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var BaddiePool = function (_ObjectPool) {
   _inherits(BaddiePool, _ObjectPool);
 
-  function BaddiePool(size, ctx, ImageStore) {
+  function BaddiePool(size, ctx, ImageStore, BulletPool) {
     _classCallCheck(this, BaddiePool);
 
     var _this = _possibleConstructorReturn(this, (BaddiePool.__proto__ || Object.getPrototypeOf(BaddiePool)).call(this, size, ctx));
+
+    _this.BulletPool = BulletPool;
 
     for (var i = 0; i < size; i++) {
       var baddie = new Baddie(ctx, 'redDemon', ImageStore);
@@ -138,7 +140,7 @@ var Baddie = function () {
     }
   }, {
     key: 'draw',
-    value: function draw() {
+    value: function draw(BulletPool) {
       if (this.isHit) {
         return true;
       } else {
@@ -146,6 +148,9 @@ var Baddie = function () {
         this.drawPoint = this.computeDrawPoint();
         this.ctx.clearRect(this.x, this.y, this.width, this.height);
         this.sprite.draw(this.drawPoint.x, this.drawPoint.y);
+
+        this.chanceToFire = Math.floor(Math.random() * 101);
+        this.fire(BulletPool);
       }
     }
   }, {
@@ -157,13 +162,18 @@ var Baddie = function () {
       };
     }
   }, {
-    key: 'isHit',
-    value: function isHit() {}
+    key: 'fire',
+    value: function fire(BulletPool) {
+      console.log('baddie.fire');
+      var bulletSpeed = 0.5;
+      BulletPool.get(this.theta, bulletSpeed);
+    }
   }, {
     key: 'setDefaultValues',
     value: function setDefaultValues() {
       this.isHit = false;
-      this.chanceToFire = 0.01;
+      this.chanceToFire = 0;
+      this.fireThreshold = 0.01;
       this.spawned = false;
       this.drawPoint = { x: 400, y: 250 };
       this.speed = 0.1;
@@ -203,13 +213,13 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var BulletPool = function (_ObjectPool) {
   _inherits(BulletPool, _ObjectPool);
 
-  function BulletPool(size, ctx) {
+  function BulletPool(size, ctx, type) {
     _classCallCheck(this, BulletPool);
 
     var _this = _possibleConstructorReturn(this, (BulletPool.__proto__ || Object.getPrototypeOf(BulletPool)).call(this, size));
 
     for (var i = 0; i < size; i++) {
-      var bullet = new Bullet(ctx, 'playerBullet');
+      var bullet = new Bullet(ctx, type);
       _this.pool.push(bullet);
     }
     return _this;
@@ -246,6 +256,7 @@ var Bullet = function () {
       this.endRadius -= this.speed;
       this.startPoint = this.computePoint(this.startRadius);
       this.endPoint = this.computePoint(this.endRadius);
+      console.log('bullet.draw');
 
       if ((this.startPoint.y > -1 || this.endPoint.y > -1) && (this.startPoint.y < 501 || this.endPoint.y < 501) && (this.startPoint.x > -1 || this.endPoint.x > -1) && (this.startPoint.x < 801 || this.endPoint.x < 801)) {
         this.ctx.beginPath();
@@ -253,6 +264,7 @@ var Bullet = function () {
         this.ctx.moveTo(this.startPoint.x, this.startPoint.y);
         this.ctx.lineTo(this.endPoint.x, this.endPoint.y);
         this.ctx.stroke();
+        console.log('bullet.draw#if');
       } else {
         return true;
       };
@@ -276,8 +288,8 @@ var Bullet = function () {
       } else {
         this.startRadius = 0;
         this.endRadius = 0;
-        this.xOffset = 0;
-        this.yOffset = 0;
+        this.xOffset = 400;
+        this.yOffset = 250;
       }
 
       this.pathAngle = 0;
@@ -366,9 +378,9 @@ var Field = function () {
     this.pcContext = pcCanvas.getContext("2d");
 
     this.ImageStore = new _utilities.ImageStore();
-    this.BaddiePool = new _baddie2.default(1, this.fgContext, this.ImageStore);
-    this.badBulletPool = new _bullet2.default(20, this.fgContext);
-    this.pcBulletPool = new _bullet2.default(8, this.fgContext);
+    this.badBulletPool = new _bullet2.default(20, this.fgContext, 'demonBullet');
+    this.pcBulletPool = new _bullet2.default(8, this.fgContext, 'playerBullet');
+    this.BaddiePool = new _baddie2.default(1, this.fgContext, this.ImageStore, this.badBulletPool);
     this.player = new _player2.default(this.pcContext, this.pcWidth, this.pcHeight, this.pcBulletPool);
     this.lastTime = Date.now;
 
@@ -766,6 +778,7 @@ var ObjectPool = exports.ObjectPool = function () {
   _createClass(ObjectPool, [{
     key: 'get',
     value: function get(theta, speed) {
+      // debugger
       if (!this.pool[this.size - 1].spawned) {
         this.pool[this.size - 1].spawn(theta, speed);
         this.pool.unshift(this.pool.pop());
@@ -776,7 +789,7 @@ var ObjectPool = exports.ObjectPool = function () {
     value: function draw() {
       for (var i = 0; i < this.size; i++) {
         if (this.pool[i].spawned) {
-          if (this.pool[i].draw()) {
+          if (this.pool[i].draw(this.BulletPool)) {
             this.pool[i].setDefaultValues();
             this.pool.push(this.pool.splice(i, 1)[0]);
           }

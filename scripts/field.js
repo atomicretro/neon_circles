@@ -34,9 +34,11 @@ class Field {
     this.pcContext = pcCanvas.getContext("2d");
 
     this.ImageStore = new ImageStore();
-    this.BaddiePool = new BaddiePool(1, this.fgContext, this.ImageStore);
-    this.badBulletPool = new BulletPool(20, this.fgContext);
-    this.pcBulletPool = new BulletPool(8, this.fgContext);
+    this.badBulletPool = new BulletPool(20, this.fgContext, 'demonBullet');
+    this.pcBulletPool = new BulletPool(8, this.fgContext, 'playerBullet');
+    this.BaddiePool = new BaddiePool(
+      1, this.fgContext, this.ImageStore, this.badBulletPool
+    );
     this.player = new Player(
       this.pcContext, this.pcWidth, this.pcHeight, this.pcBulletPool
     );

@@ -1,11 +1,11 @@
 import { Sprite, ObjectPool } from './utilities';
 
 export default class BulletPool extends ObjectPool {
-  constructor(size, ctx) {
+  constructor(size, ctx, type) {
     super(size);
 
     for (let i = 0; i < size; i++) {
-      let bullet = new Bullet(ctx, 'playerBullet');
+      let bullet = new Bullet(ctx, type);
       this.pool.push(bullet);
     }
   }
@@ -32,6 +32,7 @@ class Bullet {
     this.endRadius -= this.speed;
     this.startPoint = this.computePoint(this.startRadius);
     this.endPoint = this.computePoint(this.endRadius);
+    console.log('bullet.draw');
 
     if ((this.startPoint.y > -1 || this.endPoint.y > -1) &&
         (this.startPoint.y < 501 || this.endPoint.y < 501) &&
@@ -42,6 +43,7 @@ class Bullet {
       this.ctx.moveTo(this.startPoint.x, this.startPoint.y);
       this.ctx.lineTo(this.endPoint.x, this.endPoint.y);
       this.ctx.stroke();
+      console.log('bullet.draw#if');
     } else {
       return true;
     };
@@ -63,8 +65,8 @@ class Bullet {
     } else {
       this.startRadius = 0;
       this.endRadius = 0;
-      this.xOffset = 0;
-      this.yOffset = 0;
+      this.xOffset = 400;
+      this.yOffset = 250;
     }
 
     this.pathAngle = 0;
