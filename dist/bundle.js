@@ -647,23 +647,20 @@ var Player = function () {
     this.pcFieldHeight = pcFieldHeight;
     this.BulletPool = BulletPool;
 
-    this.width = 15;
-    this.height = 15;
-
-    this.speed = 0.2;
     this.velocity = 0;
     this.acceleration = 0.03;
     this.maxSpeed = 0.3;
     this.radius = 30; // The 'track' the player moves along
-    this.fireCooldown = 15;
     this.fireCharge = 0;
-    this.starboardTheta = 1.9106;
-    this.starboardVertex = this.computeStarboardVertex();
+    this.fireCooldown = 15;
+
     this.portTheta = -1.23;
-    this.portVertex = this.computePortVertex();
+    this.starboardTheta = 1.9106;
     this.bowTheta = Math.PI / 2;
-    this.bowVertex = this.computeBowVertex();
-    this.hitboxCenter = this.computeHitboxCenter();
+    this.portVertex = this.computePortVertex();
+    this.starboardVertex = this.computeStarboardVertex();
+    this.bowVertex = this.computeCenterPoints(-10);
+    this.hitboxCenter = this.computeCenterPoints(-22);
 
     this.draw = this.draw.bind(this);
     this.fire = this.fire.bind(this);
@@ -686,19 +683,11 @@ var Player = function () {
       };
     }
   }, {
-    key: 'computeBowVertex',
-    value: function computeBowVertex() {
+    key: 'computeCenterPoints',
+    value: function computeCenterPoints(radius) {
       return {
-        x: Math.cos(this.bowTheta) * -10 + this.pcFieldWidth / 2,
-        y: Math.sin(this.bowTheta) * -10 + this.pcFieldHeight / 2
-      };
-    }
-  }, {
-    key: 'computeHitboxCenter',
-    value: function computeHitboxCenter() {
-      return {
-        x: Math.cos(this.bowTheta) * -22 + this.pcFieldWidth / 2,
-        y: Math.sin(this.bowTheta) * -22 + this.pcFieldHeight / 2
+        x: Math.cos(this.bowTheta) * radius + this.pcFieldWidth / 2,
+        y: Math.sin(this.bowTheta) * radius + this.pcFieldHeight / 2
       };
     }
   }, {
@@ -733,8 +722,8 @@ var Player = function () {
     value: function draw() {
       this.starboardVertex = this.computeStarboardVertex();
       this.portVertex = this.computePortVertex();
-      this.bowVertex = this.computeBowVertex();
-      this.hitboxCenter = this.computeHitboxCenter();
+      this.bowVertex = this.computeCenterPoints(-10);
+      this.hitboxCenter = this.computeCenterPoints(-22);
 
       this.ctx.beginPath();
       this.ctx.moveTo(this.starboardVertex.x, this.starboardVertex.y);
