@@ -17,7 +17,6 @@ export default class Bullet {
   }
 
   draw() {
-    // ctx.clearRect(this.x, this.y, this.width, this.height); optimize later
     this.startRadius -= this.speed;
     this.endRadius -= this.speed;
     this.startPoint = this.computePoint(this.startRadius);
@@ -27,6 +26,7 @@ export default class Bullet {
        (this.startPoint.y < this.undrawY || this.endPoint.y < this.undrawY) &&
        (this.startPoint.x > -1 || this.endPoint.x > -1) &&
        (this.startPoint.x < this.undrawX || this.endPoint.x < this.undrawX)) {
+      this.clear()
       this.ctx.beginPath();
       this.ctx.lineWidth = 2;
       this.ctx.moveTo(this.startPoint.x, this.startPoint.y);
@@ -37,10 +37,28 @@ export default class Bullet {
     };
   }
 
+  clear() {
+    let startX;
+    let startY;
+
+    if(this.startPoint.x > this.endPoint.x) {
+      startX = this.endPoint.x;
+    } else {
+      startX = this.startPoint.x;
+    }
+    if(this.startPoint.y > this.endPoint.y) {
+      startY = this.endPoint.y;
+    } else {
+      startY = this.startPoint.y;
+    }
+
+    this.ctx.clearRect(startX - 5, startY - 5, 30, 30);
+  }
+
   computePoint(radius) {
     return ({
-      x: Math.cos(this.pathAngle) * -radius  + this.xOffset,
-      y: Math.sin(this.pathAngle) * -radius  + this.yOffset
+      x: Math.cos(this.pathAngle) * -radius + this.xOffset,
+      y: Math.sin(this.pathAngle) * -radius + this.yOffset
     })
   }
 
