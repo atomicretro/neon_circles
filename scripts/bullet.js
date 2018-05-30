@@ -1,21 +1,11 @@
-import { Sprite, ObjectPool } from './utilities';
-
-export default class BulletPool extends ObjectPool {
-  constructor(size, fgCanvas, type) {
-    super(size);
-
-    for (let i = 0; i < size; i++) {
-      let bullet = new BadBullet(fgCanvas, type);
-      this.pool.push(bullet);
-    }
-  }
-}
-
-class BadBullet {
+export default class Bullet {
   constructor(fgCanvas, type) {
     this.ctx = fgCanvas.ctx;
-    this.type = type;
-    this.setDefaultValues();
+    this.ctxWidth = fgCanvas.width;
+    this.ctxHeight = fgCanvas.height;
+    this.undrawX = fgCanvas.width + 1;
+    this.undrawY = fgCanvas.height + 1;
+    this.setDefaultValues(type);
   }
 
   spawn(theta, speed) {
@@ -33,10 +23,10 @@ class BadBullet {
     this.startPoint = this.computePoint(this.startRadius);
     this.endPoint = this.computePoint(this.endRadius);
 
-    if ((this.startPoint.y > -1 || this.endPoint.y > -1) &&
-        (this.startPoint.y < 501 || this.endPoint.y < 501) &&
-        (this.startPoint.x > -1 || this.endPoint.x > -1) &&
-        (this.startPoint.x < 801 || this.endPoint.x < 801)) {
+    if((this.startPoint.y > -1 || this.endPoint.y > -1) &&
+       (this.startPoint.y < this.undrawY || this.endPoint.y < this.undrawY) &&
+       (this.startPoint.x > -1 || this.endPoint.x > -1) &&
+       (this.startPoint.x < this.undrawX || this.endPoint.x < this.undrawX)) {
       this.ctx.beginPath();
       this.ctx.lineWidth = 2;
       this.ctx.moveTo(this.startPoint.x, this.startPoint.y);
@@ -54,27 +44,17 @@ class BadBullet {
     })
   }
 
-  setDefaultValues() {
-    if (this.type === 'playerBullet') {
+  setDefaultValues(type) {
+    if(type === 'player') {
       this.startRadius = 12;
       this.endRadius = -8;
-      this.xOffset = 400;
-      this.yOffset = 250;
-    } else {
-      this.startRadius = 0;
-      this.endRadius = 0;
-      this.xOffset = 400;
-      this.yOffset = 250;
     }
-
+    this.xOffset = this.ctxWidth / 2;
+    this.yOffset = this.ctxHeight / 2;
     this.pathAngle = 0;
     this.startPoint = {x: 0, y: 0}
     this.endPoint = {x: 0, y: 0}
     this.speed = 0;
     this.spawned = false;
-    // this.height = 10;
-    // this.width = 10;
   }
 };
-
-// Bullet.prototype = new Sprite();

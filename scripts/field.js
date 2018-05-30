@@ -38,7 +38,7 @@ class Field {
     pcCanvas.height = this.pcCanvas.height;
 
     this.ImageStore = new ImageStore();
-    this.badBulletPool = new BaddieBulletPool(20, this.fgCanvas.ctx, 'demonBullet');
+    this.badBulletPool = new BaddieBulletPool(20, this.fgCanvas, 'demonBullet');
     this.pcBulletPool = new PlayerBulletPool(8, this.fgCanvas);
     this.BaddiePool = new BaddiePool(
       1, this.fgCanvas.ctx, this.ImageStore, this.badBulletPool
@@ -101,7 +101,7 @@ class Field {
     this.drawPlayerRails('circle');
     this.checkCollisions();
     this.drawPlayer();
-    this.pcBulletPool.draw();
+    this.pcBulletPool.draw('player');
     this.BaddiePool.get(Math.PI / 2, 0.005);
     this.BaddiePool.draw();
   }

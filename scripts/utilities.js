@@ -11,11 +11,11 @@ export class ObjectPool {
     }
   }
 
-  draw() {
+  draw(type) {
     for (let i = 0; i < this.size; i++) {
       if(this.pool[i].spawned) {
         if(this.pool[i].draw(this.BulletPool)) {
-          this.pool[i].setDefaultValues();
+          this.pool[i].setDefaultValues(type);
           this.pool.push((this.pool.splice(i,1))[0]);
         }
       } else {

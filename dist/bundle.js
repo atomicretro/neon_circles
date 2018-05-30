@@ -213,13 +213,13 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var BulletPool = function (_ObjectPool) {
   _inherits(BulletPool, _ObjectPool);
 
-  function BulletPool(size, ctx, type) {
+  function BulletPool(size, fgCanvas, type) {
     _classCallCheck(this, BulletPool);
 
     var _this = _possibleConstructorReturn(this, (BulletPool.__proto__ || Object.getPrototypeOf(BulletPool)).call(this, size));
 
     for (var i = 0; i < size; i++) {
-      var bullet = new BadBullet(ctx, type);
+      var bullet = new BadBullet(fgCanvas, type);
       _this.pool.push(bullet);
     }
     return _this;
@@ -231,10 +231,10 @@ var BulletPool = function (_ObjectPool) {
 exports.default = BulletPool;
 
 var BadBullet = function () {
-  function BadBullet(ctx, type) {
+  function BadBullet(fgCanvas, type) {
     _classCallCheck(this, BadBullet);
 
-    this.ctx = ctx;
+    this.ctx = fgCanvas.ctx;
     this.type = type;
     this.setDefaultValues();
   }
@@ -306,6 +306,97 @@ var BadBullet = function () {
 ;
 
 // Bullet.prototype = new Sprite();
+
+/***/ }),
+
+/***/ "./scripts/bullet.js":
+/*!***************************!*\
+  !*** ./scripts/bullet.js ***!
+  \***************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Bullet = function () {
+  function Bullet(fgCanvas, type) {
+    _classCallCheck(this, Bullet);
+
+    this.ctx = fgCanvas.ctx;
+    this.ctxWidth = fgCanvas.width;
+    this.ctxHeight = fgCanvas.height;
+    this.undrawX = fgCanvas.width + 1;
+    this.undrawY = fgCanvas.height + 1;
+    this.setDefaultValues(type);
+  }
+
+  _createClass(Bullet, [{
+    key: 'spawn',
+    value: function spawn(theta, speed) {
+      this.pathAngle = theta;
+      this.startPoint = this.computePoint(this.startRadius);
+      this.endPoint = this.computePoint(this.endRadius);
+      this.speed = speed;
+      this.spawned = true;
+    }
+  }, {
+    key: 'draw',
+    value: function draw() {
+      // ctx.clearRect(this.x, this.y, this.width, this.height); optimize later
+      this.startRadius -= this.speed;
+      this.endRadius -= this.speed;
+      this.startPoint = this.computePoint(this.startRadius);
+      this.endPoint = this.computePoint(this.endRadius);
+
+      if ((this.startPoint.y > -1 || this.endPoint.y > -1) && (this.startPoint.y < this.undrawY || this.endPoint.y < this.undrawY) && (this.startPoint.x > -1 || this.endPoint.x > -1) && (this.startPoint.x < this.undrawX || this.endPoint.x < this.undrawX)) {
+        this.ctx.beginPath();
+        this.ctx.lineWidth = 2;
+        this.ctx.moveTo(this.startPoint.x, this.startPoint.y);
+        this.ctx.lineTo(this.endPoint.x, this.endPoint.y);
+        this.ctx.stroke();
+      } else {
+        return true;
+      };
+    }
+  }, {
+    key: 'computePoint',
+    value: function computePoint(radius) {
+      return {
+        x: Math.cos(this.pathAngle) * -radius + this.xOffset,
+        y: Math.sin(this.pathAngle) * -radius + this.yOffset
+      };
+    }
+  }, {
+    key: 'setDefaultValues',
+    value: function setDefaultValues(type) {
+      if (type === 'player') {
+        this.startRadius = 12;
+        this.endRadius = -8;
+      }
+      this.xOffset = this.ctxWidth / 2;
+      this.yOffset = this.ctxHeight / 2;
+      this.pathAngle = 0;
+      this.startPoint = { x: 0, y: 0 };
+      this.endPoint = { x: 0, y: 0 };
+      this.speed = 0;
+      this.spawned = false;
+    }
+  }]);
+
+  return Bullet;
+}();
+
+exports.default = Bullet;
+;
 
 /***/ }),
 
@@ -383,7 +474,7 @@ var Field = function () {
     pcCanvas.height = this.pcCanvas.height;
 
     this.ImageStore = new _utilities.ImageStore();
-    this.badBulletPool = new _baddieBullet2.default(20, this.fgCanvas.ctx, 'demonBullet');
+    this.badBulletPool = new _baddieBullet2.default(20, this.fgCanvas, 'demonBullet');
     this.pcBulletPool = new _playerBullet2.default(8, this.fgCanvas);
     this.BaddiePool = new _baddie2.default(1, this.fgCanvas.ctx, this.ImageStore, this.badBulletPool);
     this.player = new _player2.default(this.pcCanvas, this.pcBulletPool);
@@ -449,7 +540,7 @@ var Field = function () {
       this.drawPlayerRails('circle');
       this.checkCollisions();
       this.drawPlayer();
-      this.pcBulletPool.draw();
+      this.pcBulletPool.draw('player');
       this.BaddiePool.get(Math.PI / 2, 0.005);
       this.BaddiePool.draw();
     }
@@ -771,9 +862,13 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 var _utilities = __webpack_require__(/*! ./utilities */ "./scripts/utilities.js");
+
+var _bullet = __webpack_require__(/*! ./bullet */ "./scripts/bullet.js");
+
+var _bullet2 = _interopRequireDefault(_bullet);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -801,71 +896,17 @@ var BulletPool = function (_ObjectPool) {
 
 exports.default = BulletPool;
 
-var PlayerBullet = function () {
+var PlayerBullet = function (_Bullet) {
+  _inherits(PlayerBullet, _Bullet);
+
   function PlayerBullet(fgCanvas) {
     _classCallCheck(this, PlayerBullet);
 
-    this.ctx = fgCanvas.ctx;
-    this.ctxWidth = fgCanvas.width;
-    this.ctxHeight = fgCanvas.height;
-    this.undrawX = fgCanvas.width + 1;
-    this.undrawY = fgCanvas.height + 1;
-    this.setDefaultValues();
+    return _possibleConstructorReturn(this, (PlayerBullet.__proto__ || Object.getPrototypeOf(PlayerBullet)).call(this, fgCanvas, 'player'));
   }
 
-  _createClass(PlayerBullet, [{
-    key: 'spawn',
-    value: function spawn(theta, speed) {
-      this.pathAngle = theta;
-      this.startPoint = this.computePoint(this.startRadius);
-      this.endPoint = this.computePoint(this.endRadius);
-      this.speed = speed;
-      this.spawned = true;
-    }
-  }, {
-    key: 'draw',
-    value: function draw() {
-      // ctx.clearRect(this.x, this.y, this.width, this.height); optimize later
-      this.startRadius -= this.speed;
-      this.endRadius -= this.speed;
-      this.startPoint = this.computePoint(this.startRadius);
-      this.endPoint = this.computePoint(this.endRadius);
-
-      if ((this.startPoint.y > -1 || this.endPoint.y > -1) && (this.startPoint.y < this.undrawY || this.endPoint.y < this.undrawY) && (this.startPoint.x > -1 || this.endPoint.x > -1) && (this.startPoint.x < this.undrawX || this.endPoint.x < this.undrawX)) {
-        this.ctx.beginPath();
-        this.ctx.lineWidth = 2;
-        this.ctx.moveTo(this.startPoint.x, this.startPoint.y);
-        this.ctx.lineTo(this.endPoint.x, this.endPoint.y);
-        this.ctx.stroke();
-      } else {
-        return true;
-      };
-    }
-  }, {
-    key: 'computePoint',
-    value: function computePoint(radius) {
-      return {
-        x: Math.cos(this.pathAngle) * -radius + this.xOffset,
-        y: Math.sin(this.pathAngle) * -radius + this.yOffset
-      };
-    }
-  }, {
-    key: 'setDefaultValues',
-    value: function setDefaultValues() {
-      this.startRadius = 12;
-      this.endRadius = -8;
-      this.xOffset = this.ctxWidth / 2;
-      this.yOffset = this.ctxHeight / 2;
-      this.pathAngle = 0;
-      this.startPoint = { x: 0, y: 0 };
-      this.endPoint = { x: 0, y: 0 };
-      this.speed = 0;
-      this.spawned = false;
-    }
-  }]);
-
   return PlayerBullet;
-}();
+}(_bullet2.default);
 
 ;
 
@@ -909,11 +950,11 @@ var ObjectPool = exports.ObjectPool = function () {
     }
   }, {
     key: 'draw',
-    value: function draw() {
+    value: function draw(type) {
       for (var i = 0; i < this.size; i++) {
         if (this.pool[i].spawned) {
           if (this.pool[i].draw(this.BulletPool)) {
-            this.pool[i].setDefaultValues();
+            this.pool[i].setDefaultValues(type);
             this.pool.push(this.pool.splice(i, 1)[0]);
           }
         } else {
