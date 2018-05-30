@@ -1,20 +1,23 @@
 import { Sprite, ObjectPool } from './utilities';
 
 export default class BulletPool extends ObjectPool {
-  constructor(size, ctx, type) {
+  constructor(size, fgCanvas) {
     super(size);
 
-    for (let i = 0; i < size; i++) {
-      let bullet = new PlayerBullet(ctx, type);
+    for(let i = 0; i < size; i++) {
+      let bullet = new PlayerBullet(fgCanvas);
       this.pool.push(bullet);
     }
   }
 }
 
 class PlayerBullet {
-  constructor(ctx, type) {
-    this.ctx = ctx;
-    this.type = type;
+  constructor(fgCanvas) {
+    this.ctx = fgCanvas.ctx;
+    this.ctxWidth = fgCanvas.width;
+    this.ctxHeight = fgCanvas.height;
+    this.undrawX = fgCanvas.width + 1;
+    this.undrawY = fgCanvas.height + 1;
     this.setDefaultValues();
   }
 
@@ -33,10 +36,10 @@ class PlayerBullet {
     this.startPoint = this.computePoint(this.startRadius);
     this.endPoint = this.computePoint(this.endRadius);
 
-    if ((this.startPoint.y > -1 || this.endPoint.y > -1) &&
-        (this.startPoint.y < 501 || this.endPoint.y < 501) &&
-        (this.startPoint.x > -1 || this.endPoint.x > -1) &&
-        (this.startPoint.x < 801 || this.endPoint.x < 801)) {
+    if((this.startPoint.y > -1 || this.endPoint.y > -1) &&
+       (this.startPoint.y < this.undrawY || this.endPoint.y < this.undrawY) &&
+       (this.startPoint.x > -1 || this.endPoint.x > -1) &&
+       (this.startPoint.x < this.undrawX || this.endPoint.x < this.undrawX)) {
       this.ctx.beginPath();
       this.ctx.lineWidth = 2;
       this.ctx.moveTo(this.startPoint.x, this.startPoint.y);
@@ -55,25 +58,15 @@ class PlayerBullet {
   }
 
   setDefaultValues() {
-    if (this.type === 'playerBullet') {
-      this.startRadius = 12;
-      this.endRadius = -8;
-      this.xOffset = 400;
-      this.yOffset = 250;
-    } else {
-      this.startRadius = 0;
-      this.endRadius = 0;
-      this.xOffset = 400;
-      this.yOffset = 250;
-    }
-
+    this.startRadius = 12;
+    this.endRadius = -8;
+    this.xOffset = this.ctxWidth / 2;
+    this.yOffset = this.ctxHeight / 2;
     this.pathAngle = 0;
     this.startPoint = {x: 0, y: 0}
     this.endPoint = {x: 0, y: 0}
     this.speed = 0;
     this.spawned = false;
-    // this.height = 10;
-    // this.width = 10;
   }
 };
 

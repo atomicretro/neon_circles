@@ -1,7 +1,8 @@
 import Player from './player';
 import { ImageStore } from './utilities';
 import BaddiePool from './baddie';
-import BulletPool from './playerBullet';
+import PlayerBulletPool from './playerBullet';
+import BaddieBulletPool from './baddieBullet';
 
 const KEY_MAP = {
   74: 'left',     // j
@@ -20,68 +21,65 @@ for (let code in KEY_MAP) {
 
 class Field {
   constructor(fgCanvas, pcCanvas) {
-    this.fgWidth = 800;
-    this.fgHeight = 500;
-    this.pcWidth = 100;
-    this.pcHeight = 100;
+    this.fgCanvas = {
+      ctx: fgCanvas.getContext("2d"),
+      width: 800,
+      height: 500
+    }
+    this.pcCanvas = {
+      ctx: pcCanvas.getContext("2d"),
+      width: 100,
+      height: 100
+    }
 
-    fgCanvas.width = this.fgWidth;
-    fgCanvas.height = this.fgHeight;
-    pcCanvas.width = this.pcWidth;
-    pcCanvas.height = this.pcHeight;
-
-    this.fgContext = fgCanvas.getContext("2d");
-    this.pcContext = pcCanvas.getContext("2d");
+    fgCanvas.width = this.fgCanvas.width;
+    fgCanvas.height = this.fgCanvas.height;
+    pcCanvas.width = this.pcCanvas.width;
+    pcCanvas.height = this.pcCanvas.height;
 
     this.ImageStore = new ImageStore();
-    this.badBulletPool = new BulletPool(20, this.fgContext, 'demonBullet');
-    this.pcBulletPool = new BulletPool(8, this.fgContext, 'playerBullet');
+    this.badBulletPool = new BaddieBulletPool(20, this.fgCanvas.ctx, 'demonBullet');
+    this.pcBulletPool = new PlayerBulletPool(8, this.fgCanvas);
     this.BaddiePool = new BaddiePool(
-      1, this.fgContext, this.ImageStore, this.badBulletPool
+      1, this.fgCanvas.ctx, this.ImageStore, this.badBulletPool
     );
-    this.player = new Player(
-      this.pcContext, this.pcWidth, this.pcHeight, this.pcBulletPool
-    );
+    this.player = new Player(this.pcCanvas, this.pcBulletPool);
     this.lastTime = Date.now;
 
-    this.drawPlayer = this.drawPlayer.bind(this);
     this.playRound = this.playRound.bind(this);
-    this.render = this.render.bind(this);
-    this.keydown = this.keydown.bind(this);
     this.checkCollisions = this.checkCollisions.bind(this);
-    this.checkPlayerCollision = this.checkPlayerCollision.bind(this);
-    this.checkBaddieCollision = this.checkBaddieCollision.bind(this);
+    // this.checkPlayerCollision = this.checkPlayerCollision.bind(this);
 
     document.addEventListener('keydown', this.keydown.bind(this));
     document.addEventListener('keyup', this.keyup.bind(this));
   }
 
   drawFieldBorder() {
-    this.fgContext.beginPath();
-    this.fgContext.lineWidth = 1;
-    this.fgContext.rect(0, 0, this.fgWidth, this.fgHeight);
-    this.fgContext.strokeStyle = 'black';
-    this.fgContext.stroke();
+    this.fgCanvas.ctx.beginPath();
+    this.fgCanvas.ctx.lineWidth = 1;
+    this.fgCanvas.ctx.rect(0, 0, this.fgCanvas.width, this.fgCanvas.height);
+    this.fgCanvas.ctx.strokeStyle = 'black';
+    this.fgCanvas.ctx.stroke();
 
-    // this.pcContext.beginPath();
-    // this.pcContext.lineWidth = 1;
-    // this.pcContext.rect(0, 0, this.pcWidth, this.pcHeight);
-    // this.pcContext.strokeStyle = 'black';
-    // this.pcContext.stroke();
+    // this.pcCanvas.ctx.beginPath();
+    // this.pcCanvas.ctx.lineWidth = 1;
+    // this.pcCanvas.ctx.rect(0, 0, this.pcCanvas.width, this.pcCanvas.height);
+    // this.pcCanvas.ctx.strokeStyle = 'black';
+    // this.pcCanvas.ctx.stroke();
   }
 
   drawPlayerRails(shape) {
-    let xCenter = this.pcWidth / 2;
-    let yCenter = this.pcHeight / 2;
+    let xCenter = this.pcCanvas.width / 2;
+    let yCenter = this.pcCanvas.height / 2;
 
     switch (shape) {
       case 'circle':
       default:
-      this.pcContext.beginPath();
-      this.pcContext.arc(xCenter, yCenter, 35, 0, 2 * Math.PI, true);
-      this.pcContext.strokeStyle = "black";
-      this.pcContext.lineWidth = 2;
-      this.pcContext.stroke();
+      this.pcCanvas.ctx.beginPath();
+      this.pcCanvas.ctx.arc(xCenter, yCenter, 35, 0, 2 * Math.PI, true);
+      this.pcCanvas.ctx.strokeStyle = "black";
+      this.pcCanvas.ctx.lineWidth = 2;
+      this.pcCanvas.ctx.stroke();
     }
   }
 
@@ -158,8 +156,8 @@ class Field {
   }
 
   pcBulletHitsPC(player, hitbox, bullet) {
-    hitbox.x = hitbox.x - player.pcFieldWidth / 2 + this.fgWidth / 2;
-    hitbox.y = hitbox.y - player.pcFieldHeight / 2 + this.fgHeight / 2;
+    hitbox.x = hitbox.x - player.pcFieldWidth / 2 + this.fgCanvas.width / 2;
+    hitbox.y = hitbox.y - player.pcFieldHeight / 2 + this.fgCanvas.height / 2;
     let distanceFromHitboxToBullet =
       Math.sqrt(Math.pow(hitbox.x - bullet.x, 2)) +
       Math.sqrt(Math.pow(hitbox.y - bullet.y, 2));
@@ -225,11 +223,11 @@ class Field {
   // }
 
   clearFGContext() {
-    this.fgContext.clearRect(0, 0, this.fgWidth, this.fgHeight);
+    this.fgCanvas.ctx.clearRect(0, 0, this.fgCanvas.width, this.fgCanvas.height);
   } // implement dirty rectangles on each sprite?
 
   clearPCContext() {
-    this.pcContext.clearRect(0, 0, this.pcWidth, this.pcHeight);
+    this.pcCanvas.ctx.clearRect(0, 0, this.pcCanvas.width, this.pcCanvas.height);
   } // implement dirty rectangles on each sprite?
 }
 

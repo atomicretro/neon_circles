@@ -186,6 +186,129 @@ var Baddie = function () {
 
 /***/ }),
 
+/***/ "./scripts/baddieBullet.js":
+/*!*********************************!*\
+  !*** ./scripts/baddieBullet.js ***!
+  \*********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _utilities = __webpack_require__(/*! ./utilities */ "./scripts/utilities.js");
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var BulletPool = function (_ObjectPool) {
+  _inherits(BulletPool, _ObjectPool);
+
+  function BulletPool(size, ctx, type) {
+    _classCallCheck(this, BulletPool);
+
+    var _this = _possibleConstructorReturn(this, (BulletPool.__proto__ || Object.getPrototypeOf(BulletPool)).call(this, size));
+
+    for (var i = 0; i < size; i++) {
+      var bullet = new BadBullet(ctx, type);
+      _this.pool.push(bullet);
+    }
+    return _this;
+  }
+
+  return BulletPool;
+}(_utilities.ObjectPool);
+
+exports.default = BulletPool;
+
+var BadBullet = function () {
+  function BadBullet(ctx, type) {
+    _classCallCheck(this, BadBullet);
+
+    this.ctx = ctx;
+    this.type = type;
+    this.setDefaultValues();
+  }
+
+  _createClass(BadBullet, [{
+    key: 'spawn',
+    value: function spawn(theta, speed) {
+      this.pathAngle = theta;
+      this.startPoint = this.computePoint(this.startRadius);
+      this.endPoint = this.computePoint(this.endRadius);
+      this.speed = speed;
+      this.spawned = true;
+    }
+  }, {
+    key: 'draw',
+    value: function draw() {
+      // ctx.clearRect(this.x, this.y, this.width, this.height); optimize later
+      this.startRadius -= this.speed;
+      this.endRadius -= this.speed;
+      this.startPoint = this.computePoint(this.startRadius);
+      this.endPoint = this.computePoint(this.endRadius);
+
+      if ((this.startPoint.y > -1 || this.endPoint.y > -1) && (this.startPoint.y < 501 || this.endPoint.y < 501) && (this.startPoint.x > -1 || this.endPoint.x > -1) && (this.startPoint.x < 801 || this.endPoint.x < 801)) {
+        this.ctx.beginPath();
+        this.ctx.lineWidth = 2;
+        this.ctx.moveTo(this.startPoint.x, this.startPoint.y);
+        this.ctx.lineTo(this.endPoint.x, this.endPoint.y);
+        this.ctx.stroke();
+      } else {
+        return true;
+      };
+    }
+  }, {
+    key: 'computePoint',
+    value: function computePoint(radius) {
+      return {
+        x: Math.cos(this.pathAngle) * -radius + this.xOffset,
+        y: Math.sin(this.pathAngle) * -radius + this.yOffset
+      };
+    }
+  }, {
+    key: 'setDefaultValues',
+    value: function setDefaultValues() {
+      if (this.type === 'playerBullet') {
+        this.startRadius = 12;
+        this.endRadius = -8;
+        this.xOffset = 400;
+        this.yOffset = 250;
+      } else {
+        this.startRadius = 0;
+        this.endRadius = 0;
+        this.xOffset = 400;
+        this.yOffset = 250;
+      }
+
+      this.pathAngle = 0;
+      this.startPoint = { x: 0, y: 0 };
+      this.endPoint = { x: 0, y: 0 };
+      this.speed = 0;
+      this.spawned = false;
+      // this.height = 10;
+      // this.width = 10;
+    }
+  }]);
+
+  return BadBullet;
+}();
+
+;
+
+// Bullet.prototype = new Sprite();
+
+/***/ }),
+
 /***/ "./scripts/field.js":
 /*!**************************!*\
   !*** ./scripts/field.js ***!
@@ -216,6 +339,10 @@ var _playerBullet = __webpack_require__(/*! ./playerBullet */ "./scripts/playerB
 
 var _playerBullet2 = _interopRequireDefault(_playerBullet);
 
+var _baddieBullet = __webpack_require__(/*! ./baddieBullet */ "./scripts/baddieBullet.js");
+
+var _baddieBullet2 = _interopRequireDefault(_baddieBullet);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -239,33 +366,32 @@ var Field = function () {
   function Field(fgCanvas, pcCanvas) {
     _classCallCheck(this, Field);
 
-    this.fgWidth = 800;
-    this.fgHeight = 500;
-    this.pcWidth = 100;
-    this.pcHeight = 100;
+    this.fgCanvas = {
+      ctx: fgCanvas.getContext("2d"),
+      width: 800,
+      height: 500
+    };
+    this.pcCanvas = {
+      ctx: pcCanvas.getContext("2d"),
+      width: 100,
+      height: 100
+    };
 
-    fgCanvas.width = this.fgWidth;
-    fgCanvas.height = this.fgHeight;
-    pcCanvas.width = this.pcWidth;
-    pcCanvas.height = this.pcHeight;
-
-    this.fgContext = fgCanvas.getContext("2d");
-    this.pcContext = pcCanvas.getContext("2d");
+    fgCanvas.width = this.fgCanvas.width;
+    fgCanvas.height = this.fgCanvas.height;
+    pcCanvas.width = this.pcCanvas.width;
+    pcCanvas.height = this.pcCanvas.height;
 
     this.ImageStore = new _utilities.ImageStore();
-    this.badBulletPool = new _playerBullet2.default(20, this.fgContext, 'demonBullet');
-    this.pcBulletPool = new _playerBullet2.default(8, this.fgContext, 'playerBullet');
-    this.BaddiePool = new _baddie2.default(1, this.fgContext, this.ImageStore, this.badBulletPool);
-    this.player = new _player2.default(this.pcContext, this.pcWidth, this.pcHeight, this.pcBulletPool);
+    this.badBulletPool = new _baddieBullet2.default(20, this.fgCanvas.ctx, 'demonBullet');
+    this.pcBulletPool = new _playerBullet2.default(8, this.fgCanvas);
+    this.BaddiePool = new _baddie2.default(1, this.fgCanvas.ctx, this.ImageStore, this.badBulletPool);
+    this.player = new _player2.default(this.pcCanvas, this.pcBulletPool);
     this.lastTime = Date.now;
 
-    this.drawPlayer = this.drawPlayer.bind(this);
     this.playRound = this.playRound.bind(this);
-    this.render = this.render.bind(this);
-    this.keydown = this.keydown.bind(this);
     this.checkCollisions = this.checkCollisions.bind(this);
-    this.checkPlayerCollision = this.checkPlayerCollision.bind(this);
-    this.checkBaddieCollision = this.checkBaddieCollision.bind(this);
+    // this.checkPlayerCollision = this.checkPlayerCollision.bind(this);
 
     document.addEventListener('keydown', this.keydown.bind(this));
     document.addEventListener('keyup', this.keyup.bind(this));
@@ -274,32 +400,32 @@ var Field = function () {
   _createClass(Field, [{
     key: 'drawFieldBorder',
     value: function drawFieldBorder() {
-      this.fgContext.beginPath();
-      this.fgContext.lineWidth = 1;
-      this.fgContext.rect(0, 0, this.fgWidth, this.fgHeight);
-      this.fgContext.strokeStyle = 'black';
-      this.fgContext.stroke();
+      this.fgCanvas.ctx.beginPath();
+      this.fgCanvas.ctx.lineWidth = 1;
+      this.fgCanvas.ctx.rect(0, 0, this.fgCanvas.width, this.fgCanvas.height);
+      this.fgCanvas.ctx.strokeStyle = 'black';
+      this.fgCanvas.ctx.stroke();
 
-      // this.pcContext.beginPath();
-      // this.pcContext.lineWidth = 1;
-      // this.pcContext.rect(0, 0, this.pcWidth, this.pcHeight);
-      // this.pcContext.strokeStyle = 'black';
-      // this.pcContext.stroke();
+      // this.pcCanvas.ctx.beginPath();
+      // this.pcCanvas.ctx.lineWidth = 1;
+      // this.pcCanvas.ctx.rect(0, 0, this.pcCanvas.width, this.pcCanvas.height);
+      // this.pcCanvas.ctx.strokeStyle = 'black';
+      // this.pcCanvas.ctx.stroke();
     }
   }, {
     key: 'drawPlayerRails',
     value: function drawPlayerRails(shape) {
-      var xCenter = this.pcWidth / 2;
-      var yCenter = this.pcHeight / 2;
+      var xCenter = this.pcCanvas.width / 2;
+      var yCenter = this.pcCanvas.height / 2;
 
       switch (shape) {
         case 'circle':
         default:
-          this.pcContext.beginPath();
-          this.pcContext.arc(xCenter, yCenter, 35, 0, 2 * Math.PI, true);
-          this.pcContext.strokeStyle = "black";
-          this.pcContext.lineWidth = 2;
-          this.pcContext.stroke();
+          this.pcCanvas.ctx.beginPath();
+          this.pcCanvas.ctx.arc(xCenter, yCenter, 35, 0, 2 * Math.PI, true);
+          this.pcCanvas.ctx.strokeStyle = "black";
+          this.pcCanvas.ctx.lineWidth = 2;
+          this.pcCanvas.ctx.stroke();
       }
     }
   }, {
@@ -383,8 +509,8 @@ var Field = function () {
   }, {
     key: 'pcBulletHitsPC',
     value: function pcBulletHitsPC(player, hitbox, bullet) {
-      hitbox.x = hitbox.x - player.pcFieldWidth / 2 + this.fgWidth / 2;
-      hitbox.y = hitbox.y - player.pcFieldHeight / 2 + this.fgHeight / 2;
+      hitbox.x = hitbox.x - player.pcFieldWidth / 2 + this.fgCanvas.width / 2;
+      hitbox.y = hitbox.y - player.pcFieldHeight / 2 + this.fgCanvas.height / 2;
       var distanceFromHitboxToBullet = Math.sqrt(Math.pow(hitbox.x - bullet.x, 2)) + Math.sqrt(Math.pow(hitbox.y - bullet.y, 2));
 
       return distanceFromHitboxToBullet <= hitbox.radius;
@@ -445,13 +571,13 @@ var Field = function () {
   }, {
     key: 'clearFGContext',
     value: function clearFGContext() {
-      this.fgContext.clearRect(0, 0, this.fgWidth, this.fgHeight);
+      this.fgCanvas.ctx.clearRect(0, 0, this.fgCanvas.width, this.fgCanvas.height);
     } // implement dirty rectangles on each sprite?
 
   }, {
     key: 'clearPCContext',
     value: function clearPCContext() {
-      this.pcContext.clearRect(0, 0, this.pcWidth, this.pcHeight);
+      this.pcCanvas.ctx.clearRect(0, 0, this.pcCanvas.width, this.pcCanvas.height);
     } // implement dirty rectangles on each sprite?
 
   }]);
@@ -512,12 +638,12 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Player = function () {
-  function Player(ctx, pcFieldWidth, pcFieldHeight, BulletPool) {
+  function Player(pcCanvas, BulletPool) {
     _classCallCheck(this, Player);
 
-    this.ctx = ctx;
-    this.pcFieldWidth = pcFieldWidth;
-    this.pcFieldHeight = pcFieldHeight;
+    this.ctx = pcCanvas.ctx;
+    this.pcFieldWidth = pcCanvas.width;
+    this.pcFieldHeight = pcCanvas.height;
     this.BulletPool = BulletPool;
 
     this.velocity = 0;
@@ -658,13 +784,13 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var BulletPool = function (_ObjectPool) {
   _inherits(BulletPool, _ObjectPool);
 
-  function BulletPool(size, ctx, type) {
+  function BulletPool(size, fgCanvas) {
     _classCallCheck(this, BulletPool);
 
     var _this = _possibleConstructorReturn(this, (BulletPool.__proto__ || Object.getPrototypeOf(BulletPool)).call(this, size));
 
     for (var i = 0; i < size; i++) {
-      var bullet = new PlayerBullet(ctx, type);
+      var bullet = new PlayerBullet(fgCanvas);
       _this.pool.push(bullet);
     }
     return _this;
@@ -676,11 +802,14 @@ var BulletPool = function (_ObjectPool) {
 exports.default = BulletPool;
 
 var PlayerBullet = function () {
-  function PlayerBullet(ctx, type) {
+  function PlayerBullet(fgCanvas) {
     _classCallCheck(this, PlayerBullet);
 
-    this.ctx = ctx;
-    this.type = type;
+    this.ctx = fgCanvas.ctx;
+    this.ctxWidth = fgCanvas.width;
+    this.ctxHeight = fgCanvas.height;
+    this.undrawX = fgCanvas.width + 1;
+    this.undrawY = fgCanvas.height + 1;
     this.setDefaultValues();
   }
 
@@ -702,7 +831,7 @@ var PlayerBullet = function () {
       this.startPoint = this.computePoint(this.startRadius);
       this.endPoint = this.computePoint(this.endRadius);
 
-      if ((this.startPoint.y > -1 || this.endPoint.y > -1) && (this.startPoint.y < 501 || this.endPoint.y < 501) && (this.startPoint.x > -1 || this.endPoint.x > -1) && (this.startPoint.x < 801 || this.endPoint.x < 801)) {
+      if ((this.startPoint.y > -1 || this.endPoint.y > -1) && (this.startPoint.y < this.undrawY || this.endPoint.y < this.undrawY) && (this.startPoint.x > -1 || this.endPoint.x > -1) && (this.startPoint.x < this.undrawX || this.endPoint.x < this.undrawX)) {
         this.ctx.beginPath();
         this.ctx.lineWidth = 2;
         this.ctx.moveTo(this.startPoint.x, this.startPoint.y);
@@ -723,25 +852,15 @@ var PlayerBullet = function () {
   }, {
     key: 'setDefaultValues',
     value: function setDefaultValues() {
-      if (this.type === 'playerBullet') {
-        this.startRadius = 12;
-        this.endRadius = -8;
-        this.xOffset = 400;
-        this.yOffset = 250;
-      } else {
-        this.startRadius = 0;
-        this.endRadius = 0;
-        this.xOffset = 400;
-        this.yOffset = 250;
-      }
-
+      this.startRadius = 12;
+      this.endRadius = -8;
+      this.xOffset = this.ctxWidth / 2;
+      this.yOffset = this.ctxHeight / 2;
       this.pathAngle = 0;
       this.startPoint = { x: 0, y: 0 };
       this.endPoint = { x: 0, y: 0 };
       this.speed = 0;
       this.spawned = false;
-      // this.height = 10;
-      // this.width = 10;
     }
   }]);
 

@@ -1,8 +1,8 @@
 class Player {
-  constructor(ctx, pcFieldWidth, pcFieldHeight, BulletPool) {
-    this.ctx = ctx;
-    this.pcFieldWidth = pcFieldWidth;
-    this.pcFieldHeight = pcFieldHeight;
+  constructor(pcCanvas, BulletPool) {
+    this.ctx = pcCanvas.ctx;
+    this.pcFieldWidth = pcCanvas.width;
+    this.pcFieldHeight = pcCanvas.height;
     this.BulletPool = BulletPool;
 
     this.velocity = 0;
