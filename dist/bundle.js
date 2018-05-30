@@ -186,131 +186,6 @@ var Baddie = function () {
 
 /***/ }),
 
-/***/ "./scripts/bullet.js":
-/*!***************************!*\
-  !*** ./scripts/bullet.js ***!
-  \***************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _utilities = __webpack_require__(/*! ./utilities */ "./scripts/utilities.js");
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var BulletPool = function (_ObjectPool) {
-  _inherits(BulletPool, _ObjectPool);
-
-  function BulletPool(size, ctx, type) {
-    _classCallCheck(this, BulletPool);
-
-    var _this = _possibleConstructorReturn(this, (BulletPool.__proto__ || Object.getPrototypeOf(BulletPool)).call(this, size));
-
-    for (var i = 0; i < size; i++) {
-      var bullet = new Bullet(ctx, type);
-      _this.pool.push(bullet);
-    }
-    return _this;
-  }
-
-  return BulletPool;
-}(_utilities.ObjectPool);
-
-exports.default = BulletPool;
-
-var Bullet = function () {
-  function Bullet(ctx, type) {
-    _classCallCheck(this, Bullet);
-
-    this.ctx = ctx;
-    this.type = type;
-    this.setDefaultValues();
-  }
-
-  _createClass(Bullet, [{
-    key: 'spawn',
-    value: function spawn(theta, speed) {
-      this.pathAngle = theta;
-      this.startPoint = this.computePoint(this.startRadius);
-      this.endPoint = this.computePoint(this.endRadius);
-      this.speed = speed;
-      this.spawned = true;
-    }
-  }, {
-    key: 'draw',
-    value: function draw() {
-      // ctx.clearRect(this.x, this.y, this.width, this.height); optimize later
-      this.startRadius -= this.speed;
-      this.endRadius -= this.speed;
-      this.startPoint = this.computePoint(this.startRadius);
-      this.endPoint = this.computePoint(this.endRadius);
-      // console.log('bullet.draw');
-
-      if ((this.startPoint.y > -1 || this.endPoint.y > -1) && (this.startPoint.y < 501 || this.endPoint.y < 501) && (this.startPoint.x > -1 || this.endPoint.x > -1) && (this.startPoint.x < 801 || this.endPoint.x < 801)) {
-        this.ctx.beginPath();
-        this.ctx.lineWidth = 2;
-        this.ctx.moveTo(this.startPoint.x, this.startPoint.y);
-        this.ctx.lineTo(this.endPoint.x, this.endPoint.y);
-        this.ctx.stroke();
-        // console.log('bullet.draw#if');
-      } else {
-        return true;
-      };
-    }
-  }, {
-    key: 'computePoint',
-    value: function computePoint(radius) {
-      return {
-        x: Math.cos(this.pathAngle) * -radius + this.xOffset,
-        y: Math.sin(this.pathAngle) * -radius + this.yOffset
-      };
-    }
-  }, {
-    key: 'setDefaultValues',
-    value: function setDefaultValues() {
-      if (this.type === 'playerBullet') {
-        this.startRadius = 12;
-        this.endRadius = -8;
-        this.xOffset = 400;
-        this.yOffset = 250;
-      } else {
-        this.startRadius = 0;
-        this.endRadius = 0;
-        this.xOffset = 400;
-        this.yOffset = 250;
-      }
-
-      this.pathAngle = 0;
-      this.startPoint = { x: 0, y: 0 };
-      this.endPoint = { x: 0, y: 0 };
-      this.speed = 0;
-      this.spawned = false;
-      // this.height = 10;
-      // this.width = 10;
-    }
-  }]);
-
-  return Bullet;
-}();
-
-;
-
-// Bullet.prototype = new Sprite();
-
-/***/ }),
-
 /***/ "./scripts/field.js":
 /*!**************************!*\
   !*** ./scripts/field.js ***!
@@ -337,9 +212,9 @@ var _baddie = __webpack_require__(/*! ./baddie */ "./scripts/baddie.js");
 
 var _baddie2 = _interopRequireDefault(_baddie);
 
-var _bullet = __webpack_require__(/*! ./bullet */ "./scripts/bullet.js");
+var _playerBullet = __webpack_require__(/*! ./playerBullet */ "./scripts/playerBullet.js");
 
-var _bullet2 = _interopRequireDefault(_bullet);
+var _playerBullet2 = _interopRequireDefault(_playerBullet);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -378,8 +253,8 @@ var Field = function () {
     this.pcContext = pcCanvas.getContext("2d");
 
     this.ImageStore = new _utilities.ImageStore();
-    this.badBulletPool = new _bullet2.default(20, this.fgContext, 'demonBullet');
-    this.pcBulletPool = new _bullet2.default(8, this.fgContext, 'playerBullet');
+    this.badBulletPool = new _playerBullet2.default(20, this.fgContext, 'demonBullet');
+    this.pcBulletPool = new _playerBullet2.default(8, this.fgContext, 'playerBullet');
     this.BaddiePool = new _baddie2.default(1, this.fgContext, this.ImageStore, this.badBulletPool);
     this.player = new _player2.default(this.pcContext, this.pcWidth, this.pcHeight, this.pcBulletPool);
     this.lastTime = Date.now;
@@ -496,13 +371,11 @@ var Field = function () {
         x: this.player.hitboxCenter.x,
         y: this.player.hitboxCenter.y,
         radius: 9
+      };
 
-        // this.pcContext.arc(hitbox.x, hitbox.y, 5, 0, 2 * Math.PI, true);
-
-      };for (var bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
+      for (var bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
         var bullet = spawnedPCBullets[bullIdx];
         if (this.pcBulletHitsPC(this.player, hitbox, bullet.startPoint) || this.pcBulletHitsPC(this.player, hitbox, bullet.endPoint)) {
-          // debugger
           this.player.isHit();
         };
       }
@@ -652,7 +525,8 @@ var Player = function () {
     this.maxSpeed = 0.3;
     this.radius = 30; // The 'track' the player moves along
     this.fireCharge = 0;
-    this.fireCooldown = 15;
+    this.fireCooldown = 25;
+    this.damageFrames = 100;
 
     this.portTheta = -1.23;
     this.starboardTheta = 1.9106;
@@ -694,6 +568,7 @@ var Player = function () {
     key: 'move',
     value: function move(keyStatus) {
       this.fireCharge++; // increments once every frame
+      this.damageFrames++; // increments once every frame
       if (keyStatus.left) {
         if (this.velocity <= this.maxSpeed) this.velocity += this.acceleration;
         this.starboardTheta += this.velocity;
@@ -726,16 +601,26 @@ var Player = function () {
       this.hitboxCenter = this.computeCenterPoints(-22);
 
       this.ctx.beginPath();
+
+      if (this.damageFrames < 50) {
+        this.ctx.fillStyle = 'red';
+      } else {
+        if (this.fireCharge > this.fireCooldown) {
+          this.ctx.fillStyle = 'blue';
+        } else {
+          this.ctx.fillStyle = 'black';
+        }
+      }
+
       this.ctx.moveTo(this.starboardVertex.x, this.starboardVertex.y);
       this.ctx.lineTo(this.portVertex.x, this.portVertex.y);
       this.ctx.lineTo(this.bowVertex.x, this.bowVertex.y);
-      this.ctx.fillStyle = 'black';
       this.ctx.fill();
     }
   }, {
     key: 'isHit',
     value: function isHit() {
-      console.log('ouch!');
+      this.damageFrames = 0;
     }
   }]);
 
@@ -743,6 +628,129 @@ var Player = function () {
 }();
 
 exports.default = Player;
+
+/***/ }),
+
+/***/ "./scripts/playerBullet.js":
+/*!*********************************!*\
+  !*** ./scripts/playerBullet.js ***!
+  \*********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _utilities = __webpack_require__(/*! ./utilities */ "./scripts/utilities.js");
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var BulletPool = function (_ObjectPool) {
+  _inherits(BulletPool, _ObjectPool);
+
+  function BulletPool(size, ctx, type) {
+    _classCallCheck(this, BulletPool);
+
+    var _this = _possibleConstructorReturn(this, (BulletPool.__proto__ || Object.getPrototypeOf(BulletPool)).call(this, size));
+
+    for (var i = 0; i < size; i++) {
+      var bullet = new PlayerBullet(ctx, type);
+      _this.pool.push(bullet);
+    }
+    return _this;
+  }
+
+  return BulletPool;
+}(_utilities.ObjectPool);
+
+exports.default = BulletPool;
+
+var PlayerBullet = function () {
+  function PlayerBullet(ctx, type) {
+    _classCallCheck(this, PlayerBullet);
+
+    this.ctx = ctx;
+    this.type = type;
+    this.setDefaultValues();
+  }
+
+  _createClass(PlayerBullet, [{
+    key: 'spawn',
+    value: function spawn(theta, speed) {
+      this.pathAngle = theta;
+      this.startPoint = this.computePoint(this.startRadius);
+      this.endPoint = this.computePoint(this.endRadius);
+      this.speed = speed;
+      this.spawned = true;
+    }
+  }, {
+    key: 'draw',
+    value: function draw() {
+      // ctx.clearRect(this.x, this.y, this.width, this.height); optimize later
+      this.startRadius -= this.speed;
+      this.endRadius -= this.speed;
+      this.startPoint = this.computePoint(this.startRadius);
+      this.endPoint = this.computePoint(this.endRadius);
+
+      if ((this.startPoint.y > -1 || this.endPoint.y > -1) && (this.startPoint.y < 501 || this.endPoint.y < 501) && (this.startPoint.x > -1 || this.endPoint.x > -1) && (this.startPoint.x < 801 || this.endPoint.x < 801)) {
+        this.ctx.beginPath();
+        this.ctx.lineWidth = 2;
+        this.ctx.moveTo(this.startPoint.x, this.startPoint.y);
+        this.ctx.lineTo(this.endPoint.x, this.endPoint.y);
+        this.ctx.stroke();
+      } else {
+        return true;
+      };
+    }
+  }, {
+    key: 'computePoint',
+    value: function computePoint(radius) {
+      return {
+        x: Math.cos(this.pathAngle) * -radius + this.xOffset,
+        y: Math.sin(this.pathAngle) * -radius + this.yOffset
+      };
+    }
+  }, {
+    key: 'setDefaultValues',
+    value: function setDefaultValues() {
+      if (this.type === 'playerBullet') {
+        this.startRadius = 12;
+        this.endRadius = -8;
+        this.xOffset = 400;
+        this.yOffset = 250;
+      } else {
+        this.startRadius = 0;
+        this.endRadius = 0;
+        this.xOffset = 400;
+        this.yOffset = 250;
+      }
+
+      this.pathAngle = 0;
+      this.startPoint = { x: 0, y: 0 };
+      this.endPoint = { x: 0, y: 0 };
+      this.speed = 0;
+      this.spawned = false;
+      // this.height = 10;
+      // this.width = 10;
+    }
+  }]);
+
+  return PlayerBullet;
+}();
+
+;
+
+// Bullet.prototype = new Sprite();
 
 /***/ }),
 
@@ -775,7 +783,6 @@ var ObjectPool = exports.ObjectPool = function () {
   _createClass(ObjectPool, [{
     key: 'get',
     value: function get(theta, speed) {
-      // debugger
       if (!this.pool[this.size - 1].spawned) {
         this.pool[this.size - 1].spawn(theta, speed);
         this.pool.unshift(this.pool.pop());

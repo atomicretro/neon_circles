@@ -5,7 +5,6 @@ export class ObjectPool {
   }
 
   get(theta, speed) {
-    // debugger
     if(!this.pool[this.size - 1].spawned) {
       this.pool[this.size - 1].spawn(theta, speed);
       this.pool.unshift(this.pool.pop());

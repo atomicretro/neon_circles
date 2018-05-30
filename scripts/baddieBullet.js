@@ -5,13 +5,13 @@ export default class BulletPool extends ObjectPool {
     super(size);
 
     for (let i = 0; i < size; i++) {
-      let bullet = new Bullet(ctx, type);
+      let bullet = new BadBullet(ctx, type);
       this.pool.push(bullet);
     }
   }
 }
 
-class Bullet {
+class BadBullet {
   constructor(ctx, type) {
     this.ctx = ctx;
     this.type = type;
@@ -32,7 +32,6 @@ class Bullet {
     this.endRadius -= this.speed;
     this.startPoint = this.computePoint(this.startRadius);
     this.endPoint = this.computePoint(this.endRadius);
-    // console.log('bullet.draw');
 
     if ((this.startPoint.y > -1 || this.endPoint.y > -1) &&
         (this.startPoint.y < 501 || this.endPoint.y < 501) &&
@@ -43,7 +42,6 @@ class Bullet {
       this.ctx.moveTo(this.startPoint.x, this.startPoint.y);
       this.ctx.lineTo(this.endPoint.x, this.endPoint.y);
       this.ctx.stroke();
-      // console.log('bullet.draw#if');
     } else {
       return true;
     };

@@ -1,7 +1,7 @@
 import Player from './player';
 import { ImageStore } from './utilities';
 import BaddiePool from './baddie';
-import BulletPool from './bullet';
+import BulletPool from './playerBullet';
 
 const KEY_MAP = {
   74: 'left',     // j
@@ -146,15 +146,12 @@ class Field {
       radius: 9
     }
 
-    // this.pcContext.arc(hitbox.x, hitbox.y, 5, 0, 2 * Math.PI, true);
-
     for (var bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
       let bullet = spawnedPCBullets[bullIdx];
       if(
         this.pcBulletHitsPC(this.player, hitbox, bullet.startPoint) ||
         this.pcBulletHitsPC(this.player, hitbox, bullet.endPoint)
       ) {
-        // debugger
         this.player.isHit();
       };
     }

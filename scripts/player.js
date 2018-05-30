@@ -4,13 +4,14 @@ class Player {
     this.pcFieldWidth = pcFieldWidth;
     this.pcFieldHeight = pcFieldHeight;
     this.BulletPool = BulletPool;
-    
+
     this.velocity = 0;
     this.acceleration = 0.03;
     this.maxSpeed = 0.3;
     this.radius = 30; // The 'track' the player moves along
     this.fireCharge = 0;
-    this.fireCooldown = 15;
+    this.fireCooldown = 25;
+    this.damageFrames = 100;
 
     this.portTheta = -1.23;
     this.starboardTheta = 1.9106;
@@ -47,6 +48,7 @@ class Player {
 
   move(keyStatus) {
     this.fireCharge++; // increments once every frame
+    this.damageFrames++; // increments once every frame
     if(keyStatus.left) {
       if(this.velocity <= this.maxSpeed) this.velocity += this.acceleration;
       this.starboardTheta += this.velocity;
@@ -77,15 +79,25 @@ class Player {
     this.hitboxCenter = this.computeCenterPoints(-22);
 
     this.ctx.beginPath();
+
+    if(this.damageFrames < 50) {
+      this.ctx.fillStyle = 'red';
+    } else {
+      if(this.fireCharge > this.fireCooldown) {
+        this.ctx.fillStyle = 'blue';
+      } else {
+        this.ctx.fillStyle = 'black';
+      }
+    }
+
     this.ctx.moveTo(this.starboardVertex.x, this.starboardVertex.y);
     this.ctx.lineTo(this.portVertex.x, this.portVertex.y);
     this.ctx.lineTo(this.bowVertex.x, this.bowVertex.y);
-    this.ctx.fillStyle = 'black';
     this.ctx.fill();
   }
 
   isHit() {
-    console.log('ouch!');
+    this.damageFrames = 0;
   }
 }
 
