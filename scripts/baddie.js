@@ -39,11 +39,12 @@ class Baddie {
 
   draw(BulletPool) {
     if(this.isHit) {
+      this.clear();
       return true;
     } else {
       this.theta -= this.speed;
       this.drawPoint = this.computeDrawPoint();
-      this.ctx.clearRect(this.x, this.y, this.width, this.height);
+      this.clear();
       this.sprite.draw(this.drawPoint.x, this.drawPoint.y);
 
       this.chanceToFire = Math.floor(Math.random() * 101)
@@ -56,6 +57,15 @@ class Baddie {
       x: Math.cos(this.theta) * -this.radius  + 390,
       y: Math.sin(this.theta) * -this.radius  + 232
     })
+  }
+
+  clear() {
+    this.ctx.clearRect(
+      this.drawPoint.x - 5,
+      this.drawPoint.y - 5,
+      this.width + 10,
+      this.height + 10
+    );
   }
 
   fire(BulletPool) {

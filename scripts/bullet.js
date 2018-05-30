@@ -3,8 +3,8 @@ export default class Bullet {
     this.ctx = fgCanvas.ctx;
     this.ctxWidth = fgCanvas.width;
     this.ctxHeight = fgCanvas.height;
-    this.undrawX = fgCanvas.width + 1;
-    this.undrawY = fgCanvas.height + 1;
+    this.undrawX = fgCanvas.width + 5;
+    this.undrawY = fgCanvas.height + 5;
     this.setDefaultValues(type);
   }
 
@@ -22,9 +22,9 @@ export default class Bullet {
     this.startPoint = this.computePoint(this.startRadius);
     this.endPoint = this.computePoint(this.endRadius);
 
-    if((this.startPoint.y > -1 || this.endPoint.y > -1) &&
+    if((this.startPoint.y > -5 || this.endPoint.y > -5) &&
        (this.startPoint.y < this.undrawY || this.endPoint.y < this.undrawY) &&
-       (this.startPoint.x > -1 || this.endPoint.x > -1) &&
+       (this.startPoint.x > -5 || this.endPoint.x > -5) &&
        (this.startPoint.x < this.undrawX || this.endPoint.x < this.undrawX)) {
       this.clear()
       this.ctx.beginPath();
