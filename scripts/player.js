@@ -9,6 +9,9 @@ class Player {
     this.height = 15;
 
     this.speed = 0.2;
+    this.velocity = 0;
+    this.acceleration = 0.03;
+    this.maxSpeed = 0.3;
     this.radius = 30; // The 'track' the player moves along
     this.fireCooldown = 15;
     this.fireCharge = 0;
@@ -55,13 +58,17 @@ class Player {
   move(keyStatus) {
     this.fireCharge++; // increments once every frame
     if(keyStatus.left) {
-      this.starboardTheta += this.speed;
-      this.portTheta -= this.speed;
-      this.bowTheta -= this.speed;
+      if(this.velocity <= this.maxSpeed) this.velocity += this.acceleration;
+      this.starboardTheta += this.velocity;
+      this.portTheta -= this.velocity;
+      this.bowTheta -= this.velocity;
     } else if(keyStatus.right) {
-      this.starboardTheta -= this.speed;
-      this.portTheta += this.speed;
-      this.bowTheta += this.speed;
+      if(this.velocity <= this.maxSpeed) this.velocity += this.acceleration;
+      this.starboardTheta -= this.velocity;
+      this.portTheta += this.velocity;
+      this.bowTheta += this.velocity;
+    } else {
+      this.velocity = 0;
     }
 
     if(keyStatus.fire && this.fireCharge >= this.fireCooldown) this.fire();
@@ -69,7 +76,7 @@ class Player {
 
   fire() {
     this.fireCharge = 0;
-    let bulletSpeed = 3;
+    let bulletSpeed = 3.5;
     this.BulletPool.get(this.bowTheta, bulletSpeed);
   }
 
@@ -84,11 +91,6 @@ class Player {
     this.ctx.lineTo(this.portVertex.x, this.portVertex.y);
     this.ctx.lineTo(this.bowVertex.x, this.bowVertex.y);
     this.ctx.fillStyle = 'black';
-    this.ctx.fill();
-
-    this.ctx.beginPath();
-    this.ctx.fillStyle = 'green';
-    this.ctx.arc(this.hitboxCenter.x, this.hitboxCenter.y, 9, 0,2*Math.PI);
     this.ctx.fill();
   }
 
