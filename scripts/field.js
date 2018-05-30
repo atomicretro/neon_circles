@@ -143,7 +143,7 @@ class Field {
     let hitbox = {
       x: this.player.hitboxCenter.x,
       y: this.player.hitboxCenter.y,
-      radius: 6
+      radius: 9
     }
 
     // this.pcContext.arc(hitbox.x, hitbox.y, 5, 0, 2 * Math.PI, true);
@@ -154,6 +154,7 @@ class Field {
         this.pcBulletHitsPC(this.player, hitbox, bullet.startPoint) ||
         this.pcBulletHitsPC(this.player, hitbox, bullet.endPoint)
       ) {
+        // debugger
         this.player.isHit();
       };
     }

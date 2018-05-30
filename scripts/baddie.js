@@ -59,7 +59,7 @@ class Baddie {
   }
 
   fire(BulletPool) {
-    console.log('baddie.fire');
+    // console.log('baddie.fire');
     let bulletSpeed = 0.5;
     BulletPool.get(this.theta, bulletSpeed);
   }

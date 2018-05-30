@@ -164,7 +164,7 @@ var Baddie = function () {
   }, {
     key: 'fire',
     value: function fire(BulletPool) {
-      console.log('baddie.fire');
+      // console.log('baddie.fire');
       var bulletSpeed = 0.5;
       BulletPool.get(this.theta, bulletSpeed);
     }
@@ -256,7 +256,7 @@ var Bullet = function () {
       this.endRadius -= this.speed;
       this.startPoint = this.computePoint(this.startRadius);
       this.endPoint = this.computePoint(this.endRadius);
-      console.log('bullet.draw');
+      // console.log('bullet.draw');
 
       if ((this.startPoint.y > -1 || this.endPoint.y > -1) && (this.startPoint.y < 501 || this.endPoint.y < 501) && (this.startPoint.x > -1 || this.endPoint.x > -1) && (this.startPoint.x < 801 || this.endPoint.x < 801)) {
         this.ctx.beginPath();
@@ -264,7 +264,7 @@ var Bullet = function () {
         this.ctx.moveTo(this.startPoint.x, this.startPoint.y);
         this.ctx.lineTo(this.endPoint.x, this.endPoint.y);
         this.ctx.stroke();
-        console.log('bullet.draw#if');
+        // console.log('bullet.draw#if');
       } else {
         return true;
       };
@@ -281,8 +281,8 @@ var Bullet = function () {
     key: 'setDefaultValues',
     value: function setDefaultValues() {
       if (this.type === 'playerBullet') {
-        this.startRadius = 18;
-        this.endRadius = 8;
+        this.startRadius = 12;
+        this.endRadius = -8;
         this.xOffset = 400;
         this.yOffset = 250;
       } else {
@@ -495,13 +495,14 @@ var Field = function () {
       var hitbox = {
         x: this.player.hitboxCenter.x,
         y: this.player.hitboxCenter.y,
-        radius: 6
+        radius: 9
 
         // this.pcContext.arc(hitbox.x, hitbox.y, 5, 0, 2 * Math.PI, true);
 
       };for (var bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
         var bullet = spawnedPCBullets[bullIdx];
         if (this.pcBulletHitsPC(this.player, hitbox, bullet.startPoint) || this.pcBulletHitsPC(this.player, hitbox, bullet.endPoint)) {
+          // debugger
           this.player.isHit();
         };
       }
@@ -646,16 +647,16 @@ var Player = function () {
     this.pcFieldHeight = pcFieldHeight;
     this.BulletPool = BulletPool;
 
-    this.width = 10;
-    this.height = 10;
+    this.width = 15;
+    this.height = 15;
 
-    this.speed = 0.15;
+    this.speed = 0.2;
     this.radius = 30; // The 'track' the player moves along
     this.fireCooldown = 15;
     this.fireCharge = 0;
-    this.starboardTheta = 1.7359;
+    this.starboardTheta = 1.9106;
     this.starboardVertex = this.computeStarboardVertex();
-    this.portTheta = -1.4056;
+    this.portTheta = -1.23;
     this.portVertex = this.computePortVertex();
     this.bowTheta = Math.PI / 2;
     this.bowVertex = this.computeBowVertex();
@@ -685,16 +686,16 @@ var Player = function () {
     key: 'computeBowVertex',
     value: function computeBowVertex() {
       return {
-        x: Math.cos(this.bowTheta) * -20 + this.pcFieldWidth / 2,
-        y: Math.sin(this.bowTheta) * -20 + this.pcFieldHeight / 2
+        x: Math.cos(this.bowTheta) * -10 + this.pcFieldWidth / 2,
+        y: Math.sin(this.bowTheta) * -10 + this.pcFieldHeight / 2
       };
     }
   }, {
     key: 'computeHitboxCenter',
     value: function computeHitboxCenter() {
       return {
-        x: Math.cos(this.bowTheta) * -25 + this.pcFieldWidth / 2,
-        y: Math.sin(this.bowTheta) * -25 + this.pcFieldHeight / 2
+        x: Math.cos(this.bowTheta) * -22 + this.pcFieldWidth / 2,
+        y: Math.sin(this.bowTheta) * -22 + this.pcFieldHeight / 2
       };
     }
   }, {
@@ -717,7 +718,7 @@ var Player = function () {
     key: 'fire',
     value: function fire() {
       this.fireCharge = 0;
-      var bulletSpeed = 0.5;
+      var bulletSpeed = 3;
       this.BulletPool.get(this.bowTheta, bulletSpeed);
     }
   }, {
@@ -732,7 +733,12 @@ var Player = function () {
       this.ctx.moveTo(this.starboardVertex.x, this.starboardVertex.y);
       this.ctx.lineTo(this.portVertex.x, this.portVertex.y);
       this.ctx.lineTo(this.bowVertex.x, this.bowVertex.y);
-      this.ctx.strokeStyle = 'black';
+      this.ctx.fillStyle = 'black';
+      this.ctx.fill();
+
+      this.ctx.beginPath();
+      this.ctx.fillStyle = 'green';
+      this.ctx.arc(this.hitboxCenter.x, this.hitboxCenter.y, 9, 0, 2 * Math.PI);
       this.ctx.fill();
     }
   }, {

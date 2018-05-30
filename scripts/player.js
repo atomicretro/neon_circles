@@ -5,16 +5,16 @@ class Player {
     this.pcFieldHeight = pcFieldHeight;
     this.BulletPool = BulletPool;
 
-    this.width = 10;
-    this.height = 10;
+    this.width = 15;
+    this.height = 15;
 
-    this.speed = 0.15;
+    this.speed = 0.2;
     this.radius = 30; // The 'track' the player moves along
     this.fireCooldown = 15;
     this.fireCharge = 0;
-    this.starboardTheta = 1.7359;
+    this.starboardTheta = 1.9106;
     this.starboardVertex = this.computeStarboardVertex();
-    this.portTheta = -1.4056;
+    this.portTheta = -1.23;
     this.portVertex = this.computePortVertex();
     this.bowTheta = Math.PI / 2;
     this.bowVertex = this.computeBowVertex();
@@ -40,15 +40,15 @@ class Player {
 
   computeBowVertex() {
     return ({
-      x: Math.cos(this.bowTheta) * -20  + this.pcFieldWidth / 2,
-      y: Math.sin(this.bowTheta) * -20  + this.pcFieldHeight / 2
+      x: Math.cos(this.bowTheta) * -10  + this.pcFieldWidth / 2,
+      y: Math.sin(this.bowTheta) * -10  + this.pcFieldHeight / 2
     })
   }
 
   computeHitboxCenter() {
     return ({
-      x: Math.cos(this.bowTheta) * -25  + this.pcFieldWidth / 2,
-      y: Math.sin(this.bowTheta) * -25  + this.pcFieldHeight / 2
+      x: Math.cos(this.bowTheta) * -22  + this.pcFieldWidth / 2,
+      y: Math.sin(this.bowTheta) * -22  + this.pcFieldHeight / 2
     })
   }
 
@@ -69,7 +69,7 @@ class Player {
 
   fire() {
     this.fireCharge = 0;
-    let bulletSpeed = 0.5;
+    let bulletSpeed = 3;
     this.BulletPool.get(this.bowTheta, bulletSpeed);
   }
 
@@ -83,7 +83,12 @@ class Player {
     this.ctx.moveTo(this.starboardVertex.x, this.starboardVertex.y);
     this.ctx.lineTo(this.portVertex.x, this.portVertex.y);
     this.ctx.lineTo(this.bowVertex.x, this.bowVertex.y);
-    this.ctx.strokeStyle = 'black';
+    this.ctx.fillStyle = 'black';
+    this.ctx.fill();
+
+    this.ctx.beginPath();
+    this.ctx.fillStyle = 'green';
+    this.ctx.arc(this.hitboxCenter.x, this.hitboxCenter.y, 9, 0,2*Math.PI);
     this.ctx.fill();
   }
 

@@ -32,7 +32,7 @@ class Bullet {
     this.endRadius -= this.speed;
     this.startPoint = this.computePoint(this.startRadius);
     this.endPoint = this.computePoint(this.endRadius);
-    console.log('bullet.draw');
+    // console.log('bullet.draw');
 
     if ((this.startPoint.y > -1 || this.endPoint.y > -1) &&
         (this.startPoint.y < 501 || this.endPoint.y < 501) &&
@@ -43,7 +43,7 @@ class Bullet {
       this.ctx.moveTo(this.startPoint.x, this.startPoint.y);
       this.ctx.lineTo(this.endPoint.x, this.endPoint.y);
       this.ctx.stroke();
-      console.log('bullet.draw#if');
+      // console.log('bullet.draw#if');
     } else {
       return true;
     };
@@ -58,8 +58,8 @@ class Bullet {
 
   setDefaultValues() {
     if (this.type === 'playerBullet') {
-      this.startRadius = 18;
-      this.endRadius = 8;
+      this.startRadius = 12;
+      this.endRadius = -8;
       this.xOffset = 400;
       this.yOffset = 250;
     } else {
