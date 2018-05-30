@@ -116,6 +116,7 @@ var BaddiePool = function (_ObjectPool) {
 }(_utilities.ObjectPool);
 
 exports.default = BaddiePool;
+;
 
 var Baddie = function () {
   function Baddie(ctx, type, ImageStore) {
@@ -164,7 +165,6 @@ var Baddie = function () {
   }, {
     key: 'fire',
     value: function fire(BulletPool) {
-      // console.log('baddie.fire');
       var bulletSpeed = 0.5;
       BulletPool.get(this.theta, bulletSpeed);
     }
@@ -184,6 +184,8 @@ var Baddie = function () {
   return Baddie;
 }();
 
+;
+
 /***/ }),
 
 /***/ "./scripts/baddieBullet.js":
@@ -200,9 +202,13 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 var _utilities = __webpack_require__(/*! ./utilities */ "./scripts/utilities.js");
+
+var _bullet = __webpack_require__(/*! ./bullet */ "./scripts/bullet.js");
+
+var _bullet2 = _interopRequireDefault(_bullet);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -230,78 +236,17 @@ var BulletPool = function (_ObjectPool) {
 
 exports.default = BulletPool;
 
-var BadBullet = function () {
+var BadBullet = function (_Bullet) {
+  _inherits(BadBullet, _Bullet);
+
   function BadBullet(fgCanvas, type) {
     _classCallCheck(this, BadBullet);
 
-    this.ctx = fgCanvas.ctx;
-    this.type = type;
-    this.setDefaultValues();
+    return _possibleConstructorReturn(this, (BadBullet.__proto__ || Object.getPrototypeOf(BadBullet)).call(this, fgCanvas, type));
   }
 
-  _createClass(BadBullet, [{
-    key: 'spawn',
-    value: function spawn(theta, speed) {
-      this.pathAngle = theta;
-      this.startPoint = this.computePoint(this.startRadius);
-      this.endPoint = this.computePoint(this.endRadius);
-      this.speed = speed;
-      this.spawned = true;
-    }
-  }, {
-    key: 'draw',
-    value: function draw() {
-      // ctx.clearRect(this.x, this.y, this.width, this.height); optimize later
-      this.startRadius -= this.speed;
-      this.endRadius -= this.speed;
-      this.startPoint = this.computePoint(this.startRadius);
-      this.endPoint = this.computePoint(this.endRadius);
-
-      if ((this.startPoint.y > -1 || this.endPoint.y > -1) && (this.startPoint.y < 501 || this.endPoint.y < 501) && (this.startPoint.x > -1 || this.endPoint.x > -1) && (this.startPoint.x < 801 || this.endPoint.x < 801)) {
-        this.ctx.beginPath();
-        this.ctx.lineWidth = 2;
-        this.ctx.moveTo(this.startPoint.x, this.startPoint.y);
-        this.ctx.lineTo(this.endPoint.x, this.endPoint.y);
-        this.ctx.stroke();
-      } else {
-        return true;
-      };
-    }
-  }, {
-    key: 'computePoint',
-    value: function computePoint(radius) {
-      return {
-        x: Math.cos(this.pathAngle) * -radius + this.xOffset,
-        y: Math.sin(this.pathAngle) * -radius + this.yOffset
-      };
-    }
-  }, {
-    key: 'setDefaultValues',
-    value: function setDefaultValues() {
-      if (this.type === 'playerBullet') {
-        this.startRadius = 12;
-        this.endRadius = -8;
-        this.xOffset = 400;
-        this.yOffset = 250;
-      } else {
-        this.startRadius = 0;
-        this.endRadius = 0;
-        this.xOffset = 400;
-        this.yOffset = 250;
-      }
-
-      this.pathAngle = 0;
-      this.startPoint = { x: 0, y: 0 };
-      this.endPoint = { x: 0, y: 0 };
-      this.speed = 0;
-      this.spawned = false;
-      // this.height = 10;
-      // this.width = 10;
-    }
-  }]);
-
   return BadBullet;
-}();
+}(_bullet2.default);
 
 ;
 
@@ -351,13 +296,13 @@ var Bullet = function () {
   }, {
     key: 'draw',
     value: function draw() {
-      // ctx.clearRect(this.x, this.y, this.width, this.height); optimize later
       this.startRadius -= this.speed;
       this.endRadius -= this.speed;
       this.startPoint = this.computePoint(this.startRadius);
       this.endPoint = this.computePoint(this.endRadius);
 
       if ((this.startPoint.y > -1 || this.endPoint.y > -1) && (this.startPoint.y < this.undrawY || this.endPoint.y < this.undrawY) && (this.startPoint.x > -1 || this.endPoint.x > -1) && (this.startPoint.x < this.undrawX || this.endPoint.x < this.undrawX)) {
+        this.clear();
         this.ctx.beginPath();
         this.ctx.lineWidth = 2;
         this.ctx.moveTo(this.startPoint.x, this.startPoint.y);
@@ -366,6 +311,25 @@ var Bullet = function () {
       } else {
         return true;
       };
+    }
+  }, {
+    key: 'clear',
+    value: function clear() {
+      var startX = void 0;
+      var startY = void 0;
+
+      if (this.startPoint.x > this.endPoint.x) {
+        startX = this.endPoint.x;
+      } else {
+        startX = this.startPoint.x;
+      }
+      if (this.startPoint.y > this.endPoint.y) {
+        startY = this.endPoint.y;
+      } else {
+        startY = this.startPoint.y;
+      }
+
+      this.ctx.clearRect(startX - 5, startY - 5, 30, 30);
     }
   }, {
     key: 'computePoint',
@@ -489,21 +453,6 @@ var Field = function () {
   }
 
   _createClass(Field, [{
-    key: 'drawFieldBorder',
-    value: function drawFieldBorder() {
-      this.fgCanvas.ctx.beginPath();
-      this.fgCanvas.ctx.lineWidth = 1;
-      this.fgCanvas.ctx.rect(0, 0, this.fgCanvas.width, this.fgCanvas.height);
-      this.fgCanvas.ctx.strokeStyle = 'black';
-      this.fgCanvas.ctx.stroke();
-
-      // this.pcCanvas.ctx.beginPath();
-      // this.pcCanvas.ctx.lineWidth = 1;
-      // this.pcCanvas.ctx.rect(0, 0, this.pcCanvas.width, this.pcCanvas.height);
-      // this.pcCanvas.ctx.strokeStyle = 'black';
-      // this.pcCanvas.ctx.stroke();
-    }
-  }, {
     key: 'drawPlayerRails',
     value: function drawPlayerRails(shape) {
       var xCenter = this.pcCanvas.width / 2;
@@ -522,21 +471,20 @@ var Field = function () {
   }, {
     key: 'playRound',
     value: function playRound() {
-      var now = Date.now();
+      // let now = Date.now();
       // let dt = (now - this.lastTime) / 1000.0;
 
       // update(dt);
       this.render();
 
-      this.lastTime = now;
+      // this.lastTime = now;
       requestAnimationFrame(this.playRound);
     }
   }, {
     key: 'render',
     value: function render() {
-      this.clearFGContext();
+      // this.clearFGContext();
       this.clearPCContext();
-      this.drawFieldBorder();
       this.drawPlayerRails('circle');
       this.checkCollisions();
       this.drawPlayer();
@@ -629,36 +577,6 @@ var Field = function () {
     value: function pcBulletHitsBaddie(baddie, drawPoint, bullet) {
       return drawPoint.x <= bullet.x && bullet.x <= drawPoint.x + baddie.width && drawPoint.y <= bullet.y && bullet.y <= drawPoint.y + baddie.height;
     }
-
-    // spawnedBaddies.forEach((baddie) => {
-    //   spawnedPCBullets.forEach((bullet) => {
-    //     if bullet.startPoint.x
-    //     let bulletStart
-    //   })
-    // })
-
-    // debugger
-    // this.BaddiePool.pool.forEach((baddie) => {
-    //   debugger
-    //   let badX = baddie.drawPoint.x;
-    //   let badY = baddie.drawPoint.y;
-    //   this.pcBulletPool.pool.forEach((bullet) => {
-    //     debugger
-    //     console.log(`bullet ${bullet.startPoint.x}`);
-    //     console.log(`baddie ${baddie.drawPoint.x}`);
-    //     if(
-    //       (bullet.startPoint.x <= badX && bullet.startPoint.x >= badX + 20) ||
-    //       (bullet.endPoint.x <= badX && bullet.endPoint.x >= badX + 20) ||
-    //       (bullet.startPoint.y <= badY && bullet.startPoint.y >= badY + 30) ||
-    //       (bullet.endPoint.y <= badY && bullet.startPoint.y >= badY + 30)
-    //     ) {
-    //       console.log('hit!');
-    //     }
-    //   })
-    //
-    // })
-    // }
-
   }, {
     key: 'clearFGContext',
     value: function clearFGContext() {
@@ -895,6 +813,7 @@ var BulletPool = function (_ObjectPool) {
 }(_utilities.ObjectPool);
 
 exports.default = BulletPool;
+;
 
 var PlayerBullet = function (_Bullet) {
   _inherits(PlayerBullet, _Bullet);
@@ -909,8 +828,6 @@ var PlayerBullet = function (_Bullet) {
 }(_bullet2.default);
 
 ;
-
-// Bullet.prototype = new Sprite();
 
 /***/ }),
 

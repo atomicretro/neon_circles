@@ -10,7 +10,7 @@ export default class BaddiePool extends ObjectPool {
       this.pool.push(baddie);
     }
   }
-}
+};
 
 class Baddie {
   constructor(ctx, type, ImageStore) {
@@ -59,7 +59,6 @@ class Baddie {
   }
 
   fire(BulletPool) {
-    // console.log('baddie.fire');
     let bulletSpeed = 0.5;
     BulletPool.get(this.theta, bulletSpeed);
   }
@@ -73,4 +72,4 @@ class Baddie {
     this.speed = 0.1;
     this.radius = 300; // The 'track' the baddie moves along
   }
-}
+};

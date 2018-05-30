@@ -54,20 +54,6 @@ class Field {
     document.addEventListener('keyup', this.keyup.bind(this));
   }
 
-  drawFieldBorder() {
-    this.fgCanvas.ctx.beginPath();
-    this.fgCanvas.ctx.lineWidth = 1;
-    this.fgCanvas.ctx.rect(0, 0, this.fgCanvas.width, this.fgCanvas.height);
-    this.fgCanvas.ctx.strokeStyle = 'black';
-    this.fgCanvas.ctx.stroke();
-
-    // this.pcCanvas.ctx.beginPath();
-    // this.pcCanvas.ctx.lineWidth = 1;
-    // this.pcCanvas.ctx.rect(0, 0, this.pcCanvas.width, this.pcCanvas.height);
-    // this.pcCanvas.ctx.strokeStyle = 'black';
-    // this.pcCanvas.ctx.stroke();
-  }
-
   drawPlayerRails(shape) {
     let xCenter = this.pcCanvas.width / 2;
     let yCenter = this.pcCanvas.height / 2;
@@ -84,20 +70,19 @@ class Field {
   }
 
   playRound() {
-    let now = Date.now();
+    // let now = Date.now();
     // let dt = (now - this.lastTime) / 1000.0;
 
     // update(dt);
     this.render();
 
-    this.lastTime = now;
+    // this.lastTime = now;
     requestAnimationFrame(this.playRound);
   }
 
   render()  {
-    this.clearFGContext();
+    // this.clearFGContext();
     this.clearPCContext();
-    this.drawFieldBorder();
     this.drawPlayerRails('circle');
     this.checkCollisions();
     this.drawPlayer();
@@ -192,35 +177,6 @@ class Field {
       (drawPoint.y <= bullet.y && bullet.y <= drawPoint.y + baddie.height)
     )
   }
-
-    // spawnedBaddies.forEach((baddie) => {
-    //   spawnedPCBullets.forEach((bullet) => {
-    //     if bullet.startPoint.x
-    //     let bulletStart
-    //   })
-    // })
-
-    // debugger
-    // this.BaddiePool.pool.forEach((baddie) => {
-    //   debugger
-    //   let badX = baddie.drawPoint.x;
-    //   let badY = baddie.drawPoint.y;
-    //   this.pcBulletPool.pool.forEach((bullet) => {
-    //     debugger
-    //     console.log(`bullet ${bullet.startPoint.x}`);
-    //     console.log(`baddie ${baddie.drawPoint.x}`);
-    //     if(
-    //       (bullet.startPoint.x <= badX && bullet.startPoint.x >= badX + 20) ||
-    //       (bullet.endPoint.x <= badX && bullet.endPoint.x >= badX + 20) ||
-    //       (bullet.startPoint.y <= badY && bullet.startPoint.y >= badY + 30) ||
-    //       (bullet.endPoint.y <= badY && bullet.startPoint.y >= badY + 30)
-    //     ) {
-    //       console.log('hit!');
-    //     }
-    //   })
-    //
-    // })
-  // }
 
   clearFGContext() {
     this.fgCanvas.ctx.clearRect(0, 0, this.fgCanvas.width, this.fgCanvas.height);

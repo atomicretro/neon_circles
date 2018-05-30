@@ -10,12 +10,10 @@ export default class BulletPool extends ObjectPool {
       this.pool.push(bullet);
     }
   }
-}
+};
 
 class PlayerBullet extends Bullet {
   constructor(fgCanvas) {
     super(fgCanvas, 'player');
   }
 };
-
-// Bullet.prototype = new Sprite();
