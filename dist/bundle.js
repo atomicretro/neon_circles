@@ -142,13 +142,13 @@ var Baddie = function () {
   }, {
     key: 'draw',
     value: function draw(BulletPool) {
+      this.clear();
       if (this.isHit) {
         this.clear();
         return true;
       } else {
         this.theta -= this.speed;
         this.drawPoint = this.computeDrawPoint();
-        this.clear();
         this.sprite.draw(this.drawPoint.x, this.drawPoint.y);
 
         this.chanceToFire = Math.floor(Math.random() * 101);
@@ -319,13 +319,13 @@ var Bullet = function () {
   _createClass(Bullet, [{
     key: 'draw',
     value: function draw() {
+      this.clear();
       this.startRadius -= this.speed;
       this.endRadius -= this.speed;
       this.startPoint = this.computePoint(this.startRadius);
       this.endPoint = this.computePoint(this.endRadius);
 
       if ((this.startPoint.y > -5 || this.endPoint.y > -5) && (this.startPoint.y < this.undrawY || this.endPoint.y < this.undrawY) && (this.startPoint.x > -5 || this.endPoint.x > -5) && (this.startPoint.x < this.undrawX || this.endPoint.x < this.undrawX)) {
-        this.clear();
         this.ctx.beginPath();
         this.ctx.lineWidth = 2;
         this.ctx.moveTo(this.startPoint.x, this.startPoint.y);
@@ -441,13 +441,18 @@ for (var code in KEY_MAP) {
 }
 
 var Field = function () {
-  function Field(fgCanvas, pcCanvas) {
+  function Field(fgCanvas, statsCanvas, pcCanvas) {
     _classCallCheck(this, Field);
 
     this.fgCanvas = {
       ctx: fgCanvas.getContext("2d"),
       width: 800,
       height: 500
+    };
+    this.statsCanvas = {
+      ctx: statsCanvas.getContext("2d"),
+      width: 800,
+      height: 25
     };
     this.pcCanvas = {
       ctx: pcCanvas.getContext("2d"),
@@ -476,22 +481,6 @@ var Field = function () {
   }
 
   _createClass(Field, [{
-    key: 'drawPlayerRails',
-    value: function drawPlayerRails(shape) {
-      var xCenter = this.pcCanvas.width / 2;
-      var yCenter = this.pcCanvas.height / 2;
-
-      switch (shape) {
-        case 'circle':
-        default:
-          this.pcCanvas.ctx.beginPath();
-          this.pcCanvas.ctx.arc(xCenter, yCenter, 60, 0, 2 * Math.PI, true);
-          this.pcCanvas.ctx.strokeStyle = "black";
-          this.pcCanvas.ctx.lineWidth = 2;
-          this.pcCanvas.ctx.stroke();
-      }
-    }
-  }, {
     key: 'playRound',
     value: function playRound() {
       // let now = Date.now();
@@ -506,14 +495,16 @@ var Field = function () {
   }, {
     key: 'render',
     value: function render() {
-      this.clearFGContext();
+      // this.clearFGContext();
+      this.clearStatsContext();
       this.clearPCContext();
+      this.drawStatusBar();
       this.drawPlayerRails('circle');
       this.checkCollisions();
       this.drawPlayer();
-      this.pcBulletPool.draw('player');
       this.BaddiePool.get({ theta: Math.PI / 2, speed: 0.005 });
       this.BaddiePool.draw();
+      this.pcBulletPool.draw('player');
       this.badBulletPool.draw();
     }
   }, {
@@ -532,6 +523,28 @@ var Field = function () {
       if (KEY_MAP[keyCode]) {
         e.preventDefault();
         KEY_STATUS[KEY_MAP[keyCode]] = false;
+      }
+    }
+  }, {
+    key: 'drawStatusBar',
+    value: function drawStatusBar() {
+      this.statsCanvas.ctx.font = "15px Arial";
+      this.statsCanvas.ctx.fillText("Life:", 30, 20);
+    }
+  }, {
+    key: 'drawPlayerRails',
+    value: function drawPlayerRails(shape) {
+      var xCenter = this.pcCanvas.width / 2;
+      var yCenter = this.pcCanvas.height / 2;
+
+      switch (shape) {
+        case 'circle':
+        default:
+          this.pcCanvas.ctx.beginPath();
+          this.pcCanvas.ctx.arc(xCenter, yCenter, 60, 0, 2 * Math.PI, true);
+          this.pcCanvas.ctx.strokeStyle = "black";
+          this.pcCanvas.ctx.lineWidth = 2;
+          this.pcCanvas.ctx.stroke();
       }
     }
   }, {
@@ -609,6 +622,11 @@ var Field = function () {
       return drawPoint.x <= bullet.x && bullet.x <= drawPoint.x + baddie.width && drawPoint.y <= bullet.y && bullet.y <= drawPoint.y + baddie.height;
     }
   }, {
+    key: 'clearStatsContext',
+    value: function clearStatsContext() {
+      this.statsCanvas.ctx.clearRect(0, 0, this.statsCanvas.width, this.statsCanvas.height);
+    }
+  }, {
     key: 'clearFGContext',
     value: function clearFGContext() {
       this.fgCanvas.ctx.clearRect(0, 0, this.fgCanvas.width, this.fgCanvas.height);
@@ -646,7 +664,7 @@ var _field2 = _interopRequireDefault(_field);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var startGame = function startGame(foregroundCanvas, playerCanvas) {
-  var field = new _field2.default(foregroundCanvas, playerCanvas);
+  var field = new _field2.default(foregroundCanvas, statsCanvas, playerCanvas);
 
   field.playRound();
 };

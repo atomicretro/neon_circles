@@ -38,13 +38,13 @@ class Baddie {
   }
 
   draw(BulletPool) {
+    this.clear();
     if(this.isHit) {
       this.clear();
       return true;
     } else {
       this.theta -= this.speed;
       this.drawPoint = this.computeDrawPoint();
-      this.clear();
       this.sprite.draw(this.drawPoint.x, this.drawPoint.y);
 
       this.chanceToFire = Math.floor(Math.random() * 101)

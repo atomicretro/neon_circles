@@ -1,7 +1,10 @@
 import Field from './field';
 
 const startGame = (foregroundCanvas, playerCanvas) => {
-  let field = new Field(foregroundCanvas, playerCanvas);
+  let field = new Field(
+    foregroundCanvas,
+    statsCanvas,
+    playerCanvas);
 
   field.playRound();
 }

@@ -20,11 +20,16 @@ for (let code in KEY_MAP) {
 }
 
 class Field {
-  constructor(fgCanvas, pcCanvas) {
+  constructor(fgCanvas, statsCanvas, pcCanvas) {
     this.fgCanvas = {
       ctx: fgCanvas.getContext("2d"),
       width: 800,
       height: 500
+    }
+    this.statsCanvas = {
+      ctx: statsCanvas.getContext("2d"),
+      width: 800,
+      height: 25
     }
     this.pcCanvas = {
       ctx: pcCanvas.getContext("2d"),
@@ -54,21 +59,6 @@ class Field {
     document.addEventListener('keyup', this.keyup.bind(this));
   }
 
-  drawPlayerRails(shape) {
-    let xCenter = this.pcCanvas.width / 2;
-    let yCenter = this.pcCanvas.height / 2;
-
-    switch (shape) {
-      case 'circle':
-      default:
-      this.pcCanvas.ctx.beginPath();
-      this.pcCanvas.ctx.arc(xCenter, yCenter, 60, 0, 2 * Math.PI, true);
-      this.pcCanvas.ctx.strokeStyle = "black";
-      this.pcCanvas.ctx.lineWidth = 2;
-      this.pcCanvas.ctx.stroke();
-    }
-  }
-
   playRound() {
     // let now = Date.now();
     // let dt = (now - this.lastTime) / 1000.0;
@@ -81,14 +71,16 @@ class Field {
   }
 
   render()  {
-    this.clearFGContext();
+    // this.clearFGContext();
+    this.clearStatsContext();
     this.clearPCContext();
+    this.drawStatusBar();
     this.drawPlayerRails('circle');
     this.checkCollisions();
     this.drawPlayer();
-    this.pcBulletPool.draw('player');
     this.BaddiePool.get({ theta: Math.PI / 2, speed: 0.005 });
     this.BaddiePool.draw();
+    this.pcBulletPool.draw('player');
     this.badBulletPool.draw();
   }
 
@@ -105,6 +97,26 @@ class Field {
     if (KEY_MAP[keyCode]) {
       e.preventDefault();
       KEY_STATUS[KEY_MAP[keyCode]] = false;
+    }
+  }
+
+  drawStatusBar() {
+    this.statsCanvas.ctx.font = "15px Arial";
+    this.statsCanvas.ctx.fillText("Life:", 30, 20);
+  }
+
+  drawPlayerRails(shape) {
+    let xCenter = this.pcCanvas.width / 2;
+    let yCenter = this.pcCanvas.height / 2;
+
+    switch (shape) {
+      case 'circle':
+      default:
+      this.pcCanvas.ctx.beginPath();
+      this.pcCanvas.ctx.arc(xCenter, yCenter, 60, 0, 2 * Math.PI, true);
+      this.pcCanvas.ctx.strokeStyle = "black";
+      this.pcCanvas.ctx.lineWidth = 2;
+      this.pcCanvas.ctx.stroke();
     }
   }
 
@@ -188,6 +200,10 @@ class Field {
       (drawPoint.x <= bullet.x && bullet.x <= drawPoint.x + baddie.width) &&
       (drawPoint.y <= bullet.y && bullet.y <= drawPoint.y + baddie.height)
     )
+  }
+
+  clearStatsContext() {
+    this.statsCanvas.ctx.clearRect(0, 0, this.statsCanvas.width, this.statsCanvas.height);
   }
 
   clearFGContext() {

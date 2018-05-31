@@ -9,6 +9,7 @@ export default class Bullet {
   }
 
   draw() {
+    this.clear()
     this.startRadius -= this.speed;
     this.endRadius -= this.speed;
     this.startPoint = this.computePoint(this.startRadius);
@@ -18,7 +19,6 @@ export default class Bullet {
        (this.startPoint.y < this.undrawY || this.endPoint.y < this.undrawY) &&
        (this.startPoint.x > -5 || this.endPoint.x > -5) &&
        (this.startPoint.x < this.undrawX || this.endPoint.x < this.undrawX)) {
-      this.clear()
       this.ctx.beginPath();
       this.ctx.lineWidth = 2;
       this.ctx.moveTo(this.startPoint.x, this.startPoint.y);
