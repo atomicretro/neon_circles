@@ -133,10 +133,10 @@ var Baddie = function () {
 
   _createClass(Baddie, [{
     key: 'spawn',
-    value: function spawn(theta, speed) {
-      this.theta = theta;
+    value: function spawn(baddieData) {
+      this.theta = baddieData.theta;
       this.drawPoint = this.computeDrawPoint();
-      this.speed = speed;
+      this.speed = baddieData.speed;
       this.spawned = true;
     }
   }, {
@@ -152,7 +152,9 @@ var Baddie = function () {
         this.sprite.draw(this.drawPoint.x, this.drawPoint.y);
 
         this.chanceToFire = Math.floor(Math.random() * 101);
-        this.fire(BulletPool);
+        if (this.chanceToFire / 100 < this.fireThreshold) {
+          this.fire(BulletPool);
+        }
       }
     }
   }, {
@@ -171,8 +173,16 @@ var Baddie = function () {
   }, {
     key: 'fire',
     value: function fire(BulletPool) {
-      var bulletSpeed = 0.5;
-      BulletPool.get(this.theta, bulletSpeed);
+      var bulletData = {
+        theta: this.theta,
+        speed: 4,
+        radius: this.radius,
+        startPoint: {
+          x: this.drawPoint.x + this.width / 2,
+          y: this.drawPoint.y + this.height / 2
+        }
+      };
+      BulletPool.get(bulletData);
     }
   }, {
     key: 'setDefaultValues',
@@ -207,6 +217,8 @@ var Baddie = function () {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _utilities = __webpack_require__(/*! ./utilities */ "./scripts/utilities.js");
 
@@ -251,6 +263,20 @@ var BadBullet = function (_Bullet) {
     return _possibleConstructorReturn(this, (BadBullet.__proto__ || Object.getPrototypeOf(BadBullet)).call(this, fgCanvas, type));
   }
 
+  _createClass(BadBullet, [{
+    key: 'spawn',
+    value: function spawn(bulletData) {
+      // debugger
+      this.pathAngle = bulletData.theta;
+      this.speed = bulletData.speed;
+      this.startPoint = this.computePoint(bulletData.radius);
+      this.endPoint = this.computePoint(bulletData.radius - 20);
+      this.startRadius = bulletData.radius;
+      this.endRadius = bulletData.radius - 20;
+      this.spawned = true;
+    }
+  }]);
+
   return BadBullet;
 }(_bullet2.default);
 
@@ -291,15 +317,6 @@ var Bullet = function () {
   }
 
   _createClass(Bullet, [{
-    key: 'spawn',
-    value: function spawn(theta, speed) {
-      this.pathAngle = theta;
-      this.startPoint = this.computePoint(this.startRadius);
-      this.endPoint = this.computePoint(this.endRadius);
-      this.speed = speed;
-      this.spawned = true;
-    }
-  }, {
     key: 'draw',
     value: function draw() {
       this.startRadius -= this.speed;
@@ -444,7 +461,7 @@ var Field = function () {
     pcCanvas.height = this.pcCanvas.height;
 
     this.ImageStore = new _utilities.ImageStore();
-    this.badBulletPool = new _baddieBullet2.default(20, this.fgCanvas, 'demonBullet');
+    this.badBulletPool = new _baddieBullet2.default(1, this.fgCanvas, 'demonBullet');
     this.pcBulletPool = new _playerBullet2.default(8, this.fgCanvas);
     this.BaddiePool = new _baddie2.default(1, this.fgCanvas.ctx, this.ImageStore, this.badBulletPool);
     this.player = new _player2.default(this.pcCanvas, this.pcBulletPool);
@@ -489,14 +506,15 @@ var Field = function () {
   }, {
     key: 'render',
     value: function render() {
-      // this.clearFGContext();
+      this.clearFGContext();
       this.clearPCContext();
       this.drawPlayerRails('circle');
       this.checkCollisions();
       this.drawPlayer();
       this.pcBulletPool.draw('player');
-      this.BaddiePool.get(Math.PI / 2, 0.005);
+      this.BaddiePool.get({ theta: Math.PI / 2, speed: 0.005 });
       this.BaddiePool.draw();
+      this.badBulletPool.draw();
     }
   }, {
     key: 'keydown',
@@ -544,20 +562,32 @@ var Field = function () {
         radius: 9
       };
 
+      this.fgCanvas.ctx.beginPath();
+      this.fgCanvas.ctx.arc(this.player.hitboxCenter.x + 350, this.player.hitboxCenter.y + 200, 9, 0, 2 * Math.PI);
+      this.fgCanvas.ctx.stroke();
+
       for (var bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
         var bullet = spawnedPCBullets[bullIdx];
-        if (this.pcBulletHitsPC(this.player, hitbox, bullet.startPoint) || this.pcBulletHitsPC(this.player, hitbox, bullet.endPoint)) {
+        if (this.bulletHitsPC(this.player, hitbox, bullet.startPoint) || this.bulletHitsPC(this.player, hitbox, bullet.endPoint)) {
+          this.player.isHit();
+        };
+      }
+
+      for (var bullIdx = 0; bullIdx < spawnedBadBullets.length; bullIdx++) {
+        var _bullet = spawnedBadBullets[bullIdx];
+        if (this.bulletHitsPC(this.player, hitbox, _bullet.startPoint) || this.bulletHitsPC(this.player, hitbox, _bullet.endPoint)) {
           this.player.isHit();
         };
       }
     }
   }, {
-    key: 'pcBulletHitsPC',
-    value: function pcBulletHitsPC(player, hitbox, bullet) {
+    key: 'bulletHitsPC',
+    value: function bulletHitsPC(player, hitbox, bullet) {
       hitbox.x = hitbox.x - player.pcFieldWidth / 2 + this.fgCanvas.width / 2;
       hitbox.y = hitbox.y - player.pcFieldHeight / 2 + this.fgCanvas.height / 2;
       var distanceFromHitboxToBullet = Math.sqrt(Math.pow(hitbox.x - bullet.x, 2)) + Math.sqrt(Math.pow(hitbox.y - bullet.y, 2));
 
+      debugger;
       return distanceFromHitboxToBullet <= hitbox.radius;
     }
   }, {
@@ -662,7 +692,7 @@ var Player = function () {
     this.BulletPool = BulletPool;
 
     this.velocity = 0;
-    this.acceleration = 0.03;
+    this.acceleration = 0.02;
     this.maxSpeed = 0.3;
     this.radius = 30; // The 'track' the player moves along
     this.fireCharge = 0;
@@ -730,8 +760,11 @@ var Player = function () {
     key: 'fire',
     value: function fire() {
       this.fireCharge = 0;
-      var bulletSpeed = 3.5;
-      this.BulletPool.get(this.bowTheta, bulletSpeed);
+      var bulletData = {
+        theta: this.bowTheta,
+        speed: 3.5
+      };
+      this.BulletPool.get(bulletData);
     }
   }, {
     key: 'draw',
@@ -786,6 +819,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 var _utilities = __webpack_require__(/*! ./utilities */ "./scripts/utilities.js");
 
 var _bullet = __webpack_require__(/*! ./bullet */ "./scripts/bullet.js");
@@ -830,6 +865,17 @@ var PlayerBullet = function (_Bullet) {
     return _possibleConstructorReturn(this, (PlayerBullet.__proto__ || Object.getPrototypeOf(PlayerBullet)).call(this, fgCanvas, 'player'));
   }
 
+  _createClass(PlayerBullet, [{
+    key: 'spawn',
+    value: function spawn(bulletData) {
+      this.pathAngle = bulletData.theta;
+      this.startPoint = this.computePoint(this.startRadius);
+      this.endPoint = this.computePoint(this.endRadius);
+      this.speed = bulletData.speed;
+      this.spawned = true;
+    }
+  }]);
+
   return PlayerBullet;
 }(_bullet2.default);
 
@@ -865,9 +911,9 @@ var ObjectPool = exports.ObjectPool = function () {
 
   _createClass(ObjectPool, [{
     key: 'get',
-    value: function get(theta, speed) {
+    value: function get(objectData) {
       if (!this.pool[this.size - 1].spawned) {
-        this.pool[this.size - 1].spawn(theta, speed);
+        this.pool[this.size - 1].spawn(objectData);
         this.pool.unshift(this.pool.pop());
       }
     }

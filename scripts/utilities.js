@@ -4,9 +4,9 @@ export class ObjectPool {
     this.pool = [];
   }
 
-  get(theta, speed) {
+  get(objectData) {
     if(!this.pool[this.size - 1].spawned) {
-      this.pool[this.size - 1].spawn(theta, speed);
+      this.pool[this.size - 1].spawn(objectData);
       this.pool.unshift(this.pool.pop());
     }
   }

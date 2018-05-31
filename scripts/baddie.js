@@ -30,10 +30,10 @@ class Baddie {
     );
   }
 
-  spawn(theta, speed) {
-    this.theta = theta;
+  spawn(baddieData) {
+    this.theta = baddieData.theta;
     this.drawPoint = this.computeDrawPoint();
-    this.speed = speed;
+    this.speed = baddieData.speed;
     this.spawned = true;
   }
 
@@ -48,7 +48,9 @@ class Baddie {
       this.sprite.draw(this.drawPoint.x, this.drawPoint.y);
 
       this.chanceToFire = Math.floor(Math.random() * 101)
-      this.fire(BulletPool);
+      if (this.chanceToFire/100 < this.fireThreshold) {
+        this.fire(BulletPool);
+      }
     }
   }
 
@@ -69,8 +71,16 @@ class Baddie {
   }
 
   fire(BulletPool) {
-    let bulletSpeed = 0.5;
-    BulletPool.get(this.theta, bulletSpeed);
+    let bulletData = {
+      theta: this.theta,
+      speed: 4,
+      radius: this.radius,
+      startPoint: {
+        x: this.drawPoint.x + this.width / 2,
+        y: this.drawPoint.y + this.height / 2
+      }
+    };
+    BulletPool.get(bulletData);
   }
 
   setDefaultValues() {

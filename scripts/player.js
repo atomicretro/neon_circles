@@ -6,7 +6,7 @@ class Player {
     this.BulletPool = BulletPool;
 
     this.velocity = 0;
-    this.acceleration = 0.03;
+    this.acceleration = 0.02;
     this.maxSpeed = 0.3;
     this.radius = 30; // The 'track' the player moves along
     this.fireCharge = 0;
@@ -68,8 +68,11 @@ class Player {
 
   fire() {
     this.fireCharge = 0;
-    let bulletSpeed = 3.5;
-    this.BulletPool.get(this.bowTheta, bulletSpeed);
+    let bulletData = {
+      theta: this.bowTheta,
+      speed: 3.5
+    }
+    this.BulletPool.get(bulletData);
   }
 
   draw() {

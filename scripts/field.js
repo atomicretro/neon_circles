@@ -38,7 +38,7 @@ class Field {
     pcCanvas.height = this.pcCanvas.height;
 
     this.ImageStore = new ImageStore();
-    this.badBulletPool = new BaddieBulletPool(20, this.fgCanvas, 'demonBullet');
+    this.badBulletPool = new BaddieBulletPool(1, this.fgCanvas, 'demonBullet');
     this.pcBulletPool = new PlayerBulletPool(8, this.fgCanvas);
     this.BaddiePool = new BaddiePool(
       1, this.fgCanvas.ctx, this.ImageStore, this.badBulletPool
@@ -81,14 +81,15 @@ class Field {
   }
 
   render()  {
-    // this.clearFGContext();
+    this.clearFGContext();
     this.clearPCContext();
     this.drawPlayerRails('circle');
     this.checkCollisions();
     this.drawPlayer();
     this.pcBulletPool.draw('player');
-    this.BaddiePool.get(Math.PI / 2, 0.005);
+    this.BaddiePool.get({ theta: Math.PI / 2, speed: 0.005 });
     this.BaddiePool.draw();
+    this.badBulletPool.draw();
   }
 
   keydown(e) {
@@ -129,24 +130,39 @@ class Field {
       radius: 9
     }
 
+    this.fgCanvas.ctx.beginPath();
+    this.fgCanvas.ctx.arc(this.player.hitboxCenter.x+350,this.player.hitboxCenter.y+200,9,0,2*Math.PI);
+    this.fgCanvas.ctx.stroke();
+
     for (var bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
       let bullet = spawnedPCBullets[bullIdx];
       if(
-        this.pcBulletHitsPC(this.player, hitbox, bullet.startPoint) ||
-        this.pcBulletHitsPC(this.player, hitbox, bullet.endPoint)
+        this.bulletHitsPC(this.player, hitbox, bullet.startPoint) ||
+        this.bulletHitsPC(this.player, hitbox, bullet.endPoint)
+      ) {
+        this.player.isHit();
+      };
+    }
+
+    for (var bullIdx = 0; bullIdx < spawnedBadBullets.length; bullIdx++) {
+      let bullet = spawnedBadBullets[bullIdx];
+      if(
+        this.bulletHitsPC(this.player, hitbox, bullet.startPoint) ||
+        this.bulletHitsPC(this.player, hitbox, bullet.endPoint)
       ) {
         this.player.isHit();
       };
     }
   }
 
-  pcBulletHitsPC(player, hitbox, bullet) {
+  bulletHitsPC(player, hitbox, bullet) {
     hitbox.x = hitbox.x - player.pcFieldWidth / 2 + this.fgCanvas.width / 2;
     hitbox.y = hitbox.y - player.pcFieldHeight / 2 + this.fgCanvas.height / 2;
     let distanceFromHitboxToBullet =
       Math.sqrt(Math.pow(hitbox.x - bullet.x, 2)) +
       Math.sqrt(Math.pow(hitbox.y - bullet.y, 2));
 
+      debugger
     return (
       distanceFromHitboxToBullet <= hitbox.radius
     )

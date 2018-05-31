@@ -8,14 +8,6 @@ export default class Bullet {
     this.setDefaultValues(type);
   }
 
-  spawn(theta, speed) {
-    this.pathAngle = theta;
-    this.startPoint = this.computePoint(this.startRadius);
-    this.endPoint = this.computePoint(this.endRadius);
-    this.speed = speed;
-    this.spawned = true;
-  }
-
   draw() {
     this.startRadius -= this.speed;
     this.endRadius -= this.speed;
