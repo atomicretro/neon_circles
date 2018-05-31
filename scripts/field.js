@@ -20,7 +20,7 @@ for (let code in KEY_MAP) {
 }
 
 class Field {
-  constructor(fgCanvas, statsCanvas, pcCanvas) {
+  constructor(fgCanvas, statsCanvas, pcCanvas, bgCanvas) {
     this.fgCanvas = {
       ctx: fgCanvas.getContext("2d"),
       width: 800,
@@ -36,11 +36,17 @@ class Field {
       width: 150,
       height: 150
     }
-
-    fgCanvas.width = this.fgCanvas.width;
-    fgCanvas.height = this.fgCanvas.height;
-    pcCanvas.width = this.pcCanvas.width;
-    pcCanvas.height = this.pcCanvas.height;
+    this.bgCanvas = {
+      ctx: bgCanvas.getContext("2d"),
+      width: 800,
+      height: 500
+    }
+    this.bgCanvas.ctx.fillStyle = 'yellow';
+    this.bgCanvas.ctx.fillRect(0,0,800,500);
+    // fgCanvas.width = this.fgCanvas.width;
+    // fgCanvas.height = this.fgCanvas.height;
+    // pcCanvas.width = this.pcCanvas.width;
+    // pcCanvas.height = this.pcCanvas.height;
 
     this.ImageStore = new ImageStore(this);
     this.badBulletPool = new BaddieBulletPool(1, this.fgCanvas, 'demonBullet');
@@ -188,7 +194,7 @@ class Field {
       radius: 12
     }
 
-    for (var bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
+    for (let bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
       let bullet = spawnedPCBullets[bullIdx];
       if(
         (this.bulletHitsPC(this.player, hitbox, bullet.startPoint) ||
@@ -199,7 +205,7 @@ class Field {
       };
     }
 
-    for (var bullIdx = 0; bullIdx < spawnedBadBullets.length; bullIdx++) {
+    for (let bullIdx = 0; bullIdx < spawnedBadBullets.length; bullIdx++) {
       let bullet = spawnedBadBullets[bullIdx];
       if(
         (this.bulletHitsPC(this.player, hitbox, bullet.startPoint) ||

@@ -55,6 +55,8 @@ export class Sprite {
 export class ImageStore {
   constructor(field) {
     this.field = field;
+    this.backgroundSky = { image: new Image() }
+    this.backgroundCity = { image: new Image() }
     this.bullet = { image: new Image() }
     this.redDemon = {
       image: new Image(),
@@ -68,6 +70,12 @@ export class ImageStore {
     this.numLoaded = 0;
     this.ready = false;
 
+    this.backgroundSky.image.onload = () => {
+      this.imageLoaded();
+    }
+    this.backgroundCity.image.onload = () => {
+      this.imageLoaded();
+    }
     this.bullet.image.onload = () => {
       this.imageLoaded();
     }
@@ -78,6 +86,8 @@ export class ImageStore {
       this.imageLoaded();
     }
 
+    this.backgroundSky = 'assets/sprites/sky.png';
+    this.backgroundCity = 'assets/sprites/city_background.png';
     this.bullet.image.src = 'assets/sprites/bullet.png';
     this.redDemon.image.src = 'assets/sprites/demon_test.png';
     this.heart.image.src = 'assets/sprites/heart.png';

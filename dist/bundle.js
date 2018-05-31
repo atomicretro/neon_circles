@@ -441,7 +441,7 @@ for (var code in KEY_MAP) {
 }
 
 var Field = function () {
-  function Field(fgCanvas, statsCanvas, pcCanvas) {
+  function Field(fgCanvas, statsCanvas, pcCanvas, bgCanvas) {
     _classCallCheck(this, Field);
 
     this.fgCanvas = {
@@ -459,11 +459,17 @@ var Field = function () {
       width: 150,
       height: 150
     };
-
-    fgCanvas.width = this.fgCanvas.width;
-    fgCanvas.height = this.fgCanvas.height;
-    pcCanvas.width = this.pcCanvas.width;
-    pcCanvas.height = this.pcCanvas.height;
+    this.bgCanvas = {
+      ctx: bgCanvas.getContext("2d"),
+      width: 800,
+      height: 500
+    };
+    this.bgCanvas.ctx.fillStyle = 'yellow';
+    this.bgCanvas.ctx.fillRect(0, 0, 800, 500);
+    // fgCanvas.width = this.fgCanvas.width;
+    // fgCanvas.height = this.fgCanvas.height;
+    // pcCanvas.width = this.pcCanvas.width;
+    // pcCanvas.height = this.pcCanvas.height;
 
     this.ImageStore = new _utilities.ImageStore(this);
     this.badBulletPool = new _baddieBullet2.default(1, this.fgCanvas, 'demonBullet');
@@ -628,8 +634,8 @@ var Field = function () {
         };
       }
 
-      for (var bullIdx = 0; bullIdx < spawnedBadBullets.length; bullIdx++) {
-        var _bullet = spawnedBadBullets[bullIdx];
+      for (var _bullIdx = 0; _bullIdx < spawnedBadBullets.length; _bullIdx++) {
+        var _bullet = spawnedBadBullets[_bullIdx];
         if ((this.bulletHitsPC(this.player, hitbox, _bullet.startPoint) || this.bulletHitsPC(this.player, hitbox, _bullet.endPoint)) && this.player.invincibilityFrames > 50) {
           this.player.isHit();
           this.drawPlayerHearts();
@@ -706,14 +712,16 @@ var _field2 = _interopRequireDefault(_field);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var startGame = function startGame(foregroundCanvas, playerCanvas) {
-  var field = new _field2.default(foregroundCanvas, statsCanvas, playerCanvas);
+var startGame = function startGame(foregroundCanvas, playerCanvas, statsCanvas, backgroundCanvas) {
+  var field = new _field2.default(foregroundCanvas, statsCanvas, playerCanvas, backgroundCanvas);
 };
 
 document.addEventListener("DOMContentLoaded", function () {
   var foregroundCanvas = document.getElementById("foregroundCanvas");
   var playerCanvas = document.getElementById("playerCanvas");
-  startGame(foregroundCanvas, playerCanvas);
+  var statsCanvas = document.getElementById("statsCanvas");
+  var backgroundCanvas = document.getElementById("backgroundCanvas");
+  startGame(foregroundCanvas, playerCanvas, statsCanvas, backgroundCanvas);
 });
 
 /***/ }),
@@ -1025,6 +1033,8 @@ var ImageStore = exports.ImageStore = function () {
     _classCallCheck(this, ImageStore);
 
     this.field = field;
+    this.backgroundSky = { image: new Image() };
+    this.backgroundCity = { image: new Image() };
     this.bullet = { image: new Image() };
     this.redDemon = {
       image: new Image(),
@@ -1038,6 +1048,12 @@ var ImageStore = exports.ImageStore = function () {
     this.numLoaded = 0;
     this.ready = false;
 
+    this.backgroundSky.image.onload = function () {
+      _this.imageLoaded();
+    };
+    this.backgroundCity.image.onload = function () {
+      _this.imageLoaded();
+    };
     this.bullet.image.onload = function () {
       _this.imageLoaded();
     };
@@ -1048,6 +1064,8 @@ var ImageStore = exports.ImageStore = function () {
       _this.imageLoaded();
     };
 
+    this.backgroundSky = 'assets/sprites/sky.png';
+    this.backgroundCity = 'assets/sprites/city_background.png';
     this.bullet.image.src = 'assets/sprites/bullet.png';
     this.redDemon.image.src = 'assets/sprites/demon_test.png';
     this.heart.image.src = 'assets/sprites/heart.png';
