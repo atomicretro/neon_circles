@@ -573,7 +573,6 @@ var Field = function () {
       if (this.player.fireCharge === 0) {
         this.statsCanvas.ctx.clearRect(635, 7, 96, 11);
       } else if (this.player.fireCharge < 25) {
-        console.log(this.player.fireCharge);
         this.statsCanvas.ctx.fillStyle = 'blue';
         this.statsCanvas.ctx.fillRect(635, 7, this.player.fireCharge * 4, 11);
       }
@@ -837,11 +836,7 @@ var Player = function () {
       if (this.invincibilityFrames < 50) {
         this.ctx.fillStyle = 'red';
       } else {
-        if (this.fireCharge > this.fireCooldown) {
-          this.ctx.fillStyle = 'blue';
-        } else {
-          this.ctx.fillStyle = 'black';
-        }
+        this.ctx.fillStyle = 'black';
       }
 
       this.ctx.moveTo(this.starboardVertex.x, this.starboardVertex.y);

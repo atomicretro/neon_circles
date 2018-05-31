@@ -146,7 +146,6 @@ class Field {
     if(this.player.fireCharge === 0) {
       this.statsCanvas.ctx.clearRect(635, 7, 96, 11)
     } else if(this.player.fireCharge < 25) {
-      console.log(this.player.fireCharge);
       this.statsCanvas.ctx.fillStyle = 'blue';
       this.statsCanvas.ctx.fillRect(635, 7, this.player.fireCharge * 4, 11);
     }
