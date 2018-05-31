@@ -41,12 +41,6 @@ class Field {
       width: 800,
       height: 500
     }
-    this.bgCanvas.ctx.fillStyle = 'yellow';
-    this.bgCanvas.ctx.fillRect(0,0,800,500);
-    // fgCanvas.width = this.fgCanvas.width;
-    // fgCanvas.height = this.fgCanvas.height;
-    // pcCanvas.width = this.pcCanvas.width;
-    // pcCanvas.height = this.pcCanvas.height;
 
     this.ImageStore = new ImageStore(this);
     this.badBulletPool = new BaddieBulletPool(1, this.fgCanvas, 'demonBullet');
@@ -89,7 +83,8 @@ class Field {
   }
 
   render()  {
-    // this.clearFGContext();
+    this.clearFGContext();
+    // this.drawBackground();
     this.clearPCContext();
     this.updatePlayerCharge()
     this.drawPlayerRails('circle');
@@ -99,6 +94,19 @@ class Field {
     this.BaddiePool.draw();
     this.pcBulletPool.draw('player');
     this.badBulletPool.draw();
+  }
+
+  drawBackground() {
+    // debugger
+    let bg1 = new Sprite(
+      this.bgCanvas.ctx,
+      this.ImageStore.backgroundSky.image,
+      0,
+      0,
+      100,
+      100
+    )
+    bg1.draw(0,0);
   }
 
   keydown(e) {
@@ -259,7 +267,9 @@ class Field {
   }
 
   clearFGContext() {
-    this.fgCanvas.ctx.clearRect(0, 0, this.fgCanvas.width, this.fgCanvas.height);
+    this.fgCanvas.ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
+    this.fgCanvas.ctx.fillRect(0,0,800,500);
+    // this.fgCanvas.ctx.clearRect(0, 0, this.fgCanvas.width, this.fgCanvas.height);
   } // implement dirty rectangles on each sprite?
 
   clearPCContext() {
