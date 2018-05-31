@@ -562,10 +562,6 @@ var Field = function () {
         radius: 9
       };
 
-      this.fgCanvas.ctx.beginPath();
-      this.fgCanvas.ctx.arc(this.player.hitboxCenter.x + 350, this.player.hitboxCenter.y + 200, 9, 0, 2 * Math.PI);
-      this.fgCanvas.ctx.stroke();
-
       for (var bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
         var bullet = spawnedPCBullets[bullIdx];
         if (this.bulletHitsPC(this.player, hitbox, bullet.startPoint) || this.bulletHitsPC(this.player, hitbox, bullet.endPoint)) {
@@ -585,9 +581,8 @@ var Field = function () {
     value: function bulletHitsPC(player, hitbox, bullet) {
       hitbox.x = hitbox.x - player.pcFieldWidth / 2 + this.fgCanvas.width / 2;
       hitbox.y = hitbox.y - player.pcFieldHeight / 2 + this.fgCanvas.height / 2;
-      var distanceFromHitboxToBullet = Math.sqrt(Math.pow(hitbox.x - bullet.x, 2)) + Math.sqrt(Math.pow(hitbox.y - bullet.y, 2));
+      var distanceFromHitboxToBullet = Math.sqrt(Math.pow(hitbox.x - bullet.x, 2) + Math.pow(hitbox.y - bullet.y, 2));
 
-      debugger;
       return distanceFromHitboxToBullet <= hitbox.radius;
     }
   }, {
