@@ -28,3 +28,20 @@
   border-right: solid 1px black;
   z-index: 5;
 }
+
+span {
+  font-family: arial;
+  font-size: 16px;
+  position: absolute;
+  top: 507;
+}
+
+#score {
+  display: block;
+  left: 35;
+}
+
+#life {
+  display: block;
+  left: 355;
+}

@@ -472,6 +472,9 @@ var Field = function () {
     this.player = new _player2.default(this.pcCanvas, this.pcBulletPool);
     this.lastTime = Date.now;
 
+    this.playerScore = 0;
+    this.heart = new _utilities.Sprite(this.statsCanvas.ctx, this.ImageStore.heart.image, 13, 13, 0, 0);
+
     this.playRound = this.playRound.bind(this);
     this.checkCollisions = this.checkCollisions.bind(this);
     // this.checkPlayerCollision = this.checkPlayerCollision.bind(this);
@@ -528,8 +531,26 @@ var Field = function () {
   }, {
     key: 'drawStatusBar',
     value: function drawStatusBar() {
-      this.statsCanvas.ctx.font = "15px Arial";
-      this.statsCanvas.ctx.fillText("Life:", 30, 20);
+      this.statsCanvas.ctx.fillStyle = 'white';
+      this.statsCanvas.ctx.fillRect(0, 0, this.statsCanvas.width, this.statsCanvas.height);
+
+      this.statsCanvas.ctx.strokeStyle = 'black';
+      this.statsCanvas.ctx.font = "16px Arial";
+      this.statsCanvas.ctx.fillText("0", 100, 19);
+
+      this.heart.draw(400, 6);
+      this.heart.draw(420, 6);
+      this.heart.draw(440, 6);
+    }
+  }, {
+    key: 'updatePlayerScore',
+    value: function updatePlayerScore() {
+      this.statsCanvas.ctx.fillText('' + this.playerScore, 100, 19);
+    }
+  }, {
+    key: 'updatePlayerHearts',
+    value: function updatePlayerHearts() {
+      this.statsCanvas.ctx.fillText('' + this.playerScore, 100, 19);
     }
   }, {
     key: 'drawPlayerRails',
@@ -611,6 +632,7 @@ var Field = function () {
           var bullet = spawnedPCBullets[bullIdx];
           var drawPoint = baddie.drawPoint;
           if (this.pcBulletHitsBaddie(baddie, drawPoint, bullet.startPoint) || this.pcBulletHitsBaddie(baddie, drawPoint, bullet.endPoint)) {
+            this.playerScore += 100;
             baddie.isHit = true;
           };
         }
@@ -711,6 +733,7 @@ var Player = function () {
     this.fireCharge = 0;
     this.fireCooldown = 25;
     this.damageFrames = 100;
+    this.life = 3;
 
     this.portTheta = -1.23;
     this.starboardTheta = 1.9106;
@@ -809,6 +832,7 @@ var Player = function () {
   }, {
     key: 'isHit',
     value: function isHit() {
+      this.life -= 1;
       this.damageFrames = 0;
     }
   }]);
@@ -989,6 +1013,8 @@ var ImageStore = exports.ImageStore = function ImageStore() {
     height: 30,
     srcX: 0,
     srcY: 0
+  };
+  this.heart = { image: new Image()
     // this.numImages = 2;
     // this.numLoaded = 0;
     //
@@ -998,6 +1024,7 @@ var ImageStore = exports.ImageStore = function ImageStore() {
 
   };this.bullet.image.src = 'assets/sprites/bullet.png';
   this.redDemon.image.src = 'assets/sprites/demon_test.png';
+  this.heart.image.src = 'assets/sprites/heart.png';
 }
 
 // imageLoaded() {

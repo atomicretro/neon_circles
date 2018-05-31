@@ -1,5 +1,5 @@
 import Player from './player';
-import { ImageStore } from './utilities';
+import { ImageStore, Sprite } from './utilities';
 import BaddiePool from './baddie';
 import PlayerBulletPool from './playerBullet';
 import BaddieBulletPool from './baddieBullet';
@@ -51,6 +51,11 @@ class Field {
     this.player = new Player(this.pcCanvas, this.pcBulletPool);
     this.lastTime = Date.now;
 
+    this.playerScore = 0;
+    this.heart = new Sprite(
+      this.statsCanvas.ctx, this.ImageStore.heart.image, 13, 13, 0, 0
+    )
+
     this.playRound = this.playRound.bind(this);
     this.checkCollisions = this.checkCollisions.bind(this);
     // this.checkPlayerCollision = this.checkPlayerCollision.bind(this);
@@ -101,8 +106,26 @@ class Field {
   }
 
   drawStatusBar() {
-    this.statsCanvas.ctx.font = "15px Arial";
-    this.statsCanvas.ctx.fillText("Life:", 30, 20);
+    this.statsCanvas.ctx.fillStyle = 'white';
+    this.statsCanvas.ctx.fillRect(
+      0, 0, this.statsCanvas.width, this.statsCanvas.height
+    );
+
+    this.statsCanvas.ctx.strokeStyle = 'black';
+    this.statsCanvas.ctx.font = "16px Arial";
+    this.statsCanvas.ctx.fillText("0", 100, 19);
+
+    this.heart.draw(400, 6);
+    this.heart.draw(420, 6);
+    this.heart.draw(440, 6);
+  }
+
+  updatePlayerScore() {
+    this.statsCanvas.ctx.fillText(`${this.playerScore}`, 100, 19);
+  }
+
+  updatePlayerHearts() {
+    this.statsCanvas.ctx.fillText(`${this.playerScore}`, 100, 19);
   }
 
   drawPlayerRails(shape) {
@@ -189,6 +212,7 @@ class Field {
           this.pcBulletHitsBaddie(baddie, drawPoint, bullet.startPoint) ||
           this.pcBulletHitsBaddie(baddie, drawPoint, bullet.endPoint)
         ) {
+          this.playerScore += 100;
           baddie.isHit = true;
         };
       }

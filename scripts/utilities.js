@@ -62,6 +62,7 @@ export class ImageStore {
       srcX: 0,
       srcY: 0
     }
+    this.heart = { image: new Image }
     // this.numImages = 2;
     // this.numLoaded = 0;
     //
@@ -71,7 +72,7 @@ export class ImageStore {
 
     this.bullet.image.src = 'assets/sprites/bullet.png';
     this.redDemon.image.src = 'assets/sprites/demon_test.png';
-
+    this.heart.image.src = 'assets/sprites/heart.png';
   }
 
   // imageLoaded() {

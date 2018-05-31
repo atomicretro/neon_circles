@@ -12,6 +12,7 @@ class Player {
     this.fireCharge = 0;
     this.fireCooldown = 25;
     this.damageFrames = 100;
+    this.life = 3;
 
     this.portTheta = -1.23;
     this.starboardTheta = 1.9106;
@@ -101,6 +102,7 @@ class Player {
   }
 
   isHit() {
+    this.life -= 1;
     this.damageFrames = 0;
   }
 }
