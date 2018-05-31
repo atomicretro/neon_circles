@@ -42,7 +42,7 @@ class Field {
     pcCanvas.width = this.pcCanvas.width;
     pcCanvas.height = this.pcCanvas.height;
 
-    this.loadImages();
+    this.ImageStore = new ImageStore(this);
     this.badBulletPool = new BaddieBulletPool(1, this.fgCanvas, 'demonBullet');
     this.pcBulletPool = new PlayerBulletPool(8, this.fgCanvas);
     this.BaddiePool = new BaddiePool(
@@ -66,14 +66,8 @@ class Field {
   }
 
   startRound() {
-    // this.drawStatusBar();
-
     this.drawStatusBar();
     this.playRound();
-  }
-
-  loadImages() {
-    this.ImageStore = new ImageStore(this);
   }
 
   playRound() {
@@ -90,9 +84,8 @@ class Field {
 
   render()  {
     // this.clearFGContext();
-    // this.clearStatsContext();
     this.clearPCContext();
-
+    this.updatePlayerCharge()
     this.drawPlayerRails('circle');
     this.checkCollisions();
     this.drawPlayer();
@@ -119,7 +112,7 @@ class Field {
   }
 
   drawStatusBar() {
-    this.statsCanvas.ctx.fillStyle = 'green';
+    this.statsCanvas.ctx.fillStyle = 'white';
     this.statsCanvas.ctx.fillRect(
       0, 0, this.statsCanvas.width, this.statsCanvas.height
     );
@@ -131,11 +124,10 @@ class Field {
     this.drawPlayerHearts();
 
     this.statsCanvas.ctx.strokeStyle = 'blue';
-    this.statsCanvas.ctx.strokeRect(634, 6, 100, 13);
+    this.statsCanvas.ctx.strokeRect(634, 6, 98, 13);
   }
 
   drawPlayerHearts() {
-    console.log(this.player.life);
     this.statsCanvas.ctx.clearRect(399, 5, 200, 20);
     for(let i = 0; i < this.player.life; i++) {
       this.heart.draw(400 + (i * 20), 6)
@@ -143,7 +135,21 @@ class Field {
   }
 
   updatePlayerScore() {
+    this.playerScore += 100;
+    this.statsCanvas.ctx.clearRect(99, 5, 200, 20);
+    this.statsCanvas.ctx.fillStyle = 'black';
+    this.statsCanvas.ctx.font = "16px Arial";
     this.statsCanvas.ctx.fillText(`${this.playerScore}`, 100, 19);
+  }
+
+  updatePlayerCharge() {
+    if(this.player.fireCharge === 0) {
+      this.statsCanvas.ctx.clearRect(635, 7, 96, 11)
+    } else if(this.player.fireCharge < 25) {
+      console.log(this.player.fireCharge);
+      this.statsCanvas.ctx.fillStyle = 'blue';
+      this.statsCanvas.ctx.fillRect(635, 7, this.player.fireCharge * 4, 11);
+    }
   }
 
   drawPlayerRails(shape) {
@@ -201,8 +207,8 @@ class Field {
         this.bulletHitsPC(this.player, hitbox, bullet.endPoint)) &&
         this.player.invincibilityFrames > 50
       ) {
-        this.drawPlayerHearts();
         this.player.isHit();
+        this.drawPlayerHearts();
       };
     }
   }
@@ -233,7 +239,7 @@ class Field {
           this.pcBulletHitsBaddie(baddie, drawPoint, bullet.startPoint) ||
           this.pcBulletHitsBaddie(baddie, drawPoint, bullet.endPoint)
         ) {
-          this.playerScore += 100;
+          this.updatePlayerScore();
           baddie.isHit = true;
         };
       }
@@ -245,10 +251,6 @@ class Field {
       (drawPoint.x <= bullet.x && bullet.x <= drawPoint.x + baddie.width) &&
       (drawPoint.y <= bullet.y && bullet.y <= drawPoint.y + baddie.height)
     )
-  }
-
-  clearStatsContext() {
-    this.statsCanvas.ctx.clearRect(0, 0, this.statsCanvas.width, this.statsCanvas.height);
   }
 
   clearFGContext() {

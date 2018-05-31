@@ -465,7 +465,7 @@ var Field = function () {
     pcCanvas.width = this.pcCanvas.width;
     pcCanvas.height = this.pcCanvas.height;
 
-    this.loadImages();
+    this.ImageStore = new _utilities.ImageStore(this);
     this.badBulletPool = new _baddieBullet2.default(1, this.fgCanvas, 'demonBullet');
     this.pcBulletPool = new _playerBullet2.default(8, this.fgCanvas);
     this.BaddiePool = new _baddie2.default(1, this.fgCanvas.ctx, this.ImageStore, this.badBulletPool);
@@ -487,15 +487,8 @@ var Field = function () {
   _createClass(Field, [{
     key: 'startRound',
     value: function startRound() {
-      // this.drawStatusBar();
-
       this.drawStatusBar();
       this.playRound();
-    }
-  }, {
-    key: 'loadImages',
-    value: function loadImages() {
-      this.ImageStore = new _utilities.ImageStore(this);
     }
   }, {
     key: 'playRound',
@@ -514,9 +507,8 @@ var Field = function () {
     key: 'render',
     value: function render() {
       // this.clearFGContext();
-      // this.clearStatsContext();
       this.clearPCContext();
-
+      this.updatePlayerCharge();
       this.drawPlayerRails('circle');
       this.checkCollisions();
       this.drawPlayer();
@@ -546,7 +538,7 @@ var Field = function () {
   }, {
     key: 'drawStatusBar',
     value: function drawStatusBar() {
-      this.statsCanvas.ctx.fillStyle = 'green';
+      this.statsCanvas.ctx.fillStyle = 'white';
       this.statsCanvas.ctx.fillRect(0, 0, this.statsCanvas.width, this.statsCanvas.height);
 
       this.statsCanvas.ctx.fillStyle = 'black';
@@ -556,12 +548,11 @@ var Field = function () {
       this.drawPlayerHearts();
 
       this.statsCanvas.ctx.strokeStyle = 'blue';
-      this.statsCanvas.ctx.strokeRect(634, 6, 100, 13);
+      this.statsCanvas.ctx.strokeRect(634, 6, 98, 13);
     }
   }, {
     key: 'drawPlayerHearts',
     value: function drawPlayerHearts() {
-      console.log(this.player.life);
       this.statsCanvas.ctx.clearRect(399, 5, 200, 20);
       for (var i = 0; i < this.player.life; i++) {
         this.heart.draw(400 + i * 20, 6);
@@ -570,7 +561,22 @@ var Field = function () {
   }, {
     key: 'updatePlayerScore',
     value: function updatePlayerScore() {
+      this.playerScore += 100;
+      this.statsCanvas.ctx.clearRect(99, 5, 200, 20);
+      this.statsCanvas.ctx.fillStyle = 'black';
+      this.statsCanvas.ctx.font = "16px Arial";
       this.statsCanvas.ctx.fillText('' + this.playerScore, 100, 19);
+    }
+  }, {
+    key: 'updatePlayerCharge',
+    value: function updatePlayerCharge() {
+      if (this.player.fireCharge === 0) {
+        this.statsCanvas.ctx.clearRect(635, 7, 96, 11);
+      } else if (this.player.fireCharge < 25) {
+        console.log(this.player.fireCharge);
+        this.statsCanvas.ctx.fillStyle = 'blue';
+        this.statsCanvas.ctx.fillRect(635, 7, this.player.fireCharge * 4, 11);
+      }
     }
   }, {
     key: 'drawPlayerRails',
@@ -626,8 +632,8 @@ var Field = function () {
       for (var bullIdx = 0; bullIdx < spawnedBadBullets.length; bullIdx++) {
         var _bullet = spawnedBadBullets[bullIdx];
         if ((this.bulletHitsPC(this.player, hitbox, _bullet.startPoint) || this.bulletHitsPC(this.player, hitbox, _bullet.endPoint)) && this.player.invincibilityFrames > 50) {
-          this.drawPlayerHearts();
           this.player.isHit();
+          this.drawPlayerHearts();
         };
       }
     }
@@ -653,7 +659,7 @@ var Field = function () {
           var bullet = spawnedPCBullets[bullIdx];
           var drawPoint = baddie.drawPoint;
           if (this.pcBulletHitsBaddie(baddie, drawPoint, bullet.startPoint) || this.pcBulletHitsBaddie(baddie, drawPoint, bullet.endPoint)) {
-            this.playerScore += 100;
+            this.updatePlayerScore();
             baddie.isHit = true;
           };
         }
@@ -663,11 +669,6 @@ var Field = function () {
     key: 'pcBulletHitsBaddie',
     value: function pcBulletHitsBaddie(baddie, drawPoint, bullet) {
       return drawPoint.x <= bullet.x && bullet.x <= drawPoint.x + baddie.width && drawPoint.y <= bullet.y && bullet.y <= drawPoint.y + baddie.height;
-    }
-  }, {
-    key: 'clearStatsContext',
-    value: function clearStatsContext() {
-      this.statsCanvas.ctx.clearRect(0, 0, this.statsCanvas.width, this.statsCanvas.height);
     }
   }, {
     key: 'clearFGContext',
@@ -708,8 +709,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var startGame = function startGame(foregroundCanvas, playerCanvas) {
   var field = new _field2.default(foregroundCanvas, statsCanvas, playerCanvas);
-
-  field.startRound();
 };
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -1062,7 +1061,6 @@ var ImageStore = exports.ImageStore = function () {
   _createClass(ImageStore, [{
     key: 'imageLoaded',
     value: function imageLoaded() {
-      console.log('hit');
       this.numLoaded++;
       if (this.numLoaded === this.numImages) this.field.startRound();
     }

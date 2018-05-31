@@ -84,7 +84,6 @@ export class ImageStore {
   }
 
   imageLoaded() {
-    console.log('hit');
     this.numLoaded++;
     if(this.numLoaded === this.numImages) this.field.startRound();
   }
