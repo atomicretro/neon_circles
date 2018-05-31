@@ -465,7 +465,7 @@ var Field = function () {
     pcCanvas.width = this.pcCanvas.width;
     pcCanvas.height = this.pcCanvas.height;
 
-    this.ImageStore = new _utilities.ImageStore();
+    this.loadImages();
     this.badBulletPool = new _baddieBullet2.default(1, this.fgCanvas, 'demonBullet');
     this.pcBulletPool = new _playerBullet2.default(8, this.fgCanvas);
     this.BaddiePool = new _baddie2.default(1, this.fgCanvas.ctx, this.ImageStore, this.badBulletPool);
@@ -480,7 +480,6 @@ var Field = function () {
     this.checkCollisions = this.checkCollisions.bind(this);
     // this.checkPlayerCollision = this.checkPlayerCollision.bind(this);
 
-    this.drawStatusBar();
     document.addEventListener('keydown', this.keydown.bind(this));
     document.addEventListener('keyup', this.keyup.bind(this));
   }
@@ -489,7 +488,14 @@ var Field = function () {
     key: 'startRound',
     value: function startRound() {
       // this.drawStatusBar();
+
+      this.drawStatusBar();
       this.playRound();
+    }
+  }, {
+    key: 'loadImages',
+    value: function loadImages() {
+      this.ImageStore = new _utilities.ImageStore(this);
     }
   }, {
     key: 'playRound',
@@ -564,11 +570,6 @@ var Field = function () {
   }, {
     key: 'updatePlayerScore',
     value: function updatePlayerScore() {
-      this.statsCanvas.ctx.fillText('' + this.playerScore, 100, 19);
-    }
-  }, {
-    key: 'updatePlayerHearts',
-    value: function updatePlayerHearts() {
       this.statsCanvas.ctx.fillText('' + this.playerScore, 100, 19);
     }
   }, {
@@ -1023,35 +1024,52 @@ var Sprite = exports.Sprite = function () {
   return Sprite;
 }();
 
-var ImageStore = exports.ImageStore = function ImageStore() {
-  _classCallCheck(this, ImageStore);
+var ImageStore = exports.ImageStore = function () {
+  function ImageStore(field) {
+    var _this = this;
 
-  this.bullet = { image: new Image() };
-  this.redDemon = {
-    image: new Image(),
-    width: 21,
-    height: 30,
-    srcX: 0,
-    srcY: 0
-  };
-  this.heart = { image: new Image()
-    // this.numImages = 2;
-    // this.numLoaded = 0;
-    //
-    // this.bullet.onload = () => {
-    //   this.imageLoaded();
-    // }
+    _classCallCheck(this, ImageStore);
 
-  };this.bullet.image.src = 'assets/sprites/bullet.png';
-  this.redDemon.image.src = 'assets/sprites/demon_test.png';
-  this.heart.image.src = 'assets/sprites/heart.png';
-}
+    this.field = field;
+    this.bullet = { image: new Image() };
+    this.redDemon = {
+      image: new Image(),
+      width: 21,
+      height: 30,
+      srcX: 0,
+      srcY: 0
+    };
+    this.heart = { image: new Image() };
+    this.numImages = 3;
+    this.numLoaded = 0;
+    this.ready = false;
 
-// imageLoaded() {
-//   this.numLoaded++;
-//   if(this.numLoaded === this.numImages) game.playRound();
-// }
-;
+    this.bullet.image.onload = function () {
+      _this.imageLoaded();
+    };
+    this.redDemon.image.onload = function () {
+      _this.imageLoaded();
+    };
+    this.heart.image.onload = function () {
+      _this.imageLoaded();
+    };
+
+    this.bullet.image.src = 'assets/sprites/bullet.png';
+    this.redDemon.image.src = 'assets/sprites/demon_test.png';
+    this.heart.image.src = 'assets/sprites/heart.png';
+  }
+
+  _createClass(ImageStore, [{
+    key: 'imageLoaded',
+    value: function imageLoaded() {
+      console.log('hit');
+      this.numLoaded++;
+      if (this.numLoaded === this.numImages) this.field.startRound();
+    }
+  }]);
+
+  return ImageStore;
+}();
 
 /***/ })
 

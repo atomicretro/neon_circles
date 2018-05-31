@@ -42,7 +42,7 @@ class Field {
     pcCanvas.width = this.pcCanvas.width;
     pcCanvas.height = this.pcCanvas.height;
 
-    this.ImageStore = new ImageStore();
+    this.loadImages();
     this.badBulletPool = new BaddieBulletPool(1, this.fgCanvas, 'demonBullet');
     this.pcBulletPool = new PlayerBulletPool(8, this.fgCanvas);
     this.BaddiePool = new BaddiePool(
@@ -61,14 +61,19 @@ class Field {
     this.checkCollisions = this.checkCollisions.bind(this);
     // this.checkPlayerCollision = this.checkPlayerCollision.bind(this);
 
-    this.drawStatusBar();
     document.addEventListener('keydown', this.keydown.bind(this));
     document.addEventListener('keyup', this.keyup.bind(this));
   }
 
   startRound() {
     // this.drawStatusBar();
+
+    this.drawStatusBar();
     this.playRound();
+  }
+
+  loadImages() {
+    this.ImageStore = new ImageStore(this);
   }
 
   playRound() {
@@ -138,10 +143,6 @@ class Field {
   }
 
   updatePlayerScore() {
-    this.statsCanvas.ctx.fillText(`${this.playerScore}`, 100, 19);
-  }
-
-  updatePlayerHearts() {
     this.statsCanvas.ctx.fillText(`${this.playerScore}`, 100, 19);
   }
 

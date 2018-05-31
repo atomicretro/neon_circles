@@ -53,7 +53,8 @@ export class Sprite {
 }
 
 export class ImageStore {
-  constructor() {
+  constructor(field) {
+    this.field = field;
     this.bullet = { image: new Image() }
     this.redDemon = {
       image: new Image(),
@@ -62,21 +63,29 @@ export class ImageStore {
       srcX: 0,
       srcY: 0
     }
-    this.heart = { image: new Image }
-    // this.numImages = 2;
-    // this.numLoaded = 0;
-    //
-    // this.bullet.onload = () => {
-    //   this.imageLoaded();
-    // }
+    this.heart = { image: new Image() }
+    this.numImages = 3;
+    this.numLoaded = 0;
+    this.ready = false;
+
+    this.bullet.image.onload = () => {
+      this.imageLoaded();
+    }
+    this.redDemon.image.onload = () => {
+      this.imageLoaded();
+    }
+    this.heart.image.onload = () => {
+      this.imageLoaded();
+    }
 
     this.bullet.image.src = 'assets/sprites/bullet.png';
     this.redDemon.image.src = 'assets/sprites/demon_test.png';
     this.heart.image.src = 'assets/sprites/heart.png';
   }
 
-  // imageLoaded() {
-  //   this.numLoaded++;
-  //   if(this.numLoaded === this.numImages) game.playRound();
-  // }
+  imageLoaded() {
+    console.log('hit');
+    this.numLoaded++;
+    if(this.numLoaded === this.numImages) this.field.startRound();
+  }
 }
