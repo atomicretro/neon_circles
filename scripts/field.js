@@ -28,8 +28,8 @@ class Field {
     }
     this.pcCanvas = {
       ctx: pcCanvas.getContext("2d"),
-      width: 100,
-      height: 100
+      width: 150,
+      height: 150
     }
 
     fgCanvas.width = this.fgCanvas.width;
@@ -62,7 +62,7 @@ class Field {
       case 'circle':
       default:
       this.pcCanvas.ctx.beginPath();
-      this.pcCanvas.ctx.arc(xCenter, yCenter, 35, 0, 2 * Math.PI, true);
+      this.pcCanvas.ctx.arc(xCenter, yCenter, 60, 0, 2 * Math.PI, true);
       this.pcCanvas.ctx.strokeStyle = "black";
       this.pcCanvas.ctx.lineWidth = 2;
       this.pcCanvas.ctx.stroke();
@@ -127,7 +127,7 @@ class Field {
     let hitbox = {
       x: this.player.hitboxCenter.x,
       y: this.player.hitboxCenter.y,
-      radius: 9
+      radius: 12
     }
 
     for (var bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {

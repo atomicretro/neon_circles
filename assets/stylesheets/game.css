@@ -17,7 +17,7 @@
 #playerCanvas {
   display: block;
   position: absolute;
-  top: 200;
-  left: 350;
+  top: 175;
+  left: 325;
   z-index: 2;
 }

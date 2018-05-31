@@ -451,8 +451,8 @@ var Field = function () {
     };
     this.pcCanvas = {
       ctx: pcCanvas.getContext("2d"),
-      width: 100,
-      height: 100
+      width: 150,
+      height: 150
     };
 
     fgCanvas.width = this.fgCanvas.width;
@@ -485,7 +485,7 @@ var Field = function () {
         case 'circle':
         default:
           this.pcCanvas.ctx.beginPath();
-          this.pcCanvas.ctx.arc(xCenter, yCenter, 35, 0, 2 * Math.PI, true);
+          this.pcCanvas.ctx.arc(xCenter, yCenter, 60, 0, 2 * Math.PI, true);
           this.pcCanvas.ctx.strokeStyle = "black";
           this.pcCanvas.ctx.lineWidth = 2;
           this.pcCanvas.ctx.stroke();
@@ -559,7 +559,7 @@ var Field = function () {
       var hitbox = {
         x: this.player.hitboxCenter.x,
         y: this.player.hitboxCenter.y,
-        radius: 9
+        radius: 12
       };
 
       for (var bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
@@ -689,7 +689,7 @@ var Player = function () {
     this.velocity = 0;
     this.acceleration = 0.02;
     this.maxSpeed = 0.3;
-    this.radius = 30; // The 'track' the player moves along
+    this.radius = 50; // The 'track' the player moves along
     this.fireCharge = 0;
     this.fireCooldown = 25;
     this.damageFrames = 100;
@@ -697,16 +697,21 @@ var Player = function () {
     this.portTheta = -1.23;
     this.starboardTheta = 1.9106;
     this.bowTheta = Math.PI / 2;
-    this.portVertex = this.computePortVertex();
-    this.starboardVertex = this.computeStarboardVertex();
-    this.bowVertex = this.computeCenterPoints(-10);
-    this.hitboxCenter = this.computeCenterPoints(-22);
+    this.computeAllVerticies();
 
     this.draw = this.draw.bind(this);
     this.fire = this.fire.bind(this);
   }
 
   _createClass(Player, [{
+    key: 'computeAllVerticies',
+    value: function computeAllVerticies() {
+      this.portVertex = this.computePortVertex();
+      this.starboardVertex = this.computeStarboardVertex();
+      this.bowVertex = this.computeCenterPoints(-15);
+      this.hitboxCenter = this.computeCenterPoints(-35);
+    }
+  }, {
     key: 'computeStarboardVertex',
     value: function computeStarboardVertex() {
       return {
@@ -757,17 +762,14 @@ var Player = function () {
       this.fireCharge = 0;
       var bulletData = {
         theta: this.bowTheta,
-        speed: 3.5
+        speed: 4
       };
       this.BulletPool.get(bulletData);
     }
   }, {
     key: 'draw',
     value: function draw() {
-      this.starboardVertex = this.computeStarboardVertex();
-      this.portVertex = this.computePortVertex();
-      this.bowVertex = this.computeCenterPoints(-10);
-      this.hitboxCenter = this.computeCenterPoints(-22);
+      this.computeAllVerticies();
 
       this.ctx.beginPath();
 

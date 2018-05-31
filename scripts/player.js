@@ -8,7 +8,7 @@ class Player {
     this.velocity = 0;
     this.acceleration = 0.02;
     this.maxSpeed = 0.3;
-    this.radius = 30; // The 'track' the player moves along
+    this.radius = 50; // The 'track' the player moves along
     this.fireCharge = 0;
     this.fireCooldown = 25;
     this.damageFrames = 100;
@@ -16,13 +16,17 @@ class Player {
     this.portTheta = -1.23;
     this.starboardTheta = 1.9106;
     this.bowTheta = Math.PI / 2;
-    this.portVertex = this.computePortVertex();
-    this.starboardVertex = this.computeStarboardVertex();
-    this.bowVertex = this.computeCenterPoints(-10);
-    this.hitboxCenter = this.computeCenterPoints(-22);
+    this.computeAllVerticies();
 
     this.draw = this.draw.bind(this);
     this.fire = this.fire.bind(this);
+  }
+
+  computeAllVerticies() {
+    this.portVertex = this.computePortVertex();
+    this.starboardVertex = this.computeStarboardVertex();
+    this.bowVertex = this.computeCenterPoints(-15);
+    this.hitboxCenter = this.computeCenterPoints(-35);
   }
 
   computeStarboardVertex() {
@@ -70,16 +74,13 @@ class Player {
     this.fireCharge = 0;
     let bulletData = {
       theta: this.bowTheta,
-      speed: 3.5
+      speed: 4
     }
     this.BulletPool.get(bulletData);
   }
 
   draw() {
-    this.starboardVertex = this.computeStarboardVertex();
-    this.portVertex = this.computePortVertex();
-    this.bowVertex = this.computeCenterPoints(-10);
-    this.hitboxCenter = this.computeCenterPoints(-22);
+    this.computeAllVerticies();
 
     this.ctx.beginPath();
 
