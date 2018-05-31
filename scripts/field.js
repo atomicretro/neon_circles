@@ -84,7 +84,6 @@ class Field {
 
   render()  {
     this.clearFGContext();
-    // this.drawBackground();
     this.clearPCContext();
     this.updatePlayerCharge()
     this.drawPlayerRails('circle');
@@ -94,19 +93,6 @@ class Field {
     this.BaddiePool.draw();
     this.pcBulletPool.draw('player');
     this.badBulletPool.draw();
-  }
-
-  drawBackground() {
-    // debugger
-    let bg1 = new Sprite(
-      this.bgCanvas.ctx,
-      this.ImageStore.backgroundSky.image,
-      0,
-      0,
-      100,
-      100
-    )
-    bg1.draw(0,0);
   }
 
   keydown(e) {
@@ -142,7 +128,8 @@ class Field {
   }
 
   drawPlayerHearts() {
-    this.statsCanvas.ctx.clearRect(399, 5, 200, 20);
+    this.statsCanvas.ctx.fillStyle = 'white';
+    this.statsCanvas.ctx.fillRect(399, 5, 200, 20);
     for(let i = 0; i < this.player.life; i++) {
       this.heart.draw(400 + (i * 20), 6)
     }
@@ -150,7 +137,8 @@ class Field {
 
   updatePlayerScore() {
     this.playerScore += 100;
-    this.statsCanvas.ctx.clearRect(99, 5, 200, 20);
+    this.statsCanvas.ctx.fillStyle = 'white';
+    this.statsCanvas.ctx.fillRect(99, 5, 200, 20);
     this.statsCanvas.ctx.fillStyle = 'black';
     this.statsCanvas.ctx.font = "16px Arial";
     this.statsCanvas.ctx.fillText(`${this.playerScore}`, 100, 19);
@@ -158,7 +146,8 @@ class Field {
 
   updatePlayerCharge() {
     if(this.player.fireCharge === 0) {
-      this.statsCanvas.ctx.clearRect(635, 7, 96, 11)
+      this.statsCanvas.ctx.fillStyle = 'white';
+      this.statsCanvas.ctx.fillRect(635, 7, 96, 11)
     } else if(this.player.fireCharge < 25) {
       this.statsCanvas.ctx.fillStyle = 'blue';
       this.statsCanvas.ctx.fillRect(635, 7, this.player.fireCharge * 4, 11);

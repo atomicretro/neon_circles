@@ -19,11 +19,11 @@ export default class Bullet {
        (this.startPoint.y < this.undrawY || this.endPoint.y < this.undrawY) &&
        (this.startPoint.x > -5 || this.endPoint.x > -5) &&
        (this.startPoint.x < this.undrawX || this.endPoint.x < this.undrawX)) {
-      this.ctx.beginPath();
-      this.ctx.lineWidth = 2;
-      this.ctx.moveTo(this.startPoint.x, this.startPoint.y);
-      this.ctx.lineTo(this.endPoint.x, this.endPoint.y);
-      this.ctx.stroke();
+      // this.ctx.beginPath();
+      // this.ctx.lineWidth = 2;
+      // this.ctx.moveTo(this.startPoint.x, this.startPoint.y);
+      // this.ctx.lineTo(this.endPoint.x, this.endPoint.y);
+      // this.ctx.stroke();
     } else {
       return true;
     };
@@ -44,7 +44,7 @@ export default class Bullet {
       startY = this.startPoint.y;
     }
 
-    this.ctx.clearRect(startX - 5, startY - 5, 30, 30);
+    this.ctx.clearRect(startX - 5, startY - 5, 15, 15);
   }
 
   computePoint(radius) {

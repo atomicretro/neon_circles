@@ -142,9 +142,9 @@ var Baddie = function () {
   }, {
     key: 'draw',
     value: function draw(BulletPool) {
-      this.clear();
+      // this.clear();
       if (this.isHit) {
-        this.clear();
+        // this.clear();
         return true;
       } else {
         this.theta -= this.speed;
@@ -326,11 +326,11 @@ var Bullet = function () {
       this.endPoint = this.computePoint(this.endRadius);
 
       if ((this.startPoint.y > -5 || this.endPoint.y > -5) && (this.startPoint.y < this.undrawY || this.endPoint.y < this.undrawY) && (this.startPoint.x > -5 || this.endPoint.x > -5) && (this.startPoint.x < this.undrawX || this.endPoint.x < this.undrawX)) {
-        this.ctx.beginPath();
-        this.ctx.lineWidth = 2;
-        this.ctx.moveTo(this.startPoint.x, this.startPoint.y);
-        this.ctx.lineTo(this.endPoint.x, this.endPoint.y);
-        this.ctx.stroke();
+        // this.ctx.beginPath();
+        // this.ctx.lineWidth = 2;
+        // this.ctx.moveTo(this.startPoint.x, this.startPoint.y);
+        // this.ctx.lineTo(this.endPoint.x, this.endPoint.y);
+        // this.ctx.stroke();
       } else {
         return true;
       };
@@ -352,7 +352,7 @@ var Bullet = function () {
         startY = this.startPoint.y;
       }
 
-      this.ctx.clearRect(startX - 5, startY - 5, 30, 30);
+      this.ctx.clearRect(startX - 5, startY - 5, 15, 15);
     }
   }, {
     key: 'computePoint',
@@ -507,7 +507,6 @@ var Field = function () {
     key: 'render',
     value: function render() {
       this.clearFGContext();
-      // this.drawBackground();
       this.clearPCContext();
       this.updatePlayerCharge();
       this.drawPlayerRails('circle');
@@ -517,13 +516,6 @@ var Field = function () {
       this.BaddiePool.draw();
       this.pcBulletPool.draw('player');
       this.badBulletPool.draw();
-    }
-  }, {
-    key: 'drawBackground',
-    value: function drawBackground() {
-      // debugger
-      var bg1 = new _utilities.Sprite(this.bgCanvas.ctx, this.ImageStore.backgroundSky.image, 0, 0, 100, 100);
-      bg1.draw(0, 0);
     }
   }, {
     key: 'keydown',
@@ -561,7 +553,8 @@ var Field = function () {
   }, {
     key: 'drawPlayerHearts',
     value: function drawPlayerHearts() {
-      this.statsCanvas.ctx.clearRect(399, 5, 200, 20);
+      this.statsCanvas.ctx.fillStyle = 'white';
+      this.statsCanvas.ctx.fillRect(399, 5, 200, 20);
       for (var i = 0; i < this.player.life; i++) {
         this.heart.draw(400 + i * 20, 6);
       }
@@ -570,7 +563,8 @@ var Field = function () {
     key: 'updatePlayerScore',
     value: function updatePlayerScore() {
       this.playerScore += 100;
-      this.statsCanvas.ctx.clearRect(99, 5, 200, 20);
+      this.statsCanvas.ctx.fillStyle = 'white';
+      this.statsCanvas.ctx.fillRect(99, 5, 200, 20);
       this.statsCanvas.ctx.fillStyle = 'black';
       this.statsCanvas.ctx.font = "16px Arial";
       this.statsCanvas.ctx.fillText('' + this.playerScore, 100, 19);
@@ -579,7 +573,8 @@ var Field = function () {
     key: 'updatePlayerCharge',
     value: function updatePlayerCharge() {
       if (this.player.fireCharge === 0) {
-        this.statsCanvas.ctx.clearRect(635, 7, 96, 11);
+        this.statsCanvas.ctx.fillStyle = 'white';
+        this.statsCanvas.ctx.fillRect(635, 7, 96, 11);
       } else if (this.player.fireCharge < 25) {
         this.statsCanvas.ctx.fillStyle = 'blue';
         this.statsCanvas.ctx.fillRect(635, 7, this.player.fireCharge * 4, 11);

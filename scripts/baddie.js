@@ -38,9 +38,9 @@ class Baddie {
   }
 
   draw(BulletPool) {
-    this.clear();
+    // this.clear();
     if(this.isHit) {
-      this.clear();
+      // this.clear();
       return true;
     } else {
       this.theta -= this.speed;
