@@ -11,7 +11,7 @@ class Player {
     this.radius = 50; // The 'track' the player moves along
     this.fireCharge = 0;
     this.fireCooldown = 25;
-    this.damageFrames = 100;
+    this.invincibilityFrames = 50;
     this.life = 3;
 
     this.portTheta = -1.23;
@@ -53,7 +53,7 @@ class Player {
 
   move(keyStatus) {
     this.fireCharge++; // increments once every frame
-    this.damageFrames++; // increments once every frame
+    this.invincibilityFrames++; // increments once every frame
     if(keyStatus.left) {
       if(this.velocity <= this.maxSpeed) this.velocity += this.acceleration;
       this.starboardTheta += this.velocity;
@@ -85,7 +85,7 @@ class Player {
 
     this.ctx.beginPath();
 
-    if(this.damageFrames < 50) {
+    if(this.invincibilityFrames < 50) {
       this.ctx.fillStyle = 'red';
     } else {
       if(this.fireCharge > this.fireCooldown) {
@@ -103,7 +103,7 @@ class Player {
 
   isHit() {
     this.life -= 1;
-    this.damageFrames = 0;
+    this.invincibilityFrames = 0;
   }
 }
 

@@ -475,21 +475,30 @@ var Field = function () {
     this.playerScore = 0;
     this.heart = new _utilities.Sprite(this.statsCanvas.ctx, this.ImageStore.heart.image, 13, 13, 0, 0);
 
+    this.startRound = this.startRound.bind(this);
     this.playRound = this.playRound.bind(this);
     this.checkCollisions = this.checkCollisions.bind(this);
     // this.checkPlayerCollision = this.checkPlayerCollision.bind(this);
 
+    this.drawStatusBar();
     document.addEventListener('keydown', this.keydown.bind(this));
     document.addEventListener('keyup', this.keyup.bind(this));
   }
 
   _createClass(Field, [{
+    key: 'startRound',
+    value: function startRound() {
+      // this.drawStatusBar();
+      this.playRound();
+    }
+  }, {
     key: 'playRound',
     value: function playRound() {
       // let now = Date.now();
       // let dt = (now - this.lastTime) / 1000.0;
 
       // update(dt);
+      // this.drawStatusBar();
       this.render();
 
       // this.lastTime = now;
@@ -499,9 +508,9 @@ var Field = function () {
     key: 'render',
     value: function render() {
       // this.clearFGContext();
-      this.clearStatsContext();
+      // this.clearStatsContext();
       this.clearPCContext();
-      this.drawStatusBar();
+
       this.drawPlayerRails('circle');
       this.checkCollisions();
       this.drawPlayer();
@@ -531,16 +540,26 @@ var Field = function () {
   }, {
     key: 'drawStatusBar',
     value: function drawStatusBar() {
-      this.statsCanvas.ctx.fillStyle = 'white';
+      this.statsCanvas.ctx.fillStyle = 'green';
       this.statsCanvas.ctx.fillRect(0, 0, this.statsCanvas.width, this.statsCanvas.height);
 
-      this.statsCanvas.ctx.strokeStyle = 'black';
+      this.statsCanvas.ctx.fillStyle = 'black';
       this.statsCanvas.ctx.font = "16px Arial";
       this.statsCanvas.ctx.fillText("0", 100, 19);
 
-      this.heart.draw(400, 6);
-      this.heart.draw(420, 6);
-      this.heart.draw(440, 6);
+      this.drawPlayerHearts();
+
+      this.statsCanvas.ctx.strokeStyle = 'blue';
+      this.statsCanvas.ctx.strokeRect(634, 6, 100, 13);
+    }
+  }, {
+    key: 'drawPlayerHearts',
+    value: function drawPlayerHearts() {
+      console.log(this.player.life);
+      this.statsCanvas.ctx.clearRect(399, 5, 200, 20);
+      for (var i = 0; i < this.player.life; i++) {
+        this.heart.draw(400 + i * 20, 6);
+      }
     }
   }, {
     key: 'updatePlayerScore',
@@ -598,14 +617,15 @@ var Field = function () {
 
       for (var bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
         var bullet = spawnedPCBullets[bullIdx];
-        if (this.bulletHitsPC(this.player, hitbox, bullet.startPoint) || this.bulletHitsPC(this.player, hitbox, bullet.endPoint)) {
+        if ((this.bulletHitsPC(this.player, hitbox, bullet.startPoint) || this.bulletHitsPC(this.player, hitbox, bullet.endPoint)) && this.player.invincibilityFrames < 50) {
           this.player.isHit();
         };
       }
 
       for (var bullIdx = 0; bullIdx < spawnedBadBullets.length; bullIdx++) {
         var _bullet = spawnedBadBullets[bullIdx];
-        if (this.bulletHitsPC(this.player, hitbox, _bullet.startPoint) || this.bulletHitsPC(this.player, hitbox, _bullet.endPoint)) {
+        if ((this.bulletHitsPC(this.player, hitbox, _bullet.startPoint) || this.bulletHitsPC(this.player, hitbox, _bullet.endPoint)) && this.player.invincibilityFrames > 50) {
+          this.drawPlayerHearts();
           this.player.isHit();
         };
       }
@@ -688,7 +708,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var startGame = function startGame(foregroundCanvas, playerCanvas) {
   var field = new _field2.default(foregroundCanvas, statsCanvas, playerCanvas);
 
-  field.playRound();
+  field.startRound();
 };
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -732,7 +752,7 @@ var Player = function () {
     this.radius = 50; // The 'track' the player moves along
     this.fireCharge = 0;
     this.fireCooldown = 25;
-    this.damageFrames = 100;
+    this.invincibilityFrames = 50;
     this.life = 3;
 
     this.portTheta = -1.23;
@@ -780,7 +800,7 @@ var Player = function () {
     key: 'move',
     value: function move(keyStatus) {
       this.fireCharge++; // increments once every frame
-      this.damageFrames++; // increments once every frame
+      this.invincibilityFrames++; // increments once every frame
       if (keyStatus.left) {
         if (this.velocity <= this.maxSpeed) this.velocity += this.acceleration;
         this.starboardTheta += this.velocity;
@@ -814,7 +834,7 @@ var Player = function () {
 
       this.ctx.beginPath();
 
-      if (this.damageFrames < 50) {
+      if (this.invincibilityFrames < 50) {
         this.ctx.fillStyle = 'red';
       } else {
         if (this.fireCharge > this.fireCooldown) {
@@ -833,7 +853,7 @@ var Player = function () {
     key: 'isHit',
     value: function isHit() {
       this.life -= 1;
-      this.damageFrames = 0;
+      this.invincibilityFrames = 0;
     }
   }]);
 

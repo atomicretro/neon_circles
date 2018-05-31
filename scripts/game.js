@@ -6,7 +6,7 @@ const startGame = (foregroundCanvas, playerCanvas) => {
     statsCanvas,
     playerCanvas);
 
-  field.playRound();
+  field.startRound();
 }
 
 document.addEventListener("DOMContentLoaded", () => {

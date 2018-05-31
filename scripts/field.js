@@ -56,12 +56,19 @@ class Field {
       this.statsCanvas.ctx, this.ImageStore.heart.image, 13, 13, 0, 0
     )
 
+    this.startRound = this.startRound.bind(this);
     this.playRound = this.playRound.bind(this);
     this.checkCollisions = this.checkCollisions.bind(this);
     // this.checkPlayerCollision = this.checkPlayerCollision.bind(this);
 
+    this.drawStatusBar();
     document.addEventListener('keydown', this.keydown.bind(this));
     document.addEventListener('keyup', this.keyup.bind(this));
+  }
+
+  startRound() {
+    // this.drawStatusBar();
+    this.playRound();
   }
 
   playRound() {
@@ -69,6 +76,7 @@ class Field {
     // let dt = (now - this.lastTime) / 1000.0;
 
     // update(dt);
+    // this.drawStatusBar();
     this.render();
 
     // this.lastTime = now;
@@ -77,9 +85,9 @@ class Field {
 
   render()  {
     // this.clearFGContext();
-    this.clearStatsContext();
+    // this.clearStatsContext();
     this.clearPCContext();
-    this.drawStatusBar();
+
     this.drawPlayerRails('circle');
     this.checkCollisions();
     this.drawPlayer();
@@ -106,18 +114,27 @@ class Field {
   }
 
   drawStatusBar() {
-    this.statsCanvas.ctx.fillStyle = 'white';
+    this.statsCanvas.ctx.fillStyle = 'green';
     this.statsCanvas.ctx.fillRect(
       0, 0, this.statsCanvas.width, this.statsCanvas.height
     );
 
-    this.statsCanvas.ctx.strokeStyle = 'black';
+    this.statsCanvas.ctx.fillStyle = 'black';
     this.statsCanvas.ctx.font = "16px Arial";
     this.statsCanvas.ctx.fillText("0", 100, 19);
 
-    this.heart.draw(400, 6);
-    this.heart.draw(420, 6);
-    this.heart.draw(440, 6);
+    this.drawPlayerHearts();
+
+    this.statsCanvas.ctx.strokeStyle = 'blue';
+    this.statsCanvas.ctx.strokeRect(634, 6, 100, 13);
+  }
+
+  drawPlayerHearts() {
+    console.log(this.player.life);
+    this.statsCanvas.ctx.clearRect(399, 5, 200, 20);
+    for(let i = 0; i < this.player.life; i++) {
+      this.heart.draw(400 + (i * 20), 6)
+    }
   }
 
   updatePlayerScore() {
@@ -168,8 +185,9 @@ class Field {
     for (var bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
       let bullet = spawnedPCBullets[bullIdx];
       if(
-        this.bulletHitsPC(this.player, hitbox, bullet.startPoint) ||
-        this.bulletHitsPC(this.player, hitbox, bullet.endPoint)
+        (this.bulletHitsPC(this.player, hitbox, bullet.startPoint) ||
+        this.bulletHitsPC(this.player, hitbox, bullet.endPoint)) &&
+        this.player.invincibilityFrames < 50
       ) {
         this.player.isHit();
       };
@@ -178,9 +196,11 @@ class Field {
     for (var bullIdx = 0; bullIdx < spawnedBadBullets.length; bullIdx++) {
       let bullet = spawnedBadBullets[bullIdx];
       if(
-        this.bulletHitsPC(this.player, hitbox, bullet.startPoint) ||
-        this.bulletHitsPC(this.player, hitbox, bullet.endPoint)
+        (this.bulletHitsPC(this.player, hitbox, bullet.startPoint) ||
+        this.bulletHitsPC(this.player, hitbox, bullet.endPoint)) &&
+        this.player.invincibilityFrames > 50
       ) {
+        this.drawPlayerHearts();
         this.player.isHit();
       };
     }
