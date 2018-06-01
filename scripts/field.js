@@ -112,7 +112,7 @@ class Field {
   }
 
   drawStatusBar() {
-    this.statsCanvas.ctx.fillStyle = 'white';
+    this.statsCanvas.ctx.fillStyle = "rgba(255, 255, 255, 0.8";
     this.statsCanvas.ctx.fillRect(
       0, 0, this.statsCanvas.width, this.statsCanvas.height
     );
@@ -128,7 +128,8 @@ class Field {
   }
 
   drawPlayerHearts() {
-    this.statsCanvas.ctx.fillStyle = 'white';
+    this.statsCanvas.ctx.clearRect(399, 5, 200, 20);
+    this.statsCanvas.ctx.fillStyle = "rgba(255, 255, 255, 0.8";
     this.statsCanvas.ctx.fillRect(399, 5, 200, 20);
     for(let i = 0; i < this.player.life; i++) {
       this.heart.draw(400 + (i * 20), 6)
@@ -137,7 +138,8 @@ class Field {
 
   updatePlayerScore() {
     this.playerScore += 100;
-    this.statsCanvas.ctx.fillStyle = 'white';
+    this.statsCanvas.ctx.clearRect(99, 5, 200, 20);
+    this.statsCanvas.ctx.fillStyle = "rgba(255, 255, 255, 0.8";
     this.statsCanvas.ctx.fillRect(99, 5, 200, 20);
     this.statsCanvas.ctx.fillStyle = 'black';
     this.statsCanvas.ctx.font = "16px Arial";
@@ -146,8 +148,9 @@ class Field {
 
   updatePlayerCharge() {
     if(this.player.fireCharge === 0) {
-      this.statsCanvas.ctx.fillStyle = 'white';
-      this.statsCanvas.ctx.fillRect(635, 7, 96, 11)
+      this.statsCanvas.ctx.clearRect(635, 7, 96, 11);
+      this.statsCanvas.ctx.fillStyle = "rgba(255, 255, 255, 0.8";
+      this.statsCanvas.ctx.fillRect(635, 7, 96, 11);
     } else if(this.player.fireCharge < 25) {
       this.statsCanvas.ctx.fillStyle = 'blue';
       this.statsCanvas.ctx.fillRect(635, 7, this.player.fireCharge * 4, 11);
@@ -163,7 +166,7 @@ class Field {
       default:
       this.pcCanvas.ctx.beginPath();
       this.pcCanvas.ctx.arc(xCenter, yCenter, 60, 0, 2 * Math.PI, true);
-      this.pcCanvas.ctx.strokeStyle = "black";
+      this.pcCanvas.ctx.strokeStyle = "white";
       this.pcCanvas.ctx.lineWidth = 2;
       this.pcCanvas.ctx.stroke();
     }
@@ -223,9 +226,7 @@ class Field {
         Math.pow(hitbox.x - bullet.x, 2) + Math.pow(hitbox.y - bullet.y, 2)
       );
 
-    return (
-      distanceFromHitboxToBullet <= hitbox.radius
-    )
+    return distanceFromHitboxToBullet <= hitbox.radius
   }
 
   checkBaddieCollision(spawnedPCBullets) {
@@ -256,14 +257,13 @@ class Field {
   }
 
   clearFGContext() {
-    this.fgCanvas.ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
+    this.fgCanvas.ctx.fillStyle = "rgba(0, 0, 0, 0.1";
     this.fgCanvas.ctx.fillRect(0,0,800,500);
-    // this.fgCanvas.ctx.clearRect(0, 0, this.fgCanvas.width, this.fgCanvas.height);
-  } // implement dirty rectangles on each sprite?
+  }
 
   clearPCContext() {
     this.pcCanvas.ctx.clearRect(0, 0, this.pcCanvas.width, this.pcCanvas.height);
-  } // implement dirty rectangles on each sprite?
+  }
 }
 
 

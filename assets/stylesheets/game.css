@@ -1,6 +1,21 @@
+@font-face {
+    font-family: 'sf_alien_encountersitalic';
+    src: url('sfalienencounters-italic-webfont.woff2') format('woff2'),
+         url('sfalienencounters-italic-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
 body {
   background-image: url("../imgs/vaporwave_background.png");
-  background-position: center;
+  background-position: center top;
+  /* background-size: contain; */
+}
+
+h1 {
+  color: white;
+  margin: auto;
+  display: block;
 }
 
 .game-area {
@@ -24,7 +39,7 @@ body {
   display: block;
   border: solid 1px black;
   z-index: 3;
-  opacity: 1;
+  opacity: 0.8;
 }
 
 #playerCanvas {
@@ -44,18 +59,18 @@ body {
 }
 
 span {
-  font-family: arial;
-  font-size: 16px;
+  font-family: sf_alien_encountersitalic;
+  font-size: 18px;
   position: absolute;
-  top: 507;
+  top: 508;
 }
 
 #score {
   display: block;
-  left: 35;
+  left: 30;
 }
 
 #life {
   display: block;
-  left: 355;
+  left: 350;
 }

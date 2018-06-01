@@ -88,7 +88,7 @@ class Player {
     if(this.invincibilityFrames < 50) {
       this.ctx.fillStyle = 'red';
     } else {
-      this.ctx.fillStyle = 'black';
+      this.ctx.fillStyle = 'white';
     }
 
     this.ctx.moveTo(this.starboardVertex.x, this.starboardVertex.y);
