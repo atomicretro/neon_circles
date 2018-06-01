@@ -175,8 +175,9 @@ var Baddie = function () {
     value: function fire(BulletPool) {
       var bulletData = {
         theta: this.theta,
+        startRadius: this.radius,
+        endRadius: this.radius - 20,
         speed: 4,
-        radius: this.radius,
         startPoint: {
           x: this.drawPoint.x + this.width / 2,
           y: this.drawPoint.y + this.height / 2
@@ -204,88 +205,6 @@ var Baddie = function () {
 
 /***/ }),
 
-/***/ "./scripts/baddieBullet.js":
-/*!*********************************!*\
-  !*** ./scripts/baddieBullet.js ***!
-  \*********************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _utilities = __webpack_require__(/*! ./utilities */ "./scripts/utilities.js");
-
-var _bullet = __webpack_require__(/*! ./bullet */ "./scripts/bullet.js");
-
-var _bullet2 = _interopRequireDefault(_bullet);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var BulletPool = function (_ObjectPool) {
-  _inherits(BulletPool, _ObjectPool);
-
-  function BulletPool(size, fgCanvas, type) {
-    _classCallCheck(this, BulletPool);
-
-    var _this = _possibleConstructorReturn(this, (BulletPool.__proto__ || Object.getPrototypeOf(BulletPool)).call(this, size));
-
-    for (var i = 0; i < size; i++) {
-      var bullet = new BadBullet(fgCanvas, type);
-      _this.pool.push(bullet);
-    }
-    return _this;
-  }
-
-  return BulletPool;
-}(_utilities.ObjectPool);
-
-exports.default = BulletPool;
-
-var BadBullet = function (_Bullet) {
-  _inherits(BadBullet, _Bullet);
-
-  function BadBullet(fgCanvas, type) {
-    _classCallCheck(this, BadBullet);
-
-    return _possibleConstructorReturn(this, (BadBullet.__proto__ || Object.getPrototypeOf(BadBullet)).call(this, fgCanvas, type));
-  }
-
-  _createClass(BadBullet, [{
-    key: 'spawn',
-    value: function spawn(bulletData) {
-      // debugger
-      this.pathAngle = bulletData.theta;
-      this.speed = bulletData.speed;
-      this.startPoint = this.computePoint(bulletData.radius);
-      this.endPoint = this.computePoint(bulletData.radius - 20);
-      this.startRadius = bulletData.radius;
-      this.endRadius = bulletData.radius - 20;
-      this.spawned = true;
-    }
-  }]);
-
-  return BadBullet;
-}(_bullet2.default);
-
-;
-
-// Bullet.prototype = new Sprite();
-
-/***/ }),
-
 /***/ "./scripts/bullet.js":
 /*!***************************!*\
   !*** ./scripts/bullet.js ***!
@@ -302,7 +221,34 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _utilities = __webpack_require__(/*! ./utilities */ "./scripts/utilities.js");
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var BulletPool = function (_ObjectPool) {
+  _inherits(BulletPool, _ObjectPool);
+
+  function BulletPool(size, fgCanvas, type) {
+    _classCallCheck(this, BulletPool);
+
+    var _this = _possibleConstructorReturn(this, (BulletPool.__proto__ || Object.getPrototypeOf(BulletPool)).call(this, size));
+
+    for (var i = 0; i < size; i++) {
+      var bullet = new Bullet(fgCanvas, type);
+      _this.pool.push(bullet);
+    }
+    return _this;
+  }
+
+  return BulletPool;
+}(_utilities.ObjectPool);
+
+exports.default = BulletPool;
+;
 
 var Bullet = function () {
   function Bullet(fgCanvas, type) {
@@ -317,6 +263,17 @@ var Bullet = function () {
   }
 
   _createClass(Bullet, [{
+    key: 'spawn',
+    value: function spawn(bulletData) {
+      this.pathAngle = bulletData.theta;
+      this.startRadius = bulletData.startRadius;
+      this.endRadius = bulletData.endRadius;
+      this.speed = bulletData.speed;
+      this.startPoint = this.computePoint(this.startRadius);
+      this.endPoint = this.computePoint(this.endRadius);
+      this.spawned = true;
+    }
+  }, {
     key: 'draw',
     value: function draw() {
       this.clear();
@@ -382,7 +339,6 @@ var Bullet = function () {
   return Bullet;
 }();
 
-exports.default = Bullet;
 ;
 
 /***/ }),
@@ -413,13 +369,9 @@ var _baddie = __webpack_require__(/*! ./baddie */ "./scripts/baddie.js");
 
 var _baddie2 = _interopRequireDefault(_baddie);
 
-var _playerBullet = __webpack_require__(/*! ./playerBullet */ "./scripts/playerBullet.js");
+var _bullet2 = __webpack_require__(/*! ./bullet */ "./scripts/bullet.js");
 
-var _playerBullet2 = _interopRequireDefault(_playerBullet);
-
-var _baddieBullet = __webpack_require__(/*! ./baddieBullet */ "./scripts/baddieBullet.js");
-
-var _baddieBullet2 = _interopRequireDefault(_baddieBullet);
+var _bullet3 = _interopRequireDefault(_bullet2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -466,8 +418,8 @@ var Field = function () {
     };
 
     this.ImageStore = new _utilities.ImageStore(this);
-    this.badBulletPool = new _baddieBullet2.default(1, this.fgCanvas, 'demonBullet');
-    this.pcBulletPool = new _playerBullet2.default(8, this.fgCanvas);
+    this.badBulletPool = new _bullet3.default(1, this.fgCanvas, 'demonBullet');
+    this.pcBulletPool = new _bullet3.default(8, this.fgCanvas, 'player');
     this.BaddiePool = new _baddie2.default(1, this.fgCanvas.ctx, this.ImageStore, this.badBulletPool);
     this.player = new _player2.default(this.pcCanvas, this.pcBulletPool);
     this.lastTime = Date.now;
@@ -835,6 +787,8 @@ var Player = function () {
       this.fireCharge = 0;
       var bulletData = {
         theta: this.bowTheta,
+        startRadius: 12,
+        endRadius: -8,
         speed: 4
       };
       this.BulletPool.get(bulletData);
@@ -843,7 +797,6 @@ var Player = function () {
     key: 'draw',
     value: function draw() {
       this.computeAllVerticies();
-
       this.ctx.beginPath();
 
       if (this.invincibilityFrames < 50) {
@@ -869,84 +822,6 @@ var Player = function () {
 }();
 
 exports.default = Player;
-
-/***/ }),
-
-/***/ "./scripts/playerBullet.js":
-/*!*********************************!*\
-  !*** ./scripts/playerBullet.js ***!
-  \*********************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _utilities = __webpack_require__(/*! ./utilities */ "./scripts/utilities.js");
-
-var _bullet = __webpack_require__(/*! ./bullet */ "./scripts/bullet.js");
-
-var _bullet2 = _interopRequireDefault(_bullet);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var BulletPool = function (_ObjectPool) {
-  _inherits(BulletPool, _ObjectPool);
-
-  function BulletPool(size, fgCanvas) {
-    _classCallCheck(this, BulletPool);
-
-    var _this = _possibleConstructorReturn(this, (BulletPool.__proto__ || Object.getPrototypeOf(BulletPool)).call(this, size));
-
-    for (var i = 0; i < size; i++) {
-      var bullet = new PlayerBullet(fgCanvas);
-      _this.pool.push(bullet);
-    }
-    return _this;
-  }
-
-  return BulletPool;
-}(_utilities.ObjectPool);
-
-exports.default = BulletPool;
-;
-
-var PlayerBullet = function (_Bullet) {
-  _inherits(PlayerBullet, _Bullet);
-
-  function PlayerBullet(fgCanvas) {
-    _classCallCheck(this, PlayerBullet);
-
-    return _possibleConstructorReturn(this, (PlayerBullet.__proto__ || Object.getPrototypeOf(PlayerBullet)).call(this, fgCanvas, 'player'));
-  }
-
-  _createClass(PlayerBullet, [{
-    key: 'spawn',
-    value: function spawn(bulletData) {
-      this.pathAngle = bulletData.theta;
-      this.startPoint = this.computePoint(this.startRadius);
-      this.endPoint = this.computePoint(this.endRadius);
-      this.speed = bulletData.speed;
-      this.spawned = true;
-    }
-  }]);
-
-  return PlayerBullet;
-}(_bullet2.default);
-
-;
 
 /***/ }),
 

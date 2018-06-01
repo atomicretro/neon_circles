@@ -1,4 +1,17 @@
-export default class Bullet {
+import { ObjectPool } from './utilities';
+
+export default class BulletPool extends ObjectPool {
+  constructor(size, fgCanvas, type) {
+    super(size);
+
+    for(let i = 0; i < size; i++) {
+      let bullet = new Bullet(fgCanvas, type);
+      this.pool.push(bullet);
+    }
+  }
+};
+
+class Bullet {
   constructor(fgCanvas, type) {
     this.ctx = fgCanvas.ctx;
     this.ctxWidth = fgCanvas.width;
@@ -6,6 +19,16 @@ export default class Bullet {
     this.undrawX = fgCanvas.width + 5;
     this.undrawY = fgCanvas.height + 5;
     this.setDefaultValues(type);
+  }
+
+  spawn(bulletData) {
+    this.pathAngle = bulletData.theta;
+    this.startRadius = bulletData.startRadius;
+    this.endRadius = bulletData.endRadius;
+    this.speed = bulletData.speed;
+    this.startPoint = this.computePoint(this.startRadius);
+    this.endPoint = this.computePoint(this.endRadius);
+    this.spawned = true;
   }
 
   draw() {

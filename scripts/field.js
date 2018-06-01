@@ -1,8 +1,7 @@
 import Player from './player';
 import { ImageStore, Sprite } from './utilities';
 import BaddiePool from './baddie';
-import PlayerBulletPool from './playerBullet';
-import BaddieBulletPool from './baddieBullet';
+import BulletPool from './bullet';
 
 const KEY_MAP = {
   74: 'left',     // j
@@ -43,8 +42,8 @@ class Field {
     }
 
     this.ImageStore = new ImageStore(this);
-    this.badBulletPool = new BaddieBulletPool(1, this.fgCanvas, 'demonBullet');
-    this.pcBulletPool = new PlayerBulletPool(8, this.fgCanvas);
+    this.badBulletPool = new BulletPool(1, this.fgCanvas, 'demonBullet');
+    this.pcBulletPool = new BulletPool(8, this.fgCanvas, 'player');
     this.BaddiePool = new BaddiePool(
       1, this.fgCanvas.ctx, this.ImageStore, this.badBulletPool
     );

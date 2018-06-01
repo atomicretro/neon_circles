@@ -73,8 +73,9 @@ class Baddie {
   fire(BulletPool) {
     let bulletData = {
       theta: this.theta,
+      startRadius: this.radius,
+      endRadius: this.radius - 20,
       speed: 4,
-      radius: this.radius,
       startPoint: {
         x: this.drawPoint.x + this.width / 2,
         y: this.drawPoint.y + this.height / 2

@@ -75,6 +75,8 @@ class Player {
     this.fireCharge = 0;
     let bulletData = {
       theta: this.bowTheta,
+      startRadius: 12,
+      endRadius: -8,
       speed: 4
     }
     this.BulletPool.get(bulletData);
@@ -82,7 +84,6 @@ class Player {
 
   draw() {
     this.computeAllVerticies();
-
     this.ctx.beginPath();
 
     if(this.invincibilityFrames < 50) {
