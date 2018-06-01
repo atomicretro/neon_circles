@@ -98,7 +98,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var BaddiePool = function (_ObjectPool) {
   _inherits(BaddiePool, _ObjectPool);
 
-  function BaddiePool(size, ctx, ImageStore, BulletPool) {
+  function BaddiePool(size, ctx, AssetStore, BulletPool) {
     _classCallCheck(this, BaddiePool);
 
     var _this = _possibleConstructorReturn(this, (BaddiePool.__proto__ || Object.getPrototypeOf(BaddiePool)).call(this, size, ctx));
@@ -106,7 +106,7 @@ var BaddiePool = function (_ObjectPool) {
     _this.BulletPool = BulletPool;
 
     for (var i = 0; i < size; i++) {
-      var baddie = new Baddie(ctx, 'redDemon', ImageStore);
+      var baddie = new Baddie(ctx, 'redDemon', AssetStore);
       _this.pool.push(baddie);
     }
     return _this;
@@ -119,13 +119,13 @@ exports.default = BaddiePool;
 ;
 
 var Baddie = function () {
-  function Baddie(ctx, type, ImageStore) {
+  function Baddie(ctx, type, AssetStore) {
     _classCallCheck(this, Baddie);
 
     this.ctx = ctx;
     this.type = type;
     this.setDefaultValues();
-    var storedAsset = ImageStore[type];
+    var storedAsset = AssetStore[type];
     this.width = storedAsset.width;
     this.height = storedAsset.height;
     this.sprite = new _utilities.Sprite(ctx, storedAsset.image, this.width, this.height, storedAsset.srcX, storedAsset.srcY);
@@ -358,21 +358,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _player = __webpack_require__(/*! ./player */ "./scripts/player.js");
-
-var _player2 = _interopRequireDefault(_player);
-
 var _utilities = __webpack_require__(/*! ./utilities */ "./scripts/utilities.js");
-
-var _baddie = __webpack_require__(/*! ./baddie */ "./scripts/baddie.js");
-
-var _baddie2 = _interopRequireDefault(_baddie);
-
-var _bullet2 = __webpack_require__(/*! ./bullet */ "./scripts/bullet.js");
-
-var _bullet3 = _interopRequireDefault(_bullet2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -392,39 +378,24 @@ for (var code in KEY_MAP) {
 }
 
 var Field = function () {
-  function Field(fgCanvas, statsCanvas, pcCanvas, bgCanvas) {
+  function Field(fgCanvasObj, statsCanvasObj, pcCanvasObj, bgCanvasObj, AssetStore, badBulletPool, pcBulletPool, BaddiePool, player) {
     _classCallCheck(this, Field);
 
-    this.fgCanvas = {
-      ctx: fgCanvas.getContext("2d"),
-      width: 800,
-      height: 500
-    };
-    this.statsCanvas = {
-      ctx: statsCanvas.getContext("2d"),
-      width: 800,
-      height: 25
-    };
-    this.pcCanvas = {
-      ctx: pcCanvas.getContext("2d"),
-      width: 150,
-      height: 150
-    };
-    this.bgCanvas = {
-      ctx: bgCanvas.getContext("2d"),
-      width: 800,
-      height: 500
-    };
+    this.fgCanvas = fgCanvasObj;
+    this.statsCanvas = statsCanvasObj;
+    this.pcCanvas = pcCanvasObj;
+    this.bgCanvas = bgCanvasObj;
 
-    this.ImageStore = new _utilities.ImageStore(this);
-    this.badBulletPool = new _bullet3.default(1, this.fgCanvas, 'demonBullet');
-    this.pcBulletPool = new _bullet3.default(8, this.fgCanvas, 'player');
-    this.BaddiePool = new _baddie2.default(1, this.fgCanvas.ctx, this.ImageStore, this.badBulletPool);
-    this.player = new _player2.default(this.pcCanvas, this.pcBulletPool);
+    this.AssetStore = AssetStore;
+    this.badBulletPool = badBulletPool;
+    this.pcBulletPool = pcBulletPool;
+    this.BaddiePool = BaddiePool;
+
+    this.player = player;
+
     this.lastTime = Date.now;
-
     this.playerScore = 0;
-    this.heart = new _utilities.Sprite(this.statsCanvas.ctx, this.ImageStore.heart.image, 13, 13, 0, 0);
+    this.heart = new _utilities.Sprite(this.statsCanvas.ctx, this.AssetStore.heart.image, 13, 13, 0, 0);
 
     this.startRound = this.startRound.bind(this);
     this.playRound = this.playRound.bind(this);
@@ -443,7 +414,7 @@ var Field = function () {
       // this.bgCanvas.ctx.fillRect(
       //   0, 0, this.bgCanvas.width, this.bgCanvas.height
       // ); MUTED COLOR SCHEME
-      this.ImageStore.backgroundMusic.play();
+      this.AssetStore.backgroundMusic.play();
       this.drawStatusBar();
       this.playRound();
     }
@@ -662,22 +633,82 @@ exports.default = Field;
 "use strict";
 
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 var _field = __webpack_require__(/*! ./field */ "./scripts/field.js");
 
 var _field2 = _interopRequireDefault(_field);
 
+var _player = __webpack_require__(/*! ./player */ "./scripts/player.js");
+
+var _player2 = _interopRequireDefault(_player);
+
+var _utilities = __webpack_require__(/*! ./utilities */ "./scripts/utilities.js");
+
+var _baddie = __webpack_require__(/*! ./baddie */ "./scripts/baddie.js");
+
+var _baddie2 = _interopRequireDefault(_baddie);
+
+var _bullet = __webpack_require__(/*! ./bullet */ "./scripts/bullet.js");
+
+var _bullet2 = _interopRequireDefault(_bullet);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var startGame = function startGame(foregroundCanvas, playerCanvas, statsCanvas, backgroundCanvas) {
-  var field = new _field2.default(foregroundCanvas, statsCanvas, playerCanvas, backgroundCanvas);
-};
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Game = function () {
+  function Game(fgCanvas, statsCanvas, pcCanvas, bgCanvas) {
+    _classCallCheck(this, Game);
+
+    this.fgCanvas = {
+      ctx: fgCanvas.getContext("2d"),
+      width: 800,
+      height: 500
+    };
+    this.statsCanvas = {
+      ctx: statsCanvas.getContext("2d"),
+      width: 800,
+      height: 25
+    };
+    this.pcCanvas = {
+      ctx: pcCanvas.getContext("2d"),
+      width: 150,
+      height: 150
+    };
+    this.bgCanvas = {
+      ctx: bgCanvas.getContext("2d"),
+      width: 800,
+      height: 500
+    };
+
+    this.AssetStore = new _utilities.AssetStore(this);
+    this.badBulletPool = new _bullet2.default(1, this.fgCanvas, 'demonBullet');
+    this.pcBulletPool = new _bullet2.default(8, this.fgCanvas, 'player');
+    this.BaddiePool = new _baddie2.default(1, this.fgCanvas.ctx, this.AssetStore, this.badBulletPool);
+
+    this.player = new _player2.default(this.pcCanvas, this.pcBulletPool);
+
+    this.field = new _field2.default(this.fgCanvas, this.statsCanvas, this.pcCanvas, this.bgCanvas, this.AssetStore, this.badBulletPool, this.pcBulletPool, this.BaddiePool, this.player);
+  }
+
+  _createClass(Game, [{
+    key: 'start',
+    value: function start() {
+      this.field.startRound();
+    }
+  }]);
+
+  return Game;
+}();
 
 document.addEventListener("DOMContentLoaded", function () {
   var foregroundCanvas = document.getElementById("foregroundCanvas");
   var playerCanvas = document.getElementById("playerCanvas");
   var statsCanvas = document.getElementById("statsCanvas");
   var backgroundCanvas = document.getElementById("backgroundCanvas");
-  startGame(foregroundCanvas, playerCanvas, statsCanvas, backgroundCanvas);
+
+  var game = new Game(foregroundCanvas, statsCanvas, playerCanvas, backgroundCanvas);
 });
 
 /***/ }),
@@ -906,13 +937,13 @@ var Sprite = exports.Sprite = function () {
   return Sprite;
 }();
 
-var ImageStore = exports.ImageStore = function () {
-  function ImageStore(field) {
+var AssetStore = exports.AssetStore = function () {
+  function AssetStore(game) {
     var _this = this;
 
-    _classCallCheck(this, ImageStore);
+    _classCallCheck(this, AssetStore);
 
-    this.field = field;
+    this.game = game;
 
     this.backgroundMusic = new Audio("assets/sounds/background_music.mp3");
     this.backgroundMusic.loop = true;
@@ -936,33 +967,33 @@ var ImageStore = exports.ImageStore = function () {
     this.ready = false;
 
     this.redDemon.image.onload = function () {
-      _this.imageLoaded();
+      _this.assetLoaded();
     };
     this.heart.image.onload = function () {
-      _this.imageLoaded();
+      _this.assetLoaded();
     };
 
     this.redDemon.image.src = 'assets/sprites/demon_test.png';
     this.heart.image.src = 'assets/sprites/heart.png';
   }
 
-  _createClass(ImageStore, [{
-    key: 'imageLoaded',
-    value: function imageLoaded() {
+  _createClass(AssetStore, [{
+    key: 'assetLoaded',
+    value: function assetLoaded() {
       this.numLoaded++;
-      if (this.numLoaded === this.numImages) this.field.startRound();
+      if (this.numLoaded === this.numImages) this.game.start();
     }
   }, {
     key: 'checkReadyState',
     value: function checkReadyState() {
       if (this.backgroundMusic.readyState === 4) {
         window.clearInterval(this.checkAudio);
-        this.imageLoaded();
+        this.assetLoaded();
       }
     }
   }]);
 
-  return ImageStore;
+  return AssetStore;
 }();
 
 /***/ })

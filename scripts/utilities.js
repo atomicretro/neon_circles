@@ -53,9 +53,9 @@ export class Sprite {
   }
 }
 
-export class ImageStore {
-  constructor(field) {
-    this.field = field;
+export class AssetStore {
+  constructor(game) {
+    this.game = game;
 
     this.backgroundMusic = new Audio("assets/sounds/background_music.mp3");
     this.backgroundMusic.loop = true;
@@ -77,25 +77,25 @@ export class ImageStore {
     this.ready = false;
 
     this.redDemon.image.onload = () => {
-      this.imageLoaded();
+      this.assetLoaded();
     }
     this.heart.image.onload = () => {
-      this.imageLoaded();
+      this.assetLoaded();
     }
 
     this.redDemon.image.src = 'assets/sprites/demon_test.png';
     this.heart.image.src = 'assets/sprites/heart.png';
   }
 
-  imageLoaded() {
+  assetLoaded() {
     this.numLoaded++;
-    if(this.numLoaded === this.numImages) this.field.startRound();
+    if(this.numLoaded === this.numImages) this.game.start();
   }
 
   checkReadyState() {
     if(this.backgroundMusic.readyState === 4) {
       window.clearInterval(this.checkAudio);
-      this.imageLoaded();
+      this.assetLoaded();
     }
   }
 }

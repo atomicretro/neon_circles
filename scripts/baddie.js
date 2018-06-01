@@ -1,23 +1,23 @@
 import { Sprite, ObjectPool } from './utilities';
 
 export default class BaddiePool extends ObjectPool {
-  constructor(size, ctx, ImageStore, BulletPool) {
+  constructor(size, ctx, AssetStore, BulletPool) {
     super(size, ctx);
     this.BulletPool = BulletPool;
 
     for (let i = 0; i < size; i++) {
-      let baddie = new Baddie(ctx, 'redDemon', ImageStore);
+      let baddie = new Baddie(ctx, 'redDemon', AssetStore);
       this.pool.push(baddie);
     }
   }
 };
 
 class Baddie {
-  constructor(ctx, type, ImageStore) {
+  constructor(ctx, type, AssetStore) {
     this.ctx = ctx;
     this.type = type;
     this.setDefaultValues();
-    let storedAsset = ImageStore[type];
+    let storedAsset = AssetStore[type];
     this.width = storedAsset.width;
     this.height = storedAsset.height;
     this.sprite = new Sprite(

@@ -1,7 +1,4 @@
-import Player from './player';
-import { ImageStore, Sprite } from './utilities';
-import BaddiePool from './baddie';
-import BulletPool from './bullet';
+import { AssetStore, Sprite } from './utilities';
 
 const KEY_MAP = {
   74: 'left',     // j
@@ -19,41 +16,36 @@ for (let code in KEY_MAP) {
 }
 
 class Field {
-  constructor(fgCanvas, statsCanvas, pcCanvas, bgCanvas) {
-    this.fgCanvas = {
-      ctx: fgCanvas.getContext("2d"),
-      width: 800,
-      height: 500
-    }
-    this.statsCanvas = {
-      ctx: statsCanvas.getContext("2d"),
-      width: 800,
-      height: 25
-    }
-    this.pcCanvas = {
-      ctx: pcCanvas.getContext("2d"),
-      width: 150,
-      height: 150
-    }
-    this.bgCanvas = {
-      ctx: bgCanvas.getContext("2d"),
-      width: 800,
-      height: 500
-    }
+  constructor(
+    fgCanvasObj,
+    statsCanvasObj,
+    pcCanvasObj,
+    bgCanvasObj,
+    AssetStore,
+    badBulletPool,
+    pcBulletPool,
+    BaddiePool,
+    player
+  ) {
+    this.fgCanvas = fgCanvasObj;
+    this.statsCanvas = statsCanvasObj;
+    this.pcCanvas = pcCanvasObj;
+    this.bgCanvas = bgCanvasObj;
 
-    this.ImageStore = new ImageStore(this);
-    this.badBulletPool = new BulletPool(1, this.fgCanvas, 'demonBullet');
-    this.pcBulletPool = new BulletPool(8, this.fgCanvas, 'player');
-    this.BaddiePool = new BaddiePool(
-      1, this.fgCanvas.ctx, this.ImageStore, this.badBulletPool
-    );
-    this.player = new Player(this.pcCanvas, this.pcBulletPool);
+    this.AssetStore = AssetStore;
+    this.badBulletPool = badBulletPool;
+    this.pcBulletPool = pcBulletPool;
+    this.BaddiePool = BaddiePool;
+
+    this.player = player;
+
     this.lastTime = Date.now;
-
     this.playerScore = 0;
     this.heart = new Sprite(
-      this.statsCanvas.ctx, this.ImageStore.heart.image, 13, 13, 0, 0
-    )
+      this.statsCanvas.ctx,
+      this.AssetStore.heart.image,
+      13, 13, 0, 0
+    );
 
     this.startRound = this.startRound.bind(this);
     this.playRound = this.playRound.bind(this);
@@ -71,7 +63,7 @@ class Field {
     // this.bgCanvas.ctx.fillRect(
     //   0, 0, this.bgCanvas.width, this.bgCanvas.height
     // ); MUTED COLOR SCHEME
-    this.ImageStore.backgroundMusic.play();
+    this.AssetStore.backgroundMusic.play();
     this.drawStatusBar();
     this.playRound();
   }
@@ -271,6 +263,5 @@ class Field {
     this.pcCanvas.ctx.clearRect(0, 0, this.pcCanvas.width, this.pcCanvas.height);
   }
 }
-
 
 export default Field;
