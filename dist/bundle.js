@@ -142,20 +142,20 @@ var Baddie = function () {
   }, {
     key: 'draw',
     value: function draw(BulletPool) {
-      // this.clear();
-      if (this.isHit) {
-        // this.clear();
-        return true;
-      } else {
-        this.theta -= this.speed;
-        this.drawPoint = this.computeDrawPoint();
-        this.sprite.draw(this.drawPoint.x, this.drawPoint.y);
+      this.theta -= this.speed;
+      this.drawPoint = this.computeDrawPoint();
+      this.sprite.draw(this.drawPoint.x, this.drawPoint.y);
 
-        this.chanceToFire = Math.floor(Math.random() * 101);
-        if (this.chanceToFire / 100 < this.fireThreshold) {
-          this.fire(BulletPool);
-        }
+      this.chanceToFire = Math.floor(Math.random() * 101);
+      if (this.chanceToFire / 100 < this.fireThreshold) {
+        this.fire(BulletPool);
       }
+    }
+  }, {
+    key: 'resetable',
+    value: function resetable() {
+      if (this.isHit) return true;
+      return false;
     }
   }, {
     key: 'computeDrawPoint',
@@ -240,7 +240,7 @@ var BulletPool = function (_ObjectPool) {
     for (var i = 0; i < size; i++) {
       var bullet = new Bullet(fgCanvas, type);
       _this.pool.push(bullet);
-    }
+    };
     return _this;
   }
 
@@ -257,8 +257,8 @@ var Bullet = function () {
     this.ctx = fgCanvas.ctx;
     this.ctxWidth = fgCanvas.width;
     this.ctxHeight = fgCanvas.height;
-    this.undrawX = fgCanvas.width + 5;
-    this.undrawY = fgCanvas.height + 5;
+    this.resetX = fgCanvas.width + 5;
+    this.resetY = fgCanvas.height + 5;
     this.setDefaultValues(type);
   }
 
@@ -276,18 +276,18 @@ var Bullet = function () {
   }, {
     key: 'draw',
     value: function draw() {
-      this.clear();
       this.startRadius -= this.speed;
       this.endRadius -= this.speed;
       this.startPoint = this.computePoint(this.startRadius);
       this.endPoint = this.computePoint(this.endRadius);
 
-      if ((this.startPoint.y > -5 || this.endPoint.y > -5) && (this.startPoint.y < this.undrawY || this.endPoint.y < this.undrawY) && (this.startPoint.x > -5 || this.endPoint.x > -5) && (this.startPoint.x < this.undrawX || this.endPoint.x < this.undrawX)) {
-        // this.ctx.beginPath();
-        // this.ctx.lineWidth = 2;
-        // this.ctx.moveTo(this.startPoint.x, this.startPoint.y);
-        // this.ctx.lineTo(this.endPoint.x, this.endPoint.y);
-        // this.ctx.stroke();
+      this.clear();
+    }
+  }, {
+    key: 'resetable',
+    value: function resetable() {
+      if ((this.startPoint.y > -5 || this.endPoint.y > -5) && (this.startPoint.y < this.resetY || this.endPoint.y < this.resetY) && (this.startPoint.x > -5 || this.endPoint.x > -5) && (this.startPoint.x < this.resetX || this.endPoint.x < this.resetX)) {
+        return false;
       } else {
         return true;
       };
@@ -309,23 +309,22 @@ var Bullet = function () {
         startY = this.startPoint.y;
       }
 
-      this.ctx.clearRect(startX - 5, startY - 5, 15, 15);
+      this.ctx.clearRect(startX, startY, 16, 16);
     }
   }, {
     key: 'computePoint',
     value: function computePoint(radius) {
+      // create a computeOffset funciton that works on a half circle tilted 45degrees
+      // when pc is on top left of circle drawpoint needs to be in topleft;
+      // when pc is on bottom right of circle drawpoint needs to be in *topleft*
       return {
-        x: Math.cos(this.pathAngle) * -radius + this.xOffset,
-        y: Math.sin(this.pathAngle) * -radius + this.yOffset
+        x: Math.cos(this.pathAngle) * -radius + this.xOffset - 5,
+        y: Math.sin(this.pathAngle) * -radius + this.yOffset - 5
       };
     }
   }, {
     key: 'setDefaultValues',
     value: function setDefaultValues(type) {
-      if (type === 'player') {
-        this.startRadius = 12;
-        this.endRadius = -8;
-      }
       this.xOffset = this.ctxWidth / 2;
       this.yOffset = this.ctxHeight / 2;
       this.pathAngle = 0;
@@ -864,7 +863,8 @@ var ObjectPool = exports.ObjectPool = function () {
     value: function draw(type) {
       for (var i = 0; i < this.size; i++) {
         if (this.pool[i].spawned) {
-          if (this.pool[i].draw(this.BulletPool)) {
+          this.pool[i].draw(this.BulletPool);
+          if (this.pool[i].resetable()) {
             this.pool[i].setDefaultValues(type);
             this.pool.push(this.pool.splice(i, 1)[0]);
           }

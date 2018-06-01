@@ -38,11 +38,6 @@ class Baddie {
   }
 
   draw(BulletPool) {
-    // this.clear();
-    if(this.isHit) {
-      // this.clear();
-      return true;
-    } else {
       this.theta -= this.speed;
       this.drawPoint = this.computeDrawPoint();
       this.sprite.draw(this.drawPoint.x, this.drawPoint.y);
@@ -51,7 +46,11 @@ class Baddie {
       if (this.chanceToFire/100 < this.fireThreshold) {
         this.fire(BulletPool);
       }
-    }
+  }
+
+  resetable() {
+    if(this.isHit) return true;
+    return false;
   }
 
   computeDrawPoint() {

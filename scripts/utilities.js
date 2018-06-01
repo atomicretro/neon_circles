@@ -12,14 +12,15 @@ export class ObjectPool {
   }
 
   draw(type) {
-    for (let i = 0; i < this.size; i++) {
+    for(let i = 0; i < this.size; i++) {
       if(this.pool[i].spawned) {
-        if(this.pool[i].draw(this.BulletPool)) {
+        this.pool[i].draw(this.BulletPool);
+        if(this.pool[i].resetable()) {
           this.pool[i].setDefaultValues(type);
           this.pool.push((this.pool.splice(i,1))[0]);
         }
       } else {
-        break;
+          break;
       }
     }
   }
