@@ -58,14 +58,21 @@ class Field {
 
     this.startRound = this.startRound.bind(this);
     this.playRound = this.playRound.bind(this);
-    this.checkCollisions = this.checkCollisions.bind(this);
-    // this.checkPlayerCollision = this.checkPlayerCollision.bind(this);
 
     document.addEventListener('keydown', this.keydown.bind(this));
     document.addEventListener('keyup', this.keyup.bind(this));
   }
 
+  startScreen() {
+
+  }
+
   startRound() {
+    // this.bgCanvas.ctx.fillStyle = "rgba(255, 255, 255, 0.8";
+    // this.bgCanvas.ctx.fillRect(
+    //   0, 0, this.bgCanvas.width, this.bgCanvas.height
+    // ); MUTED COLOR SCHEME
+    this.ImageStore.backgroundMusic.play();
     this.drawStatusBar();
     this.playRound();
   }

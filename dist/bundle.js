@@ -477,16 +477,22 @@ var Field = function () {
 
     this.startRound = this.startRound.bind(this);
     this.playRound = this.playRound.bind(this);
-    this.checkCollisions = this.checkCollisions.bind(this);
-    // this.checkPlayerCollision = this.checkPlayerCollision.bind(this);
 
     document.addEventListener('keydown', this.keydown.bind(this));
     document.addEventListener('keyup', this.keyup.bind(this));
   }
 
   _createClass(Field, [{
+    key: 'startScreen',
+    value: function startScreen() {}
+  }, {
     key: 'startRound',
     value: function startRound() {
+      // this.bgCanvas.ctx.fillStyle = "rgba(255, 255, 255, 0.8";
+      // this.bgCanvas.ctx.fillRect(
+      //   0, 0, this.bgCanvas.width, this.bgCanvas.height
+      // ); MUTED COLOR SCHEME
+      this.ImageStore.backgroundMusic.play();
       this.drawStatusBar();
       this.playRound();
     }
@@ -1032,9 +1038,16 @@ var ImageStore = exports.ImageStore = function () {
     _classCallCheck(this, ImageStore);
 
     this.field = field;
-    this.backgroundSky = { image: new Image() };
-    this.backgroundCity = { image: new Image() };
-    this.bullet = { image: new Image() };
+
+    this.backgroundMusic = new Audio("assets/sounds/background_music.mp3");
+    this.backgroundMusic.loop = true;
+    this.backgroundMusic.volume = .25;
+    this.backgroundMusic.load();
+    this.checkReadyState = this.checkReadyState.bind(this);
+    this.checkAudio = window.setInterval(function () {
+      _this.checkReadyState();
+    }, 1000);
+
     this.redDemon = {
       image: new Image(),
       width: 21,
@@ -1047,15 +1060,6 @@ var ImageStore = exports.ImageStore = function () {
     this.numLoaded = 0;
     this.ready = false;
 
-    this.backgroundSky.image.onload = function () {
-      _this.imageLoaded();
-    };
-    this.backgroundCity.image.onload = function () {
-      _this.imageLoaded();
-    };
-    this.bullet.image.onload = function () {
-      _this.imageLoaded();
-    };
     this.redDemon.image.onload = function () {
       _this.imageLoaded();
     };
@@ -1063,9 +1067,6 @@ var ImageStore = exports.ImageStore = function () {
       _this.imageLoaded();
     };
 
-    this.backgroundSky = 'assets/sprites/sky.png';
-    this.backgroundCity = 'assets/sprites/city_background.png';
-    this.bullet.image.src = 'assets/sprites/bullet.png';
     this.redDemon.image.src = 'assets/sprites/demon_test.png';
     this.heart.image.src = 'assets/sprites/heart.png';
   }
@@ -1075,6 +1076,14 @@ var ImageStore = exports.ImageStore = function () {
     value: function imageLoaded() {
       this.numLoaded++;
       if (this.numLoaded === this.numImages) this.field.startRound();
+    }
+  }, {
+    key: 'checkReadyState',
+    value: function checkReadyState() {
+      if (this.backgroundMusic.readyState === 4) {
+        window.clearInterval(this.checkAudio);
+        this.imageLoaded();
+      }
     }
   }]);
 
