@@ -14,10 +14,21 @@ body {
   /* background-size: contain; */
 }
 
+h1 {
+  font-size: 36px;
+  font-family: sf_alien_encountersitalic;
+  padding: 0;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 10px;
+  margin-bottom: 0;
+}
+
 h6 {
   font-size: 30px;
   display: block;
   margin: auto;
+  padding-top: 20px;
   color: white;
 }
 
@@ -26,7 +37,10 @@ h6 {
   height: 525px;
   width: 800px;;
   display: block;
-  margin: auto;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 10px;
+  margin-bottom: 100px;
   padding: 0;
 }
 
@@ -81,9 +95,33 @@ h6 {
 .info-area {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  height: 200px;
 }
 
 .info-background {
-  width: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  height: 125px;
+  width: 300px;
+  border-radius: 25px;
   background-color: rgba(255,255,255,0.8);
+}
+
+.name-area {
+  font-family: sf_alien_encountersitalic;
+  font-size: 24px;
+}
+
+.info-background a {
+  color: black;
+  font-size: 36px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.info-background a:hover {
+  color: purple;
 }
