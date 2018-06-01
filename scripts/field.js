@@ -1,26 +1,10 @@
 import { AssetStore, Sprite } from './utilities';
 
-const KEY_MAP = {
-  74: 'left',     // j
-  76: 'right',    // l
-  68: 'right',    // d
-  65: 'left',     // a
-  39: 'right',    // left arrow
-  37: 'left',     // right arrow
-  32: 'fire'      // space bar
-};
-
-const KEY_STATUS = {};
-for (let code in KEY_MAP) {
-  KEY_STATUS[ KEY_MAP[ code ]] = false;
-}
-
 class Field {
   constructor(
     fgCanvasObj,
     statsCanvasObj,
     pcCanvasObj,
-    bgCanvasObj,
     AssetStore,
     badBulletPool,
     pcBulletPool,
@@ -30,7 +14,6 @@ class Field {
     this.fgCanvas = fgCanvasObj;
     this.statsCanvas = statsCanvasObj;
     this.pcCanvas = pcCanvasObj;
-    this.bgCanvas = bgCanvasObj;
 
     this.AssetStore = AssetStore;
     this.badBulletPool = badBulletPool;
@@ -46,38 +29,10 @@ class Field {
       this.AssetStore.heart.image,
       13, 13, 0, 0
     );
-
-    this.startRound = this.startRound.bind(this);
-    this.playRound = this.playRound.bind(this);
-
-    document.addEventListener('keydown', this.keydown.bind(this));
-    document.addEventListener('keyup', this.keyup.bind(this));
   }
 
   startScreen() {
 
-  }
-
-  startRound() {
-    // this.bgCanvas.ctx.fillStyle = "rgba(255, 255, 255, 0.8";
-    // this.bgCanvas.ctx.fillRect(
-    //   0, 0, this.bgCanvas.width, this.bgCanvas.height
-    // ); MUTED COLOR SCHEME
-    this.AssetStore.backgroundMusic.play();
-    this.drawStatusBar();
-    this.playRound();
-  }
-
-  playRound() {
-    // let now = Date.now();
-    // let dt = (now - this.lastTime) / 1000.0;
-
-    // update(dt);
-    // this.drawStatusBar();
-    this.render();
-
-    // this.lastTime = now;
-    requestAnimationFrame(this.playRound);
   }
 
   render()  {
@@ -86,27 +41,11 @@ class Field {
     this.updatePlayerCharge()
     this.drawPlayerRails('circle');
     this.checkCollisions();
-    this.drawPlayer();
+    this.player.draw();
     this.BaddiePool.get({ theta: Math.PI / 2, speed: 0.005 });
     this.BaddiePool.draw();
     this.pcBulletPool.draw('player');
     this.badBulletPool.draw();
-  }
-
-  keydown(e) {
-    let keyCode = e.which || e.keyCode || 0;
-    if (KEY_MAP[keyCode]) {
-      e.preventDefault();
-      KEY_STATUS[KEY_MAP[keyCode]] = true;
-    }
-  }
-
-  keyup(e) {
-    let keyCode = e.which || e.keyCode || 0;
-    if (KEY_MAP[keyCode]) {
-      e.preventDefault();
-      KEY_STATUS[KEY_MAP[keyCode]] = false;
-    }
   }
 
   drawStatusBar() {
@@ -168,11 +107,6 @@ class Field {
       this.pcCanvas.ctx.lineWidth = 2;
       this.pcCanvas.ctx.stroke();
     }
-  }
-
-  drawPlayer() {
-    this.player.move(KEY_STATUS);
-    this.player.draw();
   }
 
   checkCollisions() {

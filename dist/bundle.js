@@ -362,29 +362,13 @@ var _utilities = __webpack_require__(/*! ./utilities */ "./scripts/utilities.js"
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var KEY_MAP = {
-  74: 'left', // j
-  76: 'right', // l
-  68: 'right', // d
-  65: 'left', // a
-  39: 'right', // left arrow
-  37: 'left', // right arrow
-  32: 'fire' // space bar
-};
-
-var KEY_STATUS = {};
-for (var code in KEY_MAP) {
-  KEY_STATUS[KEY_MAP[code]] = false;
-}
-
 var Field = function () {
-  function Field(fgCanvasObj, statsCanvasObj, pcCanvasObj, bgCanvasObj, AssetStore, badBulletPool, pcBulletPool, BaddiePool, player) {
+  function Field(fgCanvasObj, statsCanvasObj, pcCanvasObj, AssetStore, badBulletPool, pcBulletPool, BaddiePool, player) {
     _classCallCheck(this, Field);
 
     this.fgCanvas = fgCanvasObj;
     this.statsCanvas = statsCanvasObj;
     this.pcCanvas = pcCanvasObj;
-    this.bgCanvas = bgCanvasObj;
 
     this.AssetStore = AssetStore;
     this.badBulletPool = badBulletPool;
@@ -396,41 +380,11 @@ var Field = function () {
     this.lastTime = Date.now;
     this.playerScore = 0;
     this.heart = new _utilities.Sprite(this.statsCanvas.ctx, this.AssetStore.heart.image, 13, 13, 0, 0);
-
-    this.startRound = this.startRound.bind(this);
-    this.playRound = this.playRound.bind(this);
-
-    document.addEventListener('keydown', this.keydown.bind(this));
-    document.addEventListener('keyup', this.keyup.bind(this));
   }
 
   _createClass(Field, [{
     key: 'startScreen',
     value: function startScreen() {}
-  }, {
-    key: 'startRound',
-    value: function startRound() {
-      // this.bgCanvas.ctx.fillStyle = "rgba(255, 255, 255, 0.8";
-      // this.bgCanvas.ctx.fillRect(
-      //   0, 0, this.bgCanvas.width, this.bgCanvas.height
-      // ); MUTED COLOR SCHEME
-      this.AssetStore.backgroundMusic.play();
-      this.drawStatusBar();
-      this.playRound();
-    }
-  }, {
-    key: 'playRound',
-    value: function playRound() {
-      // let now = Date.now();
-      // let dt = (now - this.lastTime) / 1000.0;
-
-      // update(dt);
-      // this.drawStatusBar();
-      this.render();
-
-      // this.lastTime = now;
-      requestAnimationFrame(this.playRound);
-    }
   }, {
     key: 'render',
     value: function render() {
@@ -439,29 +393,11 @@ var Field = function () {
       this.updatePlayerCharge();
       this.drawPlayerRails('circle');
       this.checkCollisions();
-      this.drawPlayer();
+      this.player.draw();
       this.BaddiePool.get({ theta: Math.PI / 2, speed: 0.005 });
       this.BaddiePool.draw();
       this.pcBulletPool.draw('player');
       this.badBulletPool.draw();
-    }
-  }, {
-    key: 'keydown',
-    value: function keydown(e) {
-      var keyCode = e.which || e.keyCode || 0;
-      if (KEY_MAP[keyCode]) {
-        e.preventDefault();
-        KEY_STATUS[KEY_MAP[keyCode]] = true;
-      }
-    }
-  }, {
-    key: 'keyup',
-    value: function keyup(e) {
-      var keyCode = e.which || e.keyCode || 0;
-      if (KEY_MAP[keyCode]) {
-        e.preventDefault();
-        KEY_STATUS[KEY_MAP[keyCode]] = false;
-      }
     }
   }, {
     key: 'drawStatusBar',
@@ -526,12 +462,6 @@ var Field = function () {
           this.pcCanvas.ctx.lineWidth = 2;
           this.pcCanvas.ctx.stroke();
       }
-    }
-  }, {
-    key: 'drawPlayer',
-    value: function drawPlayer() {
-      this.player.move(KEY_STATUS);
-      this.player.draw();
     }
   }, {
     key: 'checkCollisions',
@@ -657,6 +587,21 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var KEY_MAP = {
+  74: 'left', // j
+  76: 'right', // l
+  68: 'right', // d
+  65: 'left', // a
+  39: 'right', // left arrow
+  37: 'left', // right arrow
+  32: 'fire' // space bar
+};
+
+var KEY_STATUS = {};
+for (var code in KEY_MAP) {
+  KEY_STATUS[KEY_MAP[code]] = false;
+}
+
 var Game = function () {
   function Game(fgCanvas, statsCanvas, pcCanvas, bgCanvas) {
     _classCallCheck(this, Game);
@@ -679,8 +624,10 @@ var Game = function () {
     this.bgCanvas = {
       ctx: bgCanvas.getContext("2d"),
       width: 800,
-      height: 500
+      height: 525
     };
+
+    this.drawLoadingScreen();
 
     this.AssetStore = new _utilities.AssetStore(this);
     this.badBulletPool = new _bullet2.default(1, this.fgCanvas, 'demonBullet');
@@ -689,13 +636,70 @@ var Game = function () {
 
     this.player = new _player2.default(this.pcCanvas, this.pcBulletPool);
 
-    this.field = new _field2.default(this.fgCanvas, this.statsCanvas, this.pcCanvas, this.bgCanvas, this.AssetStore, this.badBulletPool, this.pcBulletPool, this.BaddiePool, this.player);
+    this.playRound = this.playRound.bind(this);
+    this.startRound = this.startRound.bind(this);
+
+    document.addEventListener('keydown', this.keydown.bind(this));
+    document.addEventListener('keyup', this.keyup.bind(this));
+
+    this.field = new _field2.default(this.fgCanvas, this.statsCanvas, this.pcCanvas, this.AssetStore, this.badBulletPool, this.pcBulletPool, this.BaddiePool, this.player);
   }
 
   _createClass(Game, [{
+    key: 'drawLoadingScreen',
+    value: function drawLoadingScreen() {
+      this.bgCanvas.ctx.fillStyle = 'black';
+      this.bgCanvas.ctx.font = "16px sf_alien_encountersitalic";
+      this.bgCanvas.ctx.fillText("Loading...", 50, 50);
+    }
+  }, {
     key: 'start',
     value: function start() {
-      this.field.startRound();
+      this.bgCanvas.ctx.clearRect(0, 0, this.bgCanvas.width, this.bgCanvas.height);
+      this.startRound();
+    }
+  }, {
+    key: 'startRound',
+    value: function startRound() {
+      // this.bgCanvas.ctx.fillStyle = "rgba(255, 255, 255, 0.8";
+      // this.bgCanvas.ctx.fillRect(
+      //   0, 0, this.bgCanvas.width, this.bgCanvas.height
+      // ); MUTED COLOR SCHEME
+      this.AssetStore.backgroundMusic.play();
+      this.field.drawStatusBar();
+      this.playRound();
+    }
+  }, {
+    key: 'playRound',
+    value: function playRound() {
+      this.player.move(KEY_STATUS);
+      // let now = Date.now();
+      // let dt = (now - this.lastTime) / 1000.0;
+
+      // update(dt);
+      // this.drawStatusBar();
+      this.field.render();
+
+      // this.lastTime = now;
+      requestAnimationFrame(this.playRound);
+    }
+  }, {
+    key: 'keydown',
+    value: function keydown(e) {
+      var keyCode = e.which || e.keyCode || 0;
+      if (KEY_MAP[keyCode]) {
+        e.preventDefault();
+        KEY_STATUS[KEY_MAP[keyCode]] = true;
+      }
+    }
+  }, {
+    key: 'keyup',
+    value: function keyup(e) {
+      var keyCode = e.which || e.keyCode || 0;
+      if (KEY_MAP[keyCode]) {
+        e.preventDefault();
+        KEY_STATUS[KEY_MAP[keyCode]] = false;
+      }
     }
   }]);
 

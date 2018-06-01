@@ -9,18 +9,21 @@
 body {
   background-image: url("../imgs/vaporwave_background.png");
   background-position: center top;
+  display: flex;
+  flex-direction: column;
   /* background-size: contain; */
 }
 
-h1 {
-  color: white;
-  margin: auto;
+h6 {
+  font-size: 30px;
   display: block;
+  margin: auto;
+  color: white;
 }
 
 .game-area {
   position: relative;
-  height: 500px;
+  height: 525px;
   width: 800px;;
   display: block;
   margin: auto;
@@ -58,7 +61,7 @@ h1 {
   z-index: 5;
 }
 
-span {
+.game-area span {
   font-family: sf_alien_encountersitalic;
   font-size: 18px;
   position: absolute;
@@ -73,4 +76,14 @@ span {
 #life {
   display: block;
   left: 350;
+}
+
+.info-area {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-background {
+  width: 100px;
+  background-color: rgba(255,255,255,0.8);
 }
