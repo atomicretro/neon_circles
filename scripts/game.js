@@ -29,7 +29,7 @@ class Game {
     this.statsCanvas = {
       ctx: statsCanvas.getContext("2d"),
       width: 800,
-      height: 25
+      height: 50
     }
     this.pcCanvas = {
       ctx: pcCanvas.getContext("2d"),
@@ -52,12 +52,17 @@ class Game {
     );
 
     this.player = new Player(this.pcCanvas, this.pcBulletPool);
+    this.muted = false;
 
     this.playRound = this.playRound.bind(this);
     this.startRound = this.startRound.bind(this);
+    this.checkClick = this.checkClick.bind(this);
 
     document.addEventListener('keydown', this.keydown.bind(this));
     document.addEventListener('keyup', this.keyup.bind(this));
+    statsCanvas.addEventListener('click', (e) => {
+      this.checkClick(e, statsCanvas.getBoundingClientRect());
+    });
 
     this.field = new Field(
       this.fgCanvas,
@@ -73,7 +78,7 @@ class Game {
 
   drawLoadingScreen() {
     this.bgCanvas.ctx.fillStyle = 'black';
-    this.bgCanvas.ctx.font = "16px sf_alien_encountersitalic";
+    this.bgCanvas.ctx.font = "16px Courier";
     this.bgCanvas.ctx.fillText("Loading...", 50,50);
   }
 
@@ -124,6 +129,39 @@ class Game {
       e.preventDefault();
       KEY_STATUS[KEY_MAP[keyCode]] = false;
     }
+  }
+
+  checkClick(e, boundingRect) {
+    let clickPosX = e.clientX - boundingRect.left;
+    let clickPosY = e.clientY - boundingRect.top;
+
+    if(
+      (530 <= clickPosX && clickPosX <= 630) &&
+      (10 <= clickPosY && clickPosY <= 40)
+    ) {
+      this.clickMute();
+    } else if (
+      (650 <= clickPosX && clickPosX <= 750) &&
+      (10 <= clickPosY && clickPosY <= 40)
+    ) {
+      this.clickPause();
+    }
+    // debugger
+  }
+
+  clickMute() {
+    if(this.muted === true) {
+      this.muted = false;
+      this.AssetStore.backgroundMusic.volume = 0.25;
+    } else {
+      this.muted = true;
+      this.AssetStore.backgroundMusic.volume = 0;
+    }
+    this.field.updateMuteButton(this.muted);
+  }
+
+  clickPause() {
+    console.log('hi!');
   }
 }
 

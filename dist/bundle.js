@@ -405,46 +405,80 @@ var Field = function () {
       this.statsCanvas.ctx.fillStyle = "rgba(255, 255, 255, 0.8";
       this.statsCanvas.ctx.fillRect(0, 0, this.statsCanvas.width, this.statsCanvas.height);
 
+      // Player score
       this.statsCanvas.ctx.fillStyle = 'black';
-      this.statsCanvas.ctx.font = "16px Arial";
-      this.statsCanvas.ctx.fillText("0", 100, 19);
+      this.statsCanvas.ctx.font = "20px Courier";
+      this.statsCanvas.ctx.fillText("0", 50, 43);
 
       this.drawPlayerHearts();
 
+      // Charge container
       this.statsCanvas.ctx.strokeStyle = 'blue';
-      this.statsCanvas.ctx.strokeRect(634, 6, 98, 13);
+      this.statsCanvas.ctx.strokeRect(352, 30, 98, 13);
+
+      // Mute / unmute button
+      this.statsCanvas.ctx.strokeStyle = 'black';
+      this.statsCanvas.ctx.lineWidth = 2;
+      this.statsCanvas.ctx.strokeRect(530, 10, 100, 30);
+      this.statsCanvas.ctx.fillStyle = 'black';
+      this.statsCanvas.ctx.font = "20px sf_alien_encountersitalic";
+      this.statsCanvas.ctx.fillText("MUTE", 550, 32);
+
+      // Pause button
+      this.statsCanvas.ctx.strokeStyle = 'black';
+      this.statsCanvas.ctx.lineWidth = 2;
+      this.statsCanvas.ctx.strokeRect(650, 10, 100, 30);
+      this.statsCanvas.ctx.fillStyle = 'black';
+      this.statsCanvas.ctx.font = "20px sf_alien_encountersitalic";
+      this.statsCanvas.ctx.fillText("PAUSE", 665, 32);
     }
   }, {
     key: 'drawPlayerHearts',
     value: function drawPlayerHearts() {
-      this.statsCanvas.ctx.clearRect(399, 5, 200, 20);
+      this.statsCanvas.ctx.clearRect(200, 20, 140, 40);
       this.statsCanvas.ctx.fillStyle = "rgba(255, 255, 255, 0.8";
-      this.statsCanvas.ctx.fillRect(399, 5, 200, 20);
+      this.statsCanvas.ctx.fillRect(200, 20, 140, 40);
       for (var i = 0; i < this.player.life; i++) {
-        this.heart.draw(400 + i * 20, 6);
+        this.heart.draw(205 + i * 20, 30);
       }
     }
   }, {
     key: 'updatePlayerScore',
     value: function updatePlayerScore() {
       this.playerScore += 100;
-      this.statsCanvas.ctx.clearRect(99, 5, 200, 20);
+      this.statsCanvas.ctx.clearRect(45, 20, 150, 40);
       this.statsCanvas.ctx.fillStyle = "rgba(255, 255, 255, 0.8";
-      this.statsCanvas.ctx.fillRect(99, 5, 200, 20);
+      this.statsCanvas.ctx.fillRect(45, 20, 150, 40);
       this.statsCanvas.ctx.fillStyle = 'black';
-      this.statsCanvas.ctx.font = "16px Arial";
-      this.statsCanvas.ctx.fillText('' + this.playerScore, 100, 19);
+      this.statsCanvas.ctx.font = "20px Courier";
+      this.statsCanvas.ctx.fillText('' + this.playerScore, 50, 43);
     }
   }, {
     key: 'updatePlayerCharge',
     value: function updatePlayerCharge() {
       if (this.player.fireCharge === 0) {
-        this.statsCanvas.ctx.clearRect(635, 7, 96, 11);
+        this.statsCanvas.ctx.clearRect(353, 31, 96, 11);
         this.statsCanvas.ctx.fillStyle = "rgba(255, 255, 255, 0.8";
-        this.statsCanvas.ctx.fillRect(635, 7, 96, 11);
+        this.statsCanvas.ctx.fillRect(353, 31, 96, 11);
       } else if (this.player.fireCharge < 25) {
         this.statsCanvas.ctx.fillStyle = 'blue';
-        this.statsCanvas.ctx.fillRect(635, 7, this.player.fireCharge * 4, 11);
+        this.statsCanvas.ctx.fillRect(353, 31, this.player.fireCharge * 4, 11);
+      }
+    }
+  }, {
+    key: 'updateMuteButton',
+    value: function updateMuteButton(muted) {
+      this.statsCanvas.ctx.clearRect(532, 12, 96, 26);
+      this.statsCanvas.ctx.fillStyle = "rgba(255, 255, 255, 0.8";
+      this.statsCanvas.ctx.fillRect(532, 12, 96, 26);
+      if (muted === true) {
+        this.statsCanvas.ctx.fillStyle = 'black';
+        this.statsCanvas.ctx.font = "20px sf_alien_encountersitalic";
+        this.statsCanvas.ctx.fillText("UNMUTE", 537, 32);
+      } else {
+        this.statsCanvas.ctx.fillStyle = 'black';
+        this.statsCanvas.ctx.font = "20px sf_alien_encountersitalic";
+        this.statsCanvas.ctx.fillText("MUTE", 550, 32);
       }
     }
   }, {
@@ -608,6 +642,8 @@ for (var code in KEY_MAP) {
 
 var Game = function () {
   function Game(fgCanvas, statsCanvas, pcCanvas, bgCanvas) {
+    var _this = this;
+
     _classCallCheck(this, Game);
 
     this.fgCanvas = {
@@ -618,7 +654,7 @@ var Game = function () {
     this.statsCanvas = {
       ctx: statsCanvas.getContext("2d"),
       width: 800,
-      height: 25
+      height: 50
     };
     this.pcCanvas = {
       ctx: pcCanvas.getContext("2d"),
@@ -639,12 +675,17 @@ var Game = function () {
     this.BaddiePool = new _baddie2.default(1, this.fgCanvas.ctx, this.AssetStore, this.badBulletPool);
 
     this.player = new _player2.default(this.pcCanvas, this.pcBulletPool);
+    this.muted = false;
 
     this.playRound = this.playRound.bind(this);
     this.startRound = this.startRound.bind(this);
+    this.checkClick = this.checkClick.bind(this);
 
     document.addEventListener('keydown', this.keydown.bind(this));
     document.addEventListener('keyup', this.keyup.bind(this));
+    statsCanvas.addEventListener('click', function (e) {
+      _this.checkClick(e, statsCanvas.getBoundingClientRect());
+    });
 
     this.field = new _field2.default(this.fgCanvas, this.statsCanvas, this.pcCanvas, this.AssetStore, this.badBulletPool, this.pcBulletPool, this.BaddiePool, this.player);
   }
@@ -653,7 +694,7 @@ var Game = function () {
     key: 'drawLoadingScreen',
     value: function drawLoadingScreen() {
       this.bgCanvas.ctx.fillStyle = 'black';
-      this.bgCanvas.ctx.font = "16px sf_alien_encountersitalic";
+      this.bgCanvas.ctx.font = "16px Courier";
       this.bgCanvas.ctx.fillText("Loading...", 50, 50);
     }
   }, {
@@ -704,6 +745,36 @@ var Game = function () {
         e.preventDefault();
         KEY_STATUS[KEY_MAP[keyCode]] = false;
       }
+    }
+  }, {
+    key: 'checkClick',
+    value: function checkClick(e, boundingRect) {
+      var clickPosX = e.clientX - boundingRect.left;
+      var clickPosY = e.clientY - boundingRect.top;
+
+      if (530 <= clickPosX && clickPosX <= 630 && 10 <= clickPosY && clickPosY <= 40) {
+        this.clickMute();
+      } else if (650 <= clickPosX && clickPosX <= 750 && 10 <= clickPosY && clickPosY <= 40) {
+        this.clickPause();
+      }
+      // debugger
+    }
+  }, {
+    key: 'clickMute',
+    value: function clickMute() {
+      if (this.muted === true) {
+        this.muted = false;
+        this.AssetStore.backgroundMusic.volume = 0.25;
+      } else {
+        this.muted = true;
+        this.AssetStore.backgroundMusic.volume = 0;
+      }
+      this.field.updateMuteButton(this.muted);
+    }
+  }, {
+    key: 'clickPause',
+    value: function clickPause() {
+      console.log('hi!');
     }
   }]);
 

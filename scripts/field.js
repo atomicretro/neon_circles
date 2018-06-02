@@ -54,43 +54,76 @@ class Field {
       0, 0, this.statsCanvas.width, this.statsCanvas.height
     );
 
+    // Player score
     this.statsCanvas.ctx.fillStyle = 'black';
-    this.statsCanvas.ctx.font = "16px Arial";
-    this.statsCanvas.ctx.fillText("0", 100, 19);
+    this.statsCanvas.ctx.font = "20px Courier";
+    this.statsCanvas.ctx.fillText("0", 50, 43);
 
     this.drawPlayerHearts();
 
+    // Charge container
     this.statsCanvas.ctx.strokeStyle = 'blue';
-    this.statsCanvas.ctx.strokeRect(634, 6, 98, 13);
+    this.statsCanvas.ctx.strokeRect(352, 30, 98, 13);
+
+    // Mute / unmute button
+    this.statsCanvas.ctx.strokeStyle = 'black';
+    this.statsCanvas.ctx.lineWidth = 2;
+    this.statsCanvas.ctx.strokeRect(530, 10, 100, 30);
+    this.statsCanvas.ctx.fillStyle = 'black';
+    this.statsCanvas.ctx.font = "20px sf_alien_encountersitalic";
+    this.statsCanvas.ctx.fillText("MUTE", 550, 32);
+
+    // Pause button
+    this.statsCanvas.ctx.strokeStyle = 'black';
+    this.statsCanvas.ctx.lineWidth = 2;
+    this.statsCanvas.ctx.strokeRect(650, 10, 100, 30);
+    this.statsCanvas.ctx.fillStyle = 'black';
+    this.statsCanvas.ctx.font = "20px sf_alien_encountersitalic";
+    this.statsCanvas.ctx.fillText("PAUSE", 665, 32);
   }
 
   drawPlayerHearts() {
-    this.statsCanvas.ctx.clearRect(399, 5, 200, 20);
+    this.statsCanvas.ctx.clearRect(200, 20, 140, 40);
     this.statsCanvas.ctx.fillStyle = "rgba(255, 255, 255, 0.8";
-    this.statsCanvas.ctx.fillRect(399, 5, 200, 20);
+    this.statsCanvas.ctx.fillRect(200, 20, 140, 40);
     for(let i = 0; i < this.player.life; i++) {
-      this.heart.draw(400 + (i * 20), 6)
+      this.heart.draw(205 + (i * 20), 30)
     }
   }
 
   updatePlayerScore() {
     this.playerScore += 100;
-    this.statsCanvas.ctx.clearRect(99, 5, 200, 20);
+    this.statsCanvas.ctx.clearRect(45, 20, 150, 40);
     this.statsCanvas.ctx.fillStyle = "rgba(255, 255, 255, 0.8";
-    this.statsCanvas.ctx.fillRect(99, 5, 200, 20);
+    this.statsCanvas.ctx.fillRect(45, 20, 150, 40);
     this.statsCanvas.ctx.fillStyle = 'black';
-    this.statsCanvas.ctx.font = "16px Arial";
-    this.statsCanvas.ctx.fillText(`${this.playerScore}`, 100, 19);
+    this.statsCanvas.ctx.font = "20px Courier";
+    this.statsCanvas.ctx.fillText(`${this.playerScore}`, 50, 43);
   }
 
   updatePlayerCharge() {
     if(this.player.fireCharge === 0) {
-      this.statsCanvas.ctx.clearRect(635, 7, 96, 11);
+      this.statsCanvas.ctx.clearRect(353, 31, 96, 11);
       this.statsCanvas.ctx.fillStyle = "rgba(255, 255, 255, 0.8";
-      this.statsCanvas.ctx.fillRect(635, 7, 96, 11);
+      this.statsCanvas.ctx.fillRect(353, 31, 96, 11);
     } else if(this.player.fireCharge < 25) {
       this.statsCanvas.ctx.fillStyle = 'blue';
-      this.statsCanvas.ctx.fillRect(635, 7, this.player.fireCharge * 4, 11);
+      this.statsCanvas.ctx.fillRect(353, 31, this.player.fireCharge * 4, 11);
+    }
+  }
+
+  updateMuteButton(muted) {
+    this.statsCanvas.ctx.clearRect(532, 12, 96, 26);
+    this.statsCanvas.ctx.fillStyle = "rgba(255, 255, 255, 0.8";
+    this.statsCanvas.ctx.fillRect(532, 12, 96, 26);
+    if(muted === true) {
+      this.statsCanvas.ctx.fillStyle = 'black';
+      this.statsCanvas.ctx.font = "20px sf_alien_encountersitalic";
+      this.statsCanvas.ctx.fillText("UNMUTE", 537, 32);
+    } else {
+      this.statsCanvas.ctx.fillStyle = 'black';
+      this.statsCanvas.ctx.font = "20px sf_alien_encountersitalic";
+      this.statsCanvas.ctx.fillText("MUTE", 550, 32);
     }
   }
 

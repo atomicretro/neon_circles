@@ -77,19 +77,24 @@ h6 {
 
 .game-area span {
   font-family: sf_alien_encountersitalic;
-  font-size: 18px;
+  font-size: 22px;
   position: absolute;
   top: 508;
 }
 
 #score {
   display: block;
-  left: 30;
+  left: 50;
 }
 
 #life {
   display: block;
-  left: 350;
+  left: 205;
+}
+
+#charge {
+  display: block;
+  left: 352;
 }
 
 .info-area {
