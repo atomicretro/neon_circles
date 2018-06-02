@@ -626,13 +626,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var KEY_MAP = {
+  80: 'pause', // p
+  77: 'mute', // m
   74: 'left', // j
   76: 'right', // l
   68: 'right', // d
   65: 'left', // a
   39: 'right', // left arrow
   37: 'left', // right arrow
-  32: 'fire' // space bar
+  32: 'fire', // space bar
+  13: 'start' // enter
 };
 
 var KEY_STATUS = {};
@@ -675,6 +678,7 @@ var Game = function () {
     this.BaddiePool = new _baddie2.default(1, this.fgCanvas.ctx, this.AssetStore, this.badBulletPool);
 
     this.player = new _player2.default(this.pcCanvas, this.pcBulletPool);
+    this.movementDirection = 'sdf';
     this.muted = false;
 
     this.playRound = this.playRound.bind(this);
@@ -713,45 +717,97 @@ var Game = function () {
 
       this.optsCanvas.ctx.fillStyle = 'white';
 
+      this.optsCanvas.ctx.font = "36px sf_alien_encountersitalic";
+      this.optsCanvas.ctx.fillText("SHOOT ALL DEMONS", 207, 70);
+      this.optsCanvas.ctx.font = "22px sf_alien_encountersitalic";
+      this.optsCanvas.ctx.fillText("careful! demon power is strong!", 182, 105);
+
+      this.drawControls();
+
+      this.optsCanvas.ctx.strokeRect(240, 165, 320, 35);
       this.optsCanvas.ctx.font = "20px sf_alien_encountersitalic";
-      this.optsCanvas.ctx.fillText("a   j   left", 110, 270);
-      this.optsCanvas.ctx.font = "18px sf_alien_encountersitalic";
-      this.optsCanvas.ctx.fillText("move counterclockwise", 60, 300);
-
-      this.optsCanvas.ctx.beginPath();
-      this.optsCanvas.ctx.arc(180, 210, 30, Math.PI / 2, Math.PI, true);
-      this.optsCanvas.ctx.strokeStyle = "white";
-      this.optsCanvas.ctx.lineWidth = 2;
-      this.optsCanvas.ctx.stroke();
-      this.optsCanvas.ctx.beginPath();
-      this.optsCanvas.ctx.moveTo(150, 210);
-      this.optsCanvas.ctx.lineTo(160, 200);
-      this.optsCanvas.ctx.stroke();
-      this.optsCanvas.ctx.moveTo(150, 210);
-      this.optsCanvas.ctx.lineTo(145, 195);
-      this.optsCanvas.ctx.stroke();
-
-      this.optsCanvas.ctx.beginPath();
-      this.optsCanvas.ctx.arc(620, 210, 30, Math.PI / 2, 0, false);
-      this.optsCanvas.ctx.strokeStyle = "white";
-      this.optsCanvas.ctx.lineWidth = 2;
-      this.optsCanvas.ctx.stroke();
-      this.optsCanvas.ctx.beginPath();
-      this.optsCanvas.ctx.moveTo(650, 210);
-      this.optsCanvas.ctx.lineTo(640, 200);
-      this.optsCanvas.ctx.stroke();
-      this.optsCanvas.ctx.moveTo(650, 210);
-      this.optsCanvas.ctx.lineTo(655, 195);
-      this.optsCanvas.ctx.stroke();
-
-      this.optsCanvas.ctx.font = "20px sf_alien_encountersitalic";
-      this.optsCanvas.ctx.fillText("swap movement direction", 250, 180);
+      this.optsCanvas.ctx.fillText("swap movement direction", 250, 190);
 
       this.optsCanvas.ctx.font = "24px sf_alien_encountersitalic";
-      this.optsCanvas.ctx.fillText("space to fire when charge is full!", 150, 360);
+      this.optsCanvas.ctx.fillText("SPACE TO FIRE WHEN CHARGE IS FULL!", 148, 340);
+      this.optsCanvas.ctx.beginPath();
+      this.optsCanvas.ctx.moveTo(148, 347);
+      this.optsCanvas.ctx.lineTo(650, 347);
+      this.optsCanvas.ctx.stroke();
 
+      // this.optsCanvas.ctx.beginPath();
+      // this.optsCanvas.ctx.moveTo(200,0);
+      // this.optsCanvas.ctx.lineTo(200,500);
+      // this.optsCanvas.ctx.stroke();
+      // this.optsCanvas.ctx.beginPath();
+      // this.optsCanvas.ctx.moveTo(600,0);
+      // this.optsCanvas.ctx.lineTo(600,500);
+      // this.optsCanvas.ctx.stroke();
+
+      this.optsCanvas.ctx.strokeRect(300, 385, 205, 87);
       this.optsCanvas.ctx.font = "60px sf_alien_encountersitalic";
       this.optsCanvas.ctx.fillText("PLAY", 320, 450);
+    }
+  }, {
+    key: 'drawControls',
+    value: function drawControls() {
+      var cw = void 0; // clockwise
+      var ccw = void 0; // counterclockwise
+      if (this.movementDirection === 'standard') {
+        cw = {
+          descPos: 65,
+          circlePos: 160
+        };
+        ccw = {
+          descPos: 590,
+          circlePos: -640
+        };
+      } else {
+        ccw = {
+          descPos: 65,
+          circlePos: 160
+        };
+        cw = {
+          descPos: 590,
+          circlePos: -640
+        };
+      };
+
+      this.optsCanvas.ctx.font = "20px sf_alien_encountersitalic";
+      this.optsCanvas.ctx.fillText("a   j   left", 90, 250);
+      this.optsCanvas.ctx.font = "18px sf_alien_encountersitalic";
+      this.optsCanvas.ctx.fillText("counterclockwise", cw.descPos, 280);
+
+      this.optsCanvas.ctx.beginPath();
+      this.optsCanvas.ctx.arc(cw.circlePos, 190, 30, Math.PI / 2, Math.PI, true);
+      this.optsCanvas.ctx.strokeStyle = "white";
+      this.optsCanvas.ctx.lineWidth = 2;
+      this.optsCanvas.ctx.stroke();
+      this.optsCanvas.ctx.beginPath();
+      this.optsCanvas.ctx.moveTo(Math.abs(cw.circlePos - 30), 190);
+      this.optsCanvas.ctx.lineTo(Math.abs(cw.circlePos - 20), 180);
+      this.optsCanvas.ctx.stroke();
+      this.optsCanvas.ctx.moveTo(Math.abs(cw.circlePos - 30), 190);
+      this.optsCanvas.ctx.lineTo(Math.abs(cw.circlePos - 35), 175);
+      this.optsCanvas.ctx.stroke();
+
+      this.optsCanvas.ctx.font = "20px sf_alien_encountersitalic";
+      this.optsCanvas.ctx.fillText("d  l  right", 580, 250);
+      this.optsCanvas.ctx.font = "18px sf_alien_encountersitalic";
+      this.optsCanvas.ctx.fillText("clockwise", ccw.descPos, 280);
+
+      this.optsCanvas.ctx.beginPath();
+      this.optsCanvas.ctx.arc(Math.abs(ccw.circlePos), 190, 30, Math.PI / 2, 0, false);
+      this.optsCanvas.ctx.strokeStyle = "white";
+      this.optsCanvas.ctx.lineWidth = 2;
+      this.optsCanvas.ctx.stroke();
+      this.optsCanvas.ctx.beginPath();
+      this.optsCanvas.ctx.moveTo(Math.abs(ccw.circlePos - 30), 190);
+      this.optsCanvas.ctx.lineTo(Math.abs(ccw.circlePos - 20), 180);
+      this.optsCanvas.ctx.stroke();
+      this.optsCanvas.ctx.moveTo(Math.abs(ccw.circlePos - 30), 190);
+      this.optsCanvas.ctx.lineTo(Math.abs(ccw.circlePos - 35), 175);
+      this.optsCanvas.ctx.stroke();
     }
   }, {
     key: 'startRound',
