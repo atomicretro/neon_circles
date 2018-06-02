@@ -483,18 +483,22 @@ var Field = function () {
         x: this.player.hitboxCenter.x,
         y: this.player.hitboxCenter.y,
         radius: 12
-      };
 
-      for (var bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
-        var bullet = spawnedPCBullets[bullIdx];
-        if ((this.bulletHitsPC(this.player, hitbox, bullet.startPoint) || this.bulletHitsPC(this.player, hitbox, bullet.endPoint)) && this.player.invincibilityFrames < 50) {
-          this.player.isHit();
-        };
-      }
+        // for (let bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
+        //   let bullet = spawnedPCBullets[bullIdx];
+        //   if(
+        //     (this.bulletHitsPC(this.player, hitbox, bullet.startPoint) ||
+        //     this.bulletHitsPC(this.player, hitbox, bullet.endPoint)) &&
+        //     this.player.invincibilityFrames < 50
+        //   ) {
+        //     this.player.isHit();
+        //     this.drawPlayerHearts();
+        //   };
+        // }
 
-      for (var _bullIdx = 0; _bullIdx < spawnedBadBullets.length; _bullIdx++) {
-        var _bullet = spawnedBadBullets[_bullIdx];
-        if ((this.bulletHitsPC(this.player, hitbox, _bullet.startPoint) || this.bulletHitsPC(this.player, hitbox, _bullet.endPoint)) && this.player.invincibilityFrames > 50) {
+      };for (var bullIdx = 0; bullIdx < spawnedBadBullets.length; bullIdx++) {
+        var bullet = spawnedBadBullets[bullIdx];
+        if ((this.bulletHitsPC(this.player, hitbox, bullet.startPoint) || this.bulletHitsPC(this.player, hitbox, bullet.endPoint)) && this.player.invincibilityFrames > 50) {
           this.player.isHit();
           this.drawPlayerHearts();
         };

@@ -126,16 +126,17 @@ class Field {
       radius: 12
     }
 
-    for (let bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
-      let bullet = spawnedPCBullets[bullIdx];
-      if(
-        (this.bulletHitsPC(this.player, hitbox, bullet.startPoint) ||
-        this.bulletHitsPC(this.player, hitbox, bullet.endPoint)) &&
-        this.player.invincibilityFrames < 50
-      ) {
-        this.player.isHit();
-      };
-    }
+    // for (let bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
+    //   let bullet = spawnedPCBullets[bullIdx];
+    //   if(
+    //     (this.bulletHitsPC(this.player, hitbox, bullet.startPoint) ||
+    //     this.bulletHitsPC(this.player, hitbox, bullet.endPoint)) &&
+    //     this.player.invincibilityFrames < 50
+    //   ) {
+    //     this.player.isHit();
+    //     this.drawPlayerHearts();
+    //   };
+    // }
 
     for (let bullIdx = 0; bullIdx < spawnedBadBullets.length; bullIdx++) {
       let bullet = spawnedBadBullets[bullIdx];
