@@ -641,7 +641,7 @@ for (var code in KEY_MAP) {
 }
 
 var Game = function () {
-  function Game(fgCanvas, statsCanvas, pcCanvas, bgCanvas) {
+  function Game(fgCanvas, statsCanvas, pcCanvas, optsCanvas) {
     var _this = this;
 
     _classCallCheck(this, Game);
@@ -661,10 +661,10 @@ var Game = function () {
       width: 150,
       height: 150
     };
-    this.bgCanvas = {
-      ctx: bgCanvas.getContext("2d"),
+    this.optsCanvas = {
+      ctx: optsCanvas.getContext("2d"),
       width: 800,
-      height: 525
+      height: 500
     };
 
     this.drawLoadingScreen();
@@ -693,25 +693,69 @@ var Game = function () {
   _createClass(Game, [{
     key: 'drawLoadingScreen',
     value: function drawLoadingScreen() {
-      this.bgCanvas.ctx.fillStyle = 'black';
-      this.bgCanvas.ctx.font = "16px Courier";
-      this.bgCanvas.ctx.fillText("Loading...", 50, 50);
+      this.optsCanvas.ctx.fillStyle = 'black';
+      this.optsCanvas.ctx.font = "16px Courier";
+      this.optsCanvas.ctx.fillText("Loading...", 50, 50);
     }
   }, {
     key: 'start',
     value: function start() {
-      this.bgCanvas.ctx.clearRect(0, 0, this.bgCanvas.width, this.bgCanvas.height);
-      this.startRound();
+      this.AssetStore.backgroundMusic.play();
+      this.field.drawStatusBar();
+      this.drawStartScreen();
+    }
+  }, {
+    key: 'drawStartScreen',
+    value: function drawStartScreen() {
+      this.optsCanvas.ctx.clearRect(0, 0, this.optsCanvas.width, this.optsCanvas.height);
+      this.optsCanvas.ctx.fillStyle = "rgba(0, 0, 0, 0.8";
+      this.optsCanvas.ctx.fillRect(0, 0, 800, 500);
+
+      this.optsCanvas.ctx.fillStyle = 'white';
+
+      this.optsCanvas.ctx.font = "20px sf_alien_encountersitalic";
+      this.optsCanvas.ctx.fillText("a   j   left", 110, 270);
+      this.optsCanvas.ctx.font = "18px sf_alien_encountersitalic";
+      this.optsCanvas.ctx.fillText("move counterclockwise", 60, 300);
+
+      this.optsCanvas.ctx.beginPath();
+      this.optsCanvas.ctx.arc(180, 210, 30, Math.PI / 2, Math.PI, true);
+      this.optsCanvas.ctx.strokeStyle = "white";
+      this.optsCanvas.ctx.lineWidth = 2;
+      this.optsCanvas.ctx.stroke();
+      this.optsCanvas.ctx.beginPath();
+      this.optsCanvas.ctx.moveTo(150, 210);
+      this.optsCanvas.ctx.lineTo(160, 200);
+      this.optsCanvas.ctx.stroke();
+      this.optsCanvas.ctx.moveTo(150, 210);
+      this.optsCanvas.ctx.lineTo(145, 195);
+      this.optsCanvas.ctx.stroke();
+
+      this.optsCanvas.ctx.beginPath();
+      this.optsCanvas.ctx.arc(620, 210, 30, Math.PI / 2, 0, false);
+      this.optsCanvas.ctx.strokeStyle = "white";
+      this.optsCanvas.ctx.lineWidth = 2;
+      this.optsCanvas.ctx.stroke();
+      this.optsCanvas.ctx.beginPath();
+      this.optsCanvas.ctx.moveTo(650, 210);
+      this.optsCanvas.ctx.lineTo(640, 200);
+      this.optsCanvas.ctx.stroke();
+      this.optsCanvas.ctx.moveTo(650, 210);
+      this.optsCanvas.ctx.lineTo(655, 195);
+      this.optsCanvas.ctx.stroke();
+
+      this.optsCanvas.ctx.font = "20px sf_alien_encountersitalic";
+      this.optsCanvas.ctx.fillText("swap movement direction", 250, 180);
+
+      this.optsCanvas.ctx.font = "24px sf_alien_encountersitalic";
+      this.optsCanvas.ctx.fillText("space to fire when charge is full!", 150, 360);
+
+      this.optsCanvas.ctx.font = "60px sf_alien_encountersitalic";
+      this.optsCanvas.ctx.fillText("PLAY", 320, 450);
     }
   }, {
     key: 'startRound',
     value: function startRound() {
-      // this.bgCanvas.ctx.fillStyle = "rgba(255, 255, 255, 0.8";
-      // this.bgCanvas.ctx.fillRect(
-      //   0, 0, this.bgCanvas.width, this.bgCanvas.height
-      // ); MUTED COLOR SCHEME
-      this.AssetStore.backgroundMusic.play();
-      this.field.drawStatusBar();
       this.playRound();
     }
   }, {
@@ -757,7 +801,6 @@ var Game = function () {
       } else if (650 <= clickPosX && clickPosX <= 750 && 10 <= clickPosY && clickPosY <= 40) {
         this.clickPause();
       }
-      // debugger
     }
   }, {
     key: 'clickMute',
@@ -782,12 +825,12 @@ var Game = function () {
 }();
 
 document.addEventListener("DOMContentLoaded", function () {
-  var foregroundCanvas = document.getElementById("foregroundCanvas");
-  var playerCanvas = document.getElementById("playerCanvas");
-  var statsCanvas = document.getElementById("statsCanvas");
-  var backgroundCanvas = document.getElementById("backgroundCanvas");
+  var foregroundCanvas = document.getElementById("foreground-canvas");
+  var playerCanvas = document.getElementById("player-canvas");
+  var statsCanvas = document.getElementById("stats-canvas");
+  var optionsCanvas = document.getElementById("options-canvas");
 
-  var game = new Game(foregroundCanvas, statsCanvas, playerCanvas, backgroundCanvas);
+  var game = new Game(foregroundCanvas, statsCanvas, playerCanvas, optionsCanvas);
 });
 
 /***/ }),
