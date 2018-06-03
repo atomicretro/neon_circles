@@ -109,3 +109,7 @@ h6 {
 .info-background a:hover {
   color: purple;
 }
+
+.hidden {
+  visibility: hidden;
+}

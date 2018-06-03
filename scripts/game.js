@@ -38,6 +38,7 @@ class Game {
       height: 150
     }
     this.optsCanvas = {
+      canvas: optsCanvas,
       ctx: optsCanvas.getContext("2d"),
       width: 800,
       height: 500
@@ -105,6 +106,7 @@ class Game {
 
   startRound() {
     this.clearOptsContext();
+    this.optsCanvas.canvas.classList.add('hidden');
     this.gameStatus = 'playing';
     this.play();
   }
@@ -132,6 +134,7 @@ class Game {
   }
 
   drawStartScreen() {
+    this.optsCanvas.canvas.classList.remove('hidden');
     this.clearOptsContext();
     this.optsCanvas.ctx.fillStyle = "rgba(0, 0, 0, 0.8";
     this.optsCanvas.ctx.fillRect(0,0,800,500);
@@ -166,18 +169,14 @@ class Game {
   drawStartScreenMessage() {
     if(this.gameStatus === 'over') {
       this.optsCanvas.ctx.font = "36px sf_alien_encountersitalic";
-      this.optsCanvas.ctx.fillText(
-        "GAME OVER", 285, 70
-      );
+      this.optsCanvas.ctx.fillText("GAME OVER", 285, 70);
       this.optsCanvas.ctx.font = "22px sf_alien_encountersitalic";
       this.optsCanvas.ctx.fillText(
         "fight! fight! don't let demons win!", 176, 105
       );
     } else {
       this.optsCanvas.ctx.font = "36px sf_alien_encountersitalic";
-      this.optsCanvas.ctx.fillText(
-        "SHOOT ALL DEMONS", 207, 70
-      );
+      this.optsCanvas.ctx.fillText("SHOOT ALL DEMONS", 207, 70);
       this.optsCanvas.ctx.font = "22px sf_alien_encountersitalic";
       this.optsCanvas.ctx.fillText(
         "careful! demon power is strong!", 182, 105
@@ -212,56 +211,46 @@ class Game {
 
     this.optsCanvas.ctx.strokeRect(240,165,320,35);
     this.optsCanvas.ctx.font = "20px sf_alien_encountersitalic";
-    this.optsCanvas.ctx.fillText(
-      "swap movement direction", 250, 190
-    );
+    this.optsCanvas.ctx.fillText("swap movement direction", 250, 190);
 
     this.optsCanvas.ctx.font = "18px sf_alien_encountersitalic";
-    this.optsCanvas.ctx.fillText(
-      "counterclockwise", ccw.descPos, 250
-    );
+    this.optsCanvas.ctx.fillText("counterclockwise", ccw.descPos, 250);
     this.optsCanvas.ctx.font = "20px sf_alien_encountersitalic";
-    this.optsCanvas.ctx.fillText(
-      "a   j   left", 90, 280
-    );
+    this.optsCanvas.ctx.fillText("a   j   left", 90, 280);
 
     this.optsCanvas.ctx.beginPath();
     this.optsCanvas.ctx.arc(ccw.circlePos, 190, 30, Math.PI / 2, Math.PI, true);
     this.optsCanvas.ctx.lineWidth = 2;
     this.optsCanvas.ctx.stroke();
     this.optsCanvas.ctx.beginPath();
-    this.optsCanvas.ctx.moveTo(Math.abs(ccw.circlePos - 30),190);
-    this.optsCanvas.ctx.lineTo(Math.abs(ccw.circlePos - 20),180);
+    this.optsCanvas.ctx.moveTo(Math.abs(ccw.circlePos - 30), 190);
+    this.optsCanvas.ctx.lineTo(Math.abs(ccw.circlePos - 20), 180);
     this.optsCanvas.ctx.stroke();
-    this.optsCanvas.ctx.moveTo(Math.abs(ccw.circlePos - 30),190);
-    this.optsCanvas.ctx.lineTo(Math.abs(ccw.circlePos - 35),175);
+    this.optsCanvas.ctx.moveTo(Math.abs(ccw.circlePos - 30), 190);
+    this.optsCanvas.ctx.lineTo(Math.abs(ccw.circlePos - 35), 175);
     this.optsCanvas.ctx.stroke();
 
     this.optsCanvas.ctx.font = "18px sf_alien_encountersitalic";
-    this.optsCanvas.ctx.fillText(
-      "clockwise", cw.descPos, 250
-    );
+    this.optsCanvas.ctx.fillText("clockwise", cw.descPos, 250);
     this.optsCanvas.ctx.font = "20px sf_alien_encountersitalic";
-    this.optsCanvas.ctx.fillText(
-      "d   l   right", 566, 280
-    );
+    this.optsCanvas.ctx.fillText("d   l   right", 566, 280);
 
     this.optsCanvas.ctx.beginPath();
-    this.optsCanvas.ctx.arc(Math.abs(cw.circlePos), 190, 30, Math.PI / 2, 0, false);
+    this.optsCanvas.ctx.arc(Math.abs(cw.circlePos),190,30,Math.PI/2,0,false);
     this.optsCanvas.ctx.lineWidth = 2;
     this.optsCanvas.ctx.stroke();
     this.optsCanvas.ctx.beginPath();
-    this.optsCanvas.ctx.moveTo(Math.abs(cw.circlePos - 30),190);
-    this.optsCanvas.ctx.lineTo(Math.abs(cw.circlePos - 20),180);
+    this.optsCanvas.ctx.moveTo(Math.abs(cw.circlePos - 30), 190);
+    this.optsCanvas.ctx.lineTo(Math.abs(cw.circlePos - 20), 180);
     this.optsCanvas.ctx.stroke();
-    this.optsCanvas.ctx.moveTo(Math.abs(cw.circlePos - 30),190);
-    this.optsCanvas.ctx.lineTo(Math.abs(cw.circlePos - 35),175);
+    this.optsCanvas.ctx.moveTo(Math.abs(cw.circlePos - 30), 190);
+    this.optsCanvas.ctx.lineTo(Math.abs(cw.circlePos - 35), 175);
     this.optsCanvas.ctx.stroke();
 
     this.optsCanvas.ctx.font = "24px sf_alien_encountersitalic";
     this.optsCanvas.ctx.fillText(
       "SPACE TO FIRE WHEN CHARGE IS FULL!", 148, 340
-    );
+);
     this.optsCanvas.ctx.beginPath();
     this.optsCanvas.ctx.moveTo(148,347);
     this.optsCanvas.ctx.lineTo(650,347);
@@ -342,6 +331,7 @@ class Game {
     if(this.paused && this.gameStatus === 'playing') {
       this.paused = false;
       this.clearOptsContext();
+      this.optsCanvas.canvas.classList.add('hidden');
       this.play();
     } else if (!this.paused && this.gameStatus === 'playing') {
       this.paused = true;

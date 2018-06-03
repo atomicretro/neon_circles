@@ -685,6 +685,7 @@ var Game = function () {
       height: 150
     };
     this.optsCanvas = {
+      canvas: optsCanvas,
       ctx: optsCanvas.getContext("2d"),
       width: 800,
       height: 500
@@ -747,6 +748,7 @@ var Game = function () {
     key: 'startRound',
     value: function startRound() {
       this.clearOptsContext();
+      this.optsCanvas.canvas.classList.add('hidden');
       this.gameStatus = 'playing';
       this.play();
     }
@@ -777,6 +779,7 @@ var Game = function () {
   }, {
     key: 'drawStartScreen',
     value: function drawStartScreen() {
+      this.optsCanvas.canvas.classList.remove('hidden');
       this.clearOptsContext();
       this.optsCanvas.ctx.fillStyle = "rgba(0, 0, 0, 0.8";
       this.optsCanvas.ctx.fillRect(0, 0, 800, 500);
@@ -963,6 +966,7 @@ var Game = function () {
       if (this.paused && this.gameStatus === 'playing') {
         this.paused = false;
         this.clearOptsContext();
+        this.optsCanvas.canvas.classList.add('hidden');
         this.play();
       } else if (!this.paused && this.gameStatus === 'playing') {
         this.paused = true;
