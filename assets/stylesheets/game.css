@@ -15,7 +15,8 @@ body {
 }
 
 h1 {
-  font-size: 36px;
+  font-weight: normal;
+  font-size: 48px;
   font-family: sf_alien_encountersitalic;
   padding: 0;
   margin-left: auto;
