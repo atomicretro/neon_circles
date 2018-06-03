@@ -75,28 +75,6 @@ h6 {
   z-index: 5;
 }
 
-.game-area span {
-  font-family: sf_alien_encountersitalic;
-  font-size: 22px;
-  position: absolute;
-  top: 508;
-}
-
-#score {
-  display: block;
-  left: 50;
-}
-
-#life {
-  display: block;
-  left: 205;
-}
-
-#charge {
-  display: block;
-  left: 352;
-}
-
 .info-area {
   display: flex;
   flex-direction: column;

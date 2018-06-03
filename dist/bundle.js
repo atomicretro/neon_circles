@@ -402,30 +402,37 @@ var Field = function () {
       this.statsCanvas.ctx.fillStyle = "rgba(255, 255, 255, 0.8";
       this.statsCanvas.ctx.fillRect(0, 0, this.statsCanvas.width, this.statsCanvas.height);
 
-      // Player score
-      this.statsCanvas.ctx.fillStyle = 'black';
-      this.statsCanvas.ctx.font = "20px Courier";
-      this.statsCanvas.ctx.fillText("0", 50, 43);
-
-      this.drawPlayerHearts();
-
       // Charge container
       this.statsCanvas.ctx.strokeStyle = '#6816e0';
       this.statsCanvas.ctx.strokeRect(352, 30, 98, 13);
 
-      // Mute / unmute button
+      // Player life
+      this.drawPlayerHearts();
+
+      this.statsCanvas.ctx.fillStyle = 'black';
       this.statsCanvas.ctx.strokeStyle = 'black';
+
+      // Titles
+      this.statsCanvas.ctx.font = "22px sf_alien_encountersitalic";
+      this.statsCanvas.ctx.fillText("SCORE", 50, 21);
+      this.statsCanvas.ctx.font = "22px sf_alien_encountersitalic";
+      this.statsCanvas.ctx.fillText("LIFE", 205, 21);
+      this.statsCanvas.ctx.font = "22px sf_alien_encountersitalic";
+      this.statsCanvas.ctx.fillText("CHARGE", 352, 21);
+
+      // Player score
+      this.statsCanvas.ctx.font = "20px Courier";
+      this.statsCanvas.ctx.fillText("0", 50, 43);
+
+      // Mute / unmute button
       this.statsCanvas.ctx.lineWidth = 2;
       this.statsCanvas.ctx.strokeRect(530, 10, 100, 30);
-      this.statsCanvas.ctx.fillStyle = 'black';
       this.statsCanvas.ctx.font = "20px sf_alien_encountersitalic";
       this.statsCanvas.ctx.fillText("MUTE", 550, 32);
 
       // Pause button
-      this.statsCanvas.ctx.strokeStyle = 'black';
       this.statsCanvas.ctx.lineWidth = 2;
       this.statsCanvas.ctx.strokeRect(650, 10, 100, 30);
-      this.statsCanvas.ctx.fillStyle = 'black';
       this.statsCanvas.ctx.font = "20px sf_alien_encountersitalic";
       this.statsCanvas.ctx.fillText("PAUSE", 665, 32);
     }
