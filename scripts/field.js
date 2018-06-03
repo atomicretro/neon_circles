@@ -66,7 +66,7 @@ class Field {
     this.statsCanvas.ctx.font = "22px sf_alien_encountersitalic";
     this.statsCanvas.ctx.fillText("LIFE", 204, 21);
     this.statsCanvas.ctx.font = "22px sf_alien_encountersitalic";
-    this.statsCanvas.ctx.fillText("CHARGE", 351, 21);
+    this.statsCanvas.ctx.fillText("POWER", 351, 21);
 
     // Player score
     this.statsCanvas.ctx.font = "20px Courier";

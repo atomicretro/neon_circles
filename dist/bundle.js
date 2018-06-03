@@ -418,7 +418,7 @@ var Field = function () {
       this.statsCanvas.ctx.font = "22px sf_alien_encountersitalic";
       this.statsCanvas.ctx.fillText("LIFE", 204, 21);
       this.statsCanvas.ctx.font = "22px sf_alien_encountersitalic";
-      this.statsCanvas.ctx.fillText("CHARGE", 351, 21);
+      this.statsCanvas.ctx.fillText("POWER", 351, 21);
 
       // Player score
       this.statsCanvas.ctx.font = "20px Courier";
@@ -891,7 +891,7 @@ var Game = function () {
       this.optsCanvas.ctx.stroke();
 
       this.optsCanvas.ctx.font = "24px sf_alien_encountersitalic";
-      this.optsCanvas.ctx.fillText("SPACE TO FIRE WHEN CHARGE IS FULL!", 148, 340);
+      this.optsCanvas.ctx.fillText("SPACE TO FIRE WHEN POWER IS FULL!", 148, 340);
       this.optsCanvas.ctx.beginPath();
       this.optsCanvas.ctx.moveTo(148, 347);
       this.optsCanvas.ctx.lineTo(650, 347);

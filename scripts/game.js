@@ -249,7 +249,7 @@ class Game {
 
     this.optsCanvas.ctx.font = "24px sf_alien_encountersitalic";
     this.optsCanvas.ctx.fillText(
-      "SPACE TO FIRE WHEN CHARGE IS FULL!", 148, 340
+      "SPACE TO FIRE WHEN POWER IS FULL!", 148, 340
 );
     this.optsCanvas.ctx.beginPath();
     this.optsCanvas.ctx.moveTo(148,347);
