@@ -43,7 +43,7 @@ class Baddie {
       this.sprite.draw(this.drawPoint.x, this.drawPoint.y);
 
       this.chanceToFire = Math.floor(Math.random() * 101)
-      if (this.chanceToFire/100 < this.fireThreshold) {
+      if (this.chanceToFire/100 < 100) {
         this.fire(BulletPool);
       }
   }

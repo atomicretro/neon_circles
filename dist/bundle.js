@@ -147,7 +147,7 @@ var Baddie = function () {
       this.sprite.draw(this.drawPoint.x, this.drawPoint.y);
 
       this.chanceToFire = Math.floor(Math.random() * 101);
-      if (this.chanceToFire / 100 < this.fireThreshold) {
+      if (this.chanceToFire / 100 < 100) {
         this.fire(BulletPool);
       }
     }
@@ -383,9 +383,6 @@ var Field = function () {
   }
 
   _createClass(Field, [{
-    key: 'startScreen',
-    value: function startScreen() {}
-  }, {
     key: 'render',
     value: function render() {
       this.undrawFGContext();
@@ -685,23 +682,10 @@ var Game = function () {
       height: 500
     };
 
-    this.drawLoadingScreen();
-
     this.AssetStore = new _utilities.AssetStore(this);
-    this.badBulletPool = new _bullet2.default(1, this.fgCanvas, 'demonBullet');
-    this.pcBulletPool = new _bullet2.default(8, this.fgCanvas, 'player');
-    this.BaddiePool = new _baddie2.default(1, this.fgCanvas.ctx, this.AssetStore, this.badBulletPool);
 
-    this.player = new _player2.default(this.pcCanvas, this.pcBulletPool);
-    this.movementDirection = 'standard';
-    this.muted = false;
-    this.paused = false;
-    this.gameStatus = 'unbegun';
-
-    this.play = this.play.bind(this);
-    this.startRound = this.startRound.bind(this);
-    this.optsCanvasCheckClick = this.optsCanvasCheckClick.bind(this);
-    this.statsCanvasCheckClick = this.statsCanvasCheckClick.bind(this);
+    this.drawLoadingScreen();
+    this.setupNewGame();
 
     document.addEventListener('keydown', this.keydown.bind(this));
     document.addEventListener('keyup', this.keyup.bind(this));
@@ -712,10 +696,32 @@ var Game = function () {
       _this.statsCanvasCheckClick(e, statsCanvas.getBoundingClientRect());
     });
 
-    this.field = new _field2.default(this.fgCanvas, this.statsCanvas, this.pcCanvas, this.AssetStore, this.badBulletPool, this.pcBulletPool, this.BaddiePool, this.player);
+    this.setupNewField();
   }
 
   _createClass(Game, [{
+    key: 'setupNewGame',
+    value: function setupNewGame() {
+      this.badBulletPool = new _bullet2.default(1, this.fgCanvas, 'demonBullet');
+      this.pcBulletPool = new _bullet2.default(8, this.fgCanvas, 'player');
+      this.BaddiePool = new _baddie2.default(1, this.fgCanvas.ctx, this.AssetStore, this.badBulletPool);
+      this.player = new _player2.default(this.pcCanvas, this.pcBulletPool);
+      this.movementDirection = 'standard';
+      this.muted = false;
+      this.paused = false;
+      this.gameStatus = 'unbegun';
+
+      this.play = this.play.bind(this);
+      this.startRound = this.startRound.bind(this);
+      this.optsCanvasCheckClick = this.optsCanvasCheckClick.bind(this);
+      this.statsCanvasCheckClick = this.statsCanvasCheckClick.bind(this);
+    }
+  }, {
+    key: 'setupNewField',
+    value: function setupNewField() {
+      this.field = new _field2.default(this.fgCanvas, this.statsCanvas, this.pcCanvas, this.AssetStore, this.badBulletPool, this.pcBulletPool, this.BaddiePool, this.player);
+    }
+  }, {
     key: 'drawLoadingScreen',
     value: function drawLoadingScreen() {
       this.optsCanvas.ctx.fillStyle = 'black';
@@ -725,7 +731,7 @@ var Game = function () {
   }, {
     key: 'startGame',
     value: function startGame() {
-      if (this.gameStatus === 'unbegun') this.AssetStore.backgroundMusic.play();
+      this.AssetStore.backgroundMusic.play();
       this.field.drawStatusBar();
       this.drawStartScreen();
     }
@@ -739,6 +745,7 @@ var Game = function () {
   }, {
     key: 'play',
     value: function play() {
+      this.checkGameOver();
       this.player.move(KEY_STATUS);
       // let now = Date.now();
       // let dt = (now - this.lastTime) / 1000.0;
@@ -749,6 +756,15 @@ var Game = function () {
 
       // this.lastTime = now;
       if (!this.paused) requestAnimationFrame(this.play);
+    }
+  }, {
+    key: 'checkGameOver',
+    value: function checkGameOver() {
+      if (this.player.life <= 0) {
+        this.paused = true;
+        this.gameStatus = 'over';
+        this.drawStartScreen();
+      }
     }
   }, {
     key: 'drawStartScreen',
@@ -891,7 +907,6 @@ var Game = function () {
   }, {
     key: 'optsCanvasCheckClick',
     value: function optsCanvasCheckClick(e, boundingRect) {
-      // this.optsCanvas.ctx.strokeRect(300,385,205,472);
       var clickPosX = e.clientX - boundingRect.left;
       var clickPosY = e.clientY - boundingRect.top;
 
@@ -904,8 +919,11 @@ var Game = function () {
           this.clickPause();
         } else if (this.gameStatus === 'over') {
           this.field.clearAllContexts();
-          this.field = new _field2.default(this.fgCanvas, this.statsCanvas, this.pcCanvas, this.AssetStore, this.badBulletPool, this.pcBulletPool, this.BaddiePool, this.player);
-          this.startGame();
+          this.setupNewGame();
+          this.setupNewField();
+          this.field.drawStatusBar();
+          console.log(this.paused);
+          this.startRound();
         }
       }
     }

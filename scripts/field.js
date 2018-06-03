@@ -31,10 +31,6 @@ class Field {
     );
   }
 
-  startScreen() {
-
-  }
-
   render()  {
     this.undrawFGContext();
     this.clearPCContext();

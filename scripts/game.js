@@ -43,25 +43,10 @@ class Game {
       height: 500
     }
 
-    this.drawLoadingScreen();
-
     this.AssetStore = new AssetStore(this);
-    this.badBulletPool = new BulletPool(1, this.fgCanvas, 'demonBullet');
-    this.pcBulletPool = new BulletPool(8, this.fgCanvas, 'player');
-    this.BaddiePool = new BaddiePool(
-      1, this.fgCanvas.ctx, this.AssetStore, this.badBulletPool
-    );
 
-    this.player = new Player(this.pcCanvas, this.pcBulletPool);
-    this.movementDirection = 'standard';
-    this.muted = false;
-    this.paused = false;
-    this.gameStatus = 'unbegun';
-
-    this.play = this.play.bind(this);
-    this.startRound = this.startRound.bind(this);
-    this.optsCanvasCheckClick = this.optsCanvasCheckClick.bind(this);
-    this.statsCanvasCheckClick = this.statsCanvasCheckClick.bind(this);
+    this.drawLoadingScreen();
+    this.setupNewGame();
 
     document.addEventListener('keydown', this.keydown.bind(this));
     document.addEventListener('keyup', this.keyup.bind(this));
@@ -72,6 +57,28 @@ class Game {
       this.statsCanvasCheckClick(e, statsCanvas.getBoundingClientRect());
     });
 
+    this.setupNewField();
+  }
+
+  setupNewGame() {
+    this.badBulletPool = new BulletPool(1, this.fgCanvas, 'demonBullet');
+    this.pcBulletPool = new BulletPool(8, this.fgCanvas, 'player');
+    this.BaddiePool = new BaddiePool(
+      1, this.fgCanvas.ctx, this.AssetStore, this.badBulletPool
+    );
+    this.player = new Player(this.pcCanvas, this.pcBulletPool);
+    this.movementDirection = 'standard';
+    this.muted = false;
+    this.paused = false;
+    this.gameStatus = 'unbegun';
+
+    this.play = this.play.bind(this);
+    this.startRound = this.startRound.bind(this);
+    this.optsCanvasCheckClick = this.optsCanvasCheckClick.bind(this);
+    this.statsCanvasCheckClick = this.statsCanvasCheckClick.bind(this);
+  }
+
+  setupNewField() {
     this.field = new Field(
       this.fgCanvas,
       this.statsCanvas,
@@ -91,7 +98,7 @@ class Game {
   }
 
   startGame() {
-    if(this.gameStatus === 'unbegun') this.AssetStore.backgroundMusic.play();
+    this.AssetStore.backgroundMusic.play();
     this.field.drawStatusBar();
     this.drawStartScreen();
   }
@@ -103,6 +110,7 @@ class Game {
   }
 
   play() {
+    this.checkGameOver();
     this.player.move(KEY_STATUS);
     // let now = Date.now();
     // let dt = (now - this.lastTime) / 1000.0;
@@ -113,6 +121,14 @@ class Game {
 
     // this.lastTime = now;
     if(!this.paused) requestAnimationFrame(this.play);
+  }
+
+  checkGameOver() {
+    if(this.player.life <= 0) {
+      this.paused = true;
+      this.gameStatus = 'over';
+      this.drawStartScreen();
+    }
   }
 
   drawStartScreen() {
@@ -271,7 +287,6 @@ class Game {
   }
 
   optsCanvasCheckClick(e, boundingRect) {
-    // this.optsCanvas.ctx.strokeRect(300,385,205,472);
     let clickPosX = e.clientX - boundingRect.left;
     let clickPosY = e.clientY - boundingRect.top;
 
@@ -290,17 +305,11 @@ class Game {
         this.clickPause();
       } else if(this.gameStatus === 'over') {
         this.field.clearAllContexts();
-        this.field = new Field(
-          this.fgCanvas,
-          this.statsCanvas,
-          this.pcCanvas,
-          this.AssetStore,
-          this.badBulletPool,
-          this.pcBulletPool,
-          this.BaddiePool,
-          this.player
-        );
-        this.startGame();
+        this.setupNewGame();
+        this.setupNewField();
+        this.field.drawStatusBar();
+        console.log(this.paused);
+        this.startRound();
       }
     }
   }
