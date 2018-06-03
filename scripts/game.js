@@ -137,7 +137,7 @@ class Game {
 
   play() {
     this.checkGameOver();
-    // this.checkCollisions();
+    this.checkCollisions();
     this.player.move(KEY_STATUS);
 
     let now = Date.now();
@@ -186,8 +186,7 @@ class Game {
   }
 
   spawnLevelTwoDemons(numDemons, max) {
-    if(numDemons < max && this.lastTime - this.lvl2SpawnBuffer > 20000) {
-      debugger
+    if(numDemons < max && this.lastTime - this.lvl2SpawnBuffer > 10) {
       this.lvl2DemonPool.get('faceDemon');
       this.lvl2SpawnBuffer = Date.now();
     }
@@ -247,12 +246,13 @@ class Game {
   }
 
   checkDemonCollision(spawnedPCBullets) {
-    let combinedDemonPools = Object.assign(
-      {}, this.lvl1DemonPool, this.lvl2DemonPool
-    );
-    let spawnedDemons = this.combinedDemonPools.pool.filter(
+    let spawnedlvl1Demons = this.lvl1DemonPool.pool.filter(
+      (demon) => demon.spawned );
+    let spawnedlvl2Demons = this.lvl2DemonPool.pool.filter(
       (demon) => demon.spawned );
 
+    let spawnedDemons = spawnedlvl1Demons.concat(spawnedlvl2Demons);
+debugger
     for (let demonIdx = 0; demonIdx < spawnedDemons.length; demonIdx++) {
       let demon = spawnedDemons[demonIdx];
       for (let bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
@@ -264,7 +264,7 @@ class Game {
         ) {
           this.field.updatePlayerScore();
           this.calculateDemonKillTime(demon);
-          demon.isHit = true;
+          demon.isHit();
         };
       }
     }

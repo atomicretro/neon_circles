@@ -59,7 +59,7 @@ class Demon {
   }
 
   resetable() {
-    if(this.isHit) return true;
+    if(this.life <= 0) return true;
     return false;
   }
 
@@ -93,6 +93,10 @@ class Demon {
     BulletPool.get(bulletData);
   }
 
+  isHit() {
+    this.life -= 1;
+  }
+
   setDefaultValues() {
     let thetaMultiplier = Math.random() < 0.5 ? -1 : 1;
     let speedMultiplier = Math.random() < 0.5 ? -1 : 1;
@@ -101,6 +105,7 @@ class Demon {
       this.theta = (Math.PI / 2) * thetaMultiplier;
       this.speed = (getRandNum(4, 7) / 1000) * speedMultiplier;
       this.radius = getRandNum(265, 380); // The 'track' the demon moves along
+      this.life = 1;
       this.fireThreshold = 0.01;
     } else if(this.type === 'faceDemon') {
       this.theta = (Math.PI / 2) * thetaMultiplier;
@@ -108,11 +113,11 @@ class Demon {
       this.radius = 400;
       this.endRadius = getRandNum(125, 225);
       this.endSpeed = this.endRadius / 9000;
+      this.life = 2;
       this.fireThreshold = 0.02;
     } else if(this.type === 'bossDemon') {
       this.speed = 0.4;
     }
-    this.isHit = false;
     this.chanceToFire = 0;
     this.spawned = false;
     this.drawPoint = {x: 400, y: 250};

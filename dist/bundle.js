@@ -301,7 +301,7 @@ var Demon = function () {
   }, {
     key: 'resetable',
     value: function resetable() {
-      if (this.isHit) return true;
+      if (this.life <= 0) return true;
       return false;
     }
   }, {
@@ -333,6 +333,11 @@ var Demon = function () {
       BulletPool.get(bulletData);
     }
   }, {
+    key: 'isHit',
+    value: function isHit() {
+      this.life -= 1;
+    }
+  }, {
     key: 'setDefaultValues',
     value: function setDefaultValues() {
       var thetaMultiplier = Math.random() < 0.5 ? -1 : 1;
@@ -342,6 +347,7 @@ var Demon = function () {
         this.theta = Math.PI / 2 * thetaMultiplier;
         this.speed = getRandNum(4, 7) / 1000 * speedMultiplier;
         this.radius = getRandNum(265, 380); // The 'track' the demon moves along
+        this.life = 1;
         this.fireThreshold = 0.01;
       } else if (this.type === 'faceDemon') {
         this.theta = Math.PI / 2 * thetaMultiplier;
@@ -349,11 +355,11 @@ var Demon = function () {
         this.radius = 400;
         this.endRadius = getRandNum(125, 225);
         this.endSpeed = this.endRadius / 9000;
+        this.life = 2;
         this.fireThreshold = 0.02;
       } else if (this.type === 'bossDemon') {
         this.speed = 0.4;
       }
-      this.isHit = false;
       this.chanceToFire = 0;
       this.spawned = false;
       this.drawPoint = { x: 400, y: 250 };
@@ -735,7 +741,7 @@ var Game = function () {
     key: 'play',
     value: function play() {
       this.checkGameOver();
-      // this.checkCollisions();
+      this.checkCollisions();
       this.player.move(KEY_STATUS);
 
       var now = Date.now();
@@ -786,8 +792,7 @@ var Game = function () {
   }, {
     key: 'spawnLevelTwoDemons',
     value: function spawnLevelTwoDemons(numDemons, max) {
-      if (numDemons < max && this.lastTime - this.lvl2SpawnBuffer > 20000) {
-        debugger;
+      if (numDemons < max && this.lastTime - this.lvl2SpawnBuffer > 10) {
         this.lvl2DemonPool.get('faceDemon');
         this.lvl2SpawnBuffer = Date.now();
       }
@@ -842,11 +847,15 @@ var Game = function () {
   }, {
     key: 'checkDemonCollision',
     value: function checkDemonCollision(spawnedPCBullets) {
-      var combinedDemonPools = Object.assign({}, this.lvl1DemonPool, this.lvl2DemonPool);
-      var spawnedDemons = this.combinedDemonPools.pool.filter(function (demon) {
+      var spawnedlvl1Demons = this.lvl1DemonPool.pool.filter(function (demon) {
+        return demon.spawned;
+      });
+      var spawnedlvl2Demons = this.lvl2DemonPool.pool.filter(function (demon) {
         return demon.spawned;
       });
 
+      var spawnedDemons = spawnedlvl1Demons.concat(spawnedlvl2Demons);
+      debugger;
       for (var demonIdx = 0; demonIdx < spawnedDemons.length; demonIdx++) {
         var demon = spawnedDemons[demonIdx];
         for (var bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
@@ -855,7 +864,7 @@ var Game = function () {
           if (this.pcBulletHitsDemon(demon, drawPoint, bullet.startPoint) || this.pcBulletHitsDemon(demon, drawPoint, bullet.endPoint)) {
             this.field.updatePlayerScore();
             this.calculateDemonKillTime(demon);
-            demon.isHit = true;
+            demon.isHit();
           };
         }
       }
@@ -1305,7 +1314,6 @@ var ObjectPool = exports.ObjectPool = function () {
   _createClass(ObjectPool, [{
     key: 'get',
     value: function get(objectData) {
-      debugger;
       if (!this.pool[this.size - 1].spawned) {
         this.pool[this.size - 1].spawn(objectData);
         this.pool.unshift(this.pool.pop());
