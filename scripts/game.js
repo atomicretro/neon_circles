@@ -341,7 +341,7 @@ class Game {
   }
 
   clickPause() {
-    if(this.paused) {
+    if(this.paused && this.gameStatus !== 'over') {
       this.paused = false;
       this.clearOptsContext();
       this.play();
