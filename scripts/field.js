@@ -36,7 +36,7 @@ class Field {
   }
 
   render()  {
-    this.clearFGContext();
+    this.undrawFGContext();
     this.clearPCContext();
     this.updatePlayerCharge()
     this.drawPlayerRails('circle');
@@ -222,13 +222,29 @@ class Field {
     )
   }
 
-  clearFGContext() {
+  undrawFGContext() {
     this.fgCanvas.ctx.fillStyle = "rgba(0, 0, 0, 0.1";
     this.fgCanvas.ctx.fillRect(0,0,800,500);
   }
 
+  clearFGContext() {
+    this.fgCanvas.ctx.clearRect(0,0,this.fgCanvas.width,this.fgCanvas.height);
+  }
+
+  clearStatsContext() {
+    this.statsCanvas.ctx.clearRect(
+      0,0,this.statsCanvas.width,this.statsCanvas.height
+    );
+  }
+
   clearPCContext() {
-    this.pcCanvas.ctx.clearRect(0, 0, this.pcCanvas.width, this.pcCanvas.height);
+    this.pcCanvas.ctx.clearRect(0,0,this.pcCanvas.width,this.pcCanvas.height);
+  }
+
+  clearAllContexts() {
+    this.clearFGContext();
+    this.clearStatsContext();
+    this.clearPCContext();
   }
 }
 

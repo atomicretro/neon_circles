@@ -55,6 +55,8 @@ class Game {
     this.player = new Player(this.pcCanvas, this.pcBulletPool);
     this.movementDirection = 'standard';
     this.muted = false;
+    this.paused = false;
+    this.gameStatus = 'unbegun';
 
     this.playRound = this.playRound.bind(this);
     this.startRound = this.startRound.bind(this);
@@ -88,14 +90,33 @@ class Game {
     this.optsCanvas.ctx.fillText("Loading...", 50,50);
   }
 
-  start() {
-    this.AssetStore.backgroundMusic.play();
+  startGame() {
+    if(this.gameStatus === 'unbegun') this.AssetStore.backgroundMusic.play();
     this.field.drawStatusBar();
     this.drawStartScreen();
   }
 
+  startRound() {
+    this.clearOptsContext();
+    this.gameStatus = 'playing';
+    this.playRound();
+  }
+
+  playRound() {
+    this.player.move(KEY_STATUS);
+    // let now = Date.now();
+    // let dt = (now - this.lastTime) / 1000.0;
+
+    // update(dt);
+    // this.drawStatusBar();
+    this.field.render();
+
+    // this.lastTime = now;
+    requestAnimationFrame(this.playRound);
+  }
+
   drawStartScreen() {
-    this.clearOptsCanvas();
+    this.clearOptsContext();
     this.optsCanvas.ctx.fillStyle = "rgba(0, 0, 0, 0.8";
     this.optsCanvas.ctx.fillRect(0,0,800,500);
 
@@ -214,24 +235,6 @@ class Game {
     this.optsCanvas.ctx.stroke();
   }
 
-  startRound() {
-    this.clearOptsCanvas();
-    this.playRound();
-  }
-
-  playRound() {
-    this.player.move(KEY_STATUS);
-    // let now = Date.now();
-    // let dt = (now - this.lastTime) / 1000.0;
-
-    // update(dt);
-    // this.drawStatusBar();
-    this.field.render();
-
-    // this.lastTime = now;
-    requestAnimationFrame(this.playRound);
-  }
-
   keydown(e) {
     let keyCode = e.which || e.keyCode || 0;
     if(keyCode === 77) this.clickMute();
@@ -281,7 +284,24 @@ class Game {
       (300 <= clickPosX && clickPosX <= 505) &&
       (385 <= clickPosY && clickPosY <= 472)
     ) {
-      this.startRound();
+      if(this.gameStatus === 'unbegun') {
+        this.startRound();
+      } else if(this.gameStatus === 'playing') {
+        this.clickPause();
+      } else if(this.gameStatus === 'over') {
+        this.field.clearAllContexts();
+        this.field = new Field(
+          this.fgCanvas,
+          this.statsCanvas,
+          this.pcCanvas,
+          this.AssetStore,
+          this.badBulletPool,
+          this.pcBulletPool,
+          this.BaddiePool,
+          this.player
+        );
+        this.startGame();
+      }
     }
   }
 
@@ -297,7 +317,13 @@ class Game {
   }
 
   clickPause() {
-    console.log('hi!');
+    if(this.paused) {
+      this.paused = false;
+      this.clearOptsContext();
+    } else {
+      this.paused = true;
+      this.drawStartScreen();
+    };
   }
 
   swapMovementDirection() {
@@ -321,7 +347,7 @@ class Game {
     this.drawStartScreen()
   }
 
-  clearOptsCanvas() {
+  clearOptsContext() {
     this.optsCanvas.ctx.clearRect(
       0,
       0,

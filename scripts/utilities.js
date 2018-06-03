@@ -89,7 +89,7 @@ export class AssetStore {
 
   assetLoaded() {
     this.numLoaded++;
-    if(this.numLoaded === this.numImages) this.game.start();
+    if(this.numLoaded === this.numImages) this.game.startGame();
   }
 
   checkReadyState() {

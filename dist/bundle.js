@@ -388,7 +388,7 @@ var Field = function () {
   }, {
     key: 'render',
     value: function render() {
-      this.clearFGContext();
+      this.undrawFGContext();
       this.clearPCContext();
       this.updatePlayerCharge();
       this.drawPlayerRails('circle');
@@ -572,15 +572,32 @@ var Field = function () {
       return drawPoint.x <= bullet.x && bullet.x <= drawPoint.x + baddie.width && drawPoint.y <= bullet.y && bullet.y <= drawPoint.y + baddie.height;
     }
   }, {
-    key: 'clearFGContext',
-    value: function clearFGContext() {
+    key: 'undrawFGContext',
+    value: function undrawFGContext() {
       this.fgCanvas.ctx.fillStyle = "rgba(0, 0, 0, 0.1";
       this.fgCanvas.ctx.fillRect(0, 0, 800, 500);
+    }
+  }, {
+    key: 'clearFGContext',
+    value: function clearFGContext() {
+      this.fgCanvas.ctx.clearRect(0, 0, this.fgCanvas.width, this.fgCanvas.height);
+    }
+  }, {
+    key: 'clearStatsContext',
+    value: function clearStatsContext() {
+      this.statsCanvas.ctx.clearRect(0, 0, this.statsCanvas.width, this.statsCanvas.height);
     }
   }, {
     key: 'clearPCContext',
     value: function clearPCContext() {
       this.pcCanvas.ctx.clearRect(0, 0, this.pcCanvas.width, this.pcCanvas.height);
+    }
+  }, {
+    key: 'clearAllContexts',
+    value: function clearAllContexts() {
+      this.clearFGContext();
+      this.clearStatsContext();
+      this.clearPCContext();
     }
   }]);
 
@@ -678,6 +695,8 @@ var Game = function () {
     this.player = new _player2.default(this.pcCanvas, this.pcBulletPool);
     this.movementDirection = 'standard';
     this.muted = false;
+    this.paused = false;
+    this.gameStatus = 'unbegun';
 
     this.playRound = this.playRound.bind(this);
     this.startRound = this.startRound.bind(this);
@@ -704,16 +723,37 @@ var Game = function () {
       this.optsCanvas.ctx.fillText("Loading...", 50, 50);
     }
   }, {
-    key: 'start',
-    value: function start() {
-      this.AssetStore.backgroundMusic.play();
+    key: 'startGame',
+    value: function startGame() {
+      if (this.gameStatus === 'unbegun') this.AssetStore.backgroundMusic.play();
       this.field.drawStatusBar();
       this.drawStartScreen();
     }
   }, {
+    key: 'startRound',
+    value: function startRound() {
+      this.clearOptsContext();
+      this.gameStatus = 'playing';
+      this.playRound();
+    }
+  }, {
+    key: 'playRound',
+    value: function playRound() {
+      this.player.move(KEY_STATUS);
+      // let now = Date.now();
+      // let dt = (now - this.lastTime) / 1000.0;
+
+      // update(dt);
+      // this.drawStatusBar();
+      this.field.render();
+
+      // this.lastTime = now;
+      requestAnimationFrame(this.playRound);
+    }
+  }, {
     key: 'drawStartScreen',
     value: function drawStartScreen() {
-      this.clearOptsCanvas();
+      this.clearOptsContext();
       this.optsCanvas.ctx.fillStyle = "rgba(0, 0, 0, 0.8";
       this.optsCanvas.ctx.fillRect(0, 0, 800, 500);
 
@@ -817,26 +857,6 @@ var Game = function () {
       this.optsCanvas.ctx.stroke();
     }
   }, {
-    key: 'startRound',
-    value: function startRound() {
-      this.clearOptsCanvas();
-      this.playRound();
-    }
-  }, {
-    key: 'playRound',
-    value: function playRound() {
-      this.player.move(KEY_STATUS);
-      // let now = Date.now();
-      // let dt = (now - this.lastTime) / 1000.0;
-
-      // update(dt);
-      // this.drawStatusBar();
-      this.field.render();
-
-      // this.lastTime = now;
-      requestAnimationFrame(this.playRound);
-    }
-  }, {
     key: 'keydown',
     value: function keydown(e) {
       var keyCode = e.which || e.keyCode || 0;
@@ -878,7 +898,15 @@ var Game = function () {
       if (240 <= clickPosX && clickPosX <= 560 && 165 <= clickPosY && clickPosY <= 200) {
         this.swapMovementDirection();
       } else if (300 <= clickPosX && clickPosX <= 505 && 385 <= clickPosY && clickPosY <= 472) {
-        this.startRound();
+        if (this.gameStatus === 'unbegun') {
+          this.startRound();
+        } else if (this.gameStatus === 'playing') {
+          this.clickPause();
+        } else if (this.gameStatus === 'over') {
+          this.field.clearAllContexts();
+          this.field = new _field2.default(this.fgCanvas, this.statsCanvas, this.pcCanvas, this.AssetStore, this.badBulletPool, this.pcBulletPool, this.BaddiePool, this.player);
+          this.startGame();
+        }
       }
     }
   }, {
@@ -896,7 +924,13 @@ var Game = function () {
   }, {
     key: 'clickPause',
     value: function clickPause() {
-      console.log('hi!');
+      if (this.paused) {
+        this.paused = false;
+        this.clearOptsContext();
+      } else {
+        this.paused = true;
+        this.drawStartScreen();
+      };
     }
   }, {
     key: 'swapMovementDirection',
@@ -921,8 +955,8 @@ var Game = function () {
       this.drawStartScreen();
     }
   }, {
-    key: 'clearOptsCanvas',
-    value: function clearOptsCanvas() {
+    key: 'clearOptsContext',
+    value: function clearOptsContext() {
       this.optsCanvas.ctx.clearRect(0, 0, this.optsCanvas.width, this.optsCanvas.height);
     }
   }]);
@@ -1209,7 +1243,7 @@ var AssetStore = exports.AssetStore = function () {
     key: 'assetLoaded',
     value: function assetLoaded() {
       this.numLoaded++;
-      if (this.numLoaded === this.numImages) this.game.start();
+      if (this.numLoaded === this.numImages) this.game.startGame();
     }
   }, {
     key: 'checkReadyState',
