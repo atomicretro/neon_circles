@@ -138,24 +138,17 @@ class Game {
 
     this.optsCanvas.ctx.fillStyle = 'white';
 
-    this.optsCanvas.ctx.font = "36px sf_alien_encountersitalic";
-    this.optsCanvas.ctx.fillText(
-      "SHOOT ALL DEMONS", 207, 70
-    );
-    this.optsCanvas.ctx.font = "22px sf_alien_encountersitalic";
-    this.optsCanvas.ctx.fillText(
-      "careful! demon power is strong!", 182, 105
-    );
-
+    this.drawStartScreenMessage();
     this.drawControls();
 
+    // for checking centeredness of start screen items
     // this.optsCanvas.ctx.beginPath();
-    // this.optsCanvas.ctx.moveTo(200,0);
-    // this.optsCanvas.ctx.lineTo(200,500);
+    // this.optsCanvas.ctx.moveTo(270,0);
+    // this.optsCanvas.ctx.lineTo(270,500);
     // this.optsCanvas.ctx.stroke();
     // this.optsCanvas.ctx.beginPath();
-    // this.optsCanvas.ctx.moveTo(600,0);
-    // this.optsCanvas.ctx.lineTo(600,500);
+    // this.optsCanvas.ctx.moveTo(530,0);
+    // this.optsCanvas.ctx.lineTo(530,500);
     // this.optsCanvas.ctx.stroke();
 
     this.optsCanvas.ctx.strokeRect(300,385,205,87);
@@ -166,6 +159,28 @@ class Game {
     this.optsCanvas.ctx.fillText("m to mute!", 20, 480);
     this.optsCanvas.ctx.font = "12px sf_alien_encountersitalic";
     this.optsCanvas.ctx.fillText("p to pause!", 700, 480);
+  }
+
+  drawStartScreenMessage() {
+    if(this.gameStatus === 'over') {
+      this.optsCanvas.ctx.font = "36px sf_alien_encountersitalic";
+      this.optsCanvas.ctx.fillText(
+        "GAME OVER", 285, 70
+      );
+      this.optsCanvas.ctx.font = "22px sf_alien_encountersitalic";
+      this.optsCanvas.ctx.fillText(
+        "fight! fight! don't let demons win!", 176, 105
+      );
+    } else {
+      this.optsCanvas.ctx.font = "36px sf_alien_encountersitalic";
+      this.optsCanvas.ctx.fillText(
+        "SHOOT ALL DEMONS", 207, 70
+      );
+      this.optsCanvas.ctx.font = "22px sf_alien_encountersitalic";
+      this.optsCanvas.ctx.fillText(
+        "careful! demon power is strong!", 182, 105
+      );
+    }
   }
 
   drawControls() {
