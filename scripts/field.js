@@ -62,11 +62,11 @@ class Field {
 
     // Titles
     this.statsCanvas.ctx.font = "22px sf_alien_encountersitalic";
-    this.statsCanvas.ctx.fillText("SCORE", 50, 21);
+    this.statsCanvas.ctx.fillText("SCORE", 49, 21);
     this.statsCanvas.ctx.font = "22px sf_alien_encountersitalic";
-    this.statsCanvas.ctx.fillText("LIFE", 205, 21);
+    this.statsCanvas.ctx.fillText("LIFE", 204, 21);
     this.statsCanvas.ctx.font = "22px sf_alien_encountersitalic";
-    this.statsCanvas.ctx.fillText("CHARGE", 352, 21);
+    this.statsCanvas.ctx.fillText("CHARGE", 351, 21);
 
     // Player score
     this.statsCanvas.ctx.font = "20px Courier";
