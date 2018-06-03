@@ -838,7 +838,7 @@ var Game = function () {
         };
       } else {
         ccw = {
-          descPos: 552,
+          descPos: 545,
           circlePos: 640
         };
         cw = {
@@ -873,7 +873,7 @@ var Game = function () {
       this.optsCanvas.ctx.font = "18px sf_alien_encountersitalic";
       this.optsCanvas.ctx.fillText("clockwise", cw.descPos, 250);
       this.optsCanvas.ctx.font = "20px sf_alien_encountersitalic";
-      this.optsCanvas.ctx.fillText("d  l  right", 580, 280);
+      this.optsCanvas.ctx.fillText("d   l   right", 566, 280);
 
       this.optsCanvas.ctx.beginPath();
       this.optsCanvas.ctx.arc(Math.abs(cw.circlePos), 190, 30, Math.PI / 2, 0, false);

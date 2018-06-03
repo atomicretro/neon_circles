@@ -199,7 +199,7 @@ class Game {
       };
     } else{
       ccw = {
-        descPos: 552,
+        descPos: 545,
         circlePos: 640
       };
       cw = {
@@ -243,7 +243,7 @@ class Game {
     );
     this.optsCanvas.ctx.font = "20px sf_alien_encountersitalic";
     this.optsCanvas.ctx.fillText(
-      "d  l  right", 580, 280
+      "d   l   right", 566, 280
     );
 
     this.optsCanvas.ctx.beginPath();
