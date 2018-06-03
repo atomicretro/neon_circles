@@ -65,7 +65,7 @@ class Game {
     this.demonBulletPool = new BulletPool(3, this.fgCanvas, 'demonBullet');
     this.pcBulletPool = new BulletPool(4, this.fgCanvas, 'player');
     this.DemonPool = new DemonPool(
-      4, this.fgCanvas.ctx, this.AssetStore, this.demonBulletPool
+      5, this.fgCanvas.ctx, this.AssetStore, this.demonBulletPool
     );
     this.player = new Player(this.pcCanvas, this.pcBulletPool);
     this.movementDirection = 'standard';
@@ -73,9 +73,9 @@ class Game {
     this.paused = false;
     this.gameStatus = 'unbegun';
 
-    this.timeSinceLastLvl1Kill = Date.now() - 5000;
-    this.timeSinceLastLvl2Kill = Date.now();
-    this.timeSinceLastLvl3Kill = Date.now();
+    this.lvl1SpawnBuffer = Date.now() - 5000;
+    this.lvl2SpawnBuffer = Date.now();
+    this.lvl3SpawnBuffer = Date.now();
     this.numLvl1DemonsKilled = 0;
     this.numLvl2DemonsKilled = 0;
     this.numLvl3DemonsKilled = 0;
@@ -121,7 +121,7 @@ class Game {
 
   play() {
     this.checkGameOver();
-    this.checkCollisions();
+    // this.checkCollisions();
     this.player.move(KEY_STATUS);
 
     let now = Date.now();
@@ -149,10 +149,13 @@ class Game {
       else if(demon.type === 'bossDemon' && demon.spawned) spawnedLvl3++;
     }
 
-    if(spawnedLvl1 < 4 && this.lastTime - this.timeSinceLastLvl1Kill > 5000) {
+    if(spawnedLvl1 < 4 && this.lastTime - this.lvl1SpawnBuffer > 5000) {
       let toGet = Math.random() < 0.5 ? 'mouthDemon' : 'eyeDemon';
-      debugger
       this.DemonPool.get(toGet);
+    }
+    if(spawnedLvl2 < 2 && this.lastTime - this.lvl2SpawnBuffer > 20000) {
+      this.DemonPool.get('faceDemon');
+      this.lvl2SpawnBuffer = Date.now();
     }
   }
 
@@ -239,11 +242,11 @@ class Game {
 
   calculateDemonKillTime(demon) {
     if(demon.type === 'mouthDemon' || demon.type === 'eyeDemon') {
-      this.timeSinceLastLvl1Kill = Date.now();
+      this.lvl1SpawnBuffer = Date.now();
     } else if(demon.type === 'faceDemon') {
-      this.timeSinceLastLvl2Kill = Date.now();
+      this.lvl2SpawnBuffer = Date.now();
     } else if(demon.type === 'bossDemon') {
-      this.timeSinceLastLvl3Kill = Date.now();
+      this.lvl3SpawnBuffer = Date.now();
     };
   }
 

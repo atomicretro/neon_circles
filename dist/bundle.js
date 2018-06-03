@@ -283,6 +283,15 @@ var Demon = function () {
   }, {
     key: 'draw',
     value: function draw(BulletPool) {
+      if (this.type === 'faceDemon') {
+        if (this.radius > this.endRadius) {
+          this.radius -= Math.abs(this.speed * 100);
+        } else {
+          debugger;
+          this.speed = this.endSpeed;
+        }
+      };
+
       this.theta -= this.speed;
       this.drawPoint = this.computeDrawPoint();
       this.sprite.draw(this.drawPoint.x, this.drawPoint.y);
@@ -338,7 +347,12 @@ var Demon = function () {
         this.radius = getRandNum(265, 380); // The 'track' the demon moves along
         this.fireThreshold = 0.01;
       } else if (this.type === 'faceDemon') {
-        this.speed = Math.random() < 0.5 ? 0.011 : -0.011;
+        this.theta = Math.PI / 2 * thetaMultiplier;
+        this.speed = getRandNum(6, 9) / 1000 * speedMultiplier;
+        this.endSpeed = this.speed * 2;
+        this.radius = 400;
+        this.endRadius = getRandNum(125, 225);
+        this.fireThreshold = 0.02;
       } else if (this.type === 'bossDemon') {
         this.speed = 0.4;
       }
@@ -660,16 +674,16 @@ var Game = function () {
     value: function setupNewGame() {
       this.demonBulletPool = new _bullet3.default(3, this.fgCanvas, 'demonBullet');
       this.pcBulletPool = new _bullet3.default(4, this.fgCanvas, 'player');
-      this.DemonPool = new _demon2.default(4, this.fgCanvas.ctx, this.AssetStore, this.demonBulletPool);
+      this.DemonPool = new _demon2.default(5, this.fgCanvas.ctx, this.AssetStore, this.demonBulletPool);
       this.player = new _player2.default(this.pcCanvas, this.pcBulletPool);
       this.movementDirection = 'standard';
       this.muted = false;
       this.paused = false;
       this.gameStatus = 'unbegun';
 
-      this.timeSinceLastLvl1Kill = Date.now() - 5000;
-      this.timeSinceLastLvl2Kill = Date.now();
-      this.timeSinceLastLvl3Kill = Date.now();
+      this.lvl1SpawnBuffer = Date.now() - 5000;
+      this.lvl2SpawnBuffer = Date.now();
+      this.lvl3SpawnBuffer = Date.now();
       this.numLvl1DemonsKilled = 0;
       this.numLvl2DemonsKilled = 0;
       this.numLvl3DemonsKilled = 0;
@@ -711,7 +725,7 @@ var Game = function () {
     key: 'play',
     value: function play() {
       this.checkGameOver();
-      this.checkCollisions();
+      // this.checkCollisions();
       this.player.move(KEY_STATUS);
 
       var now = Date.now();
@@ -737,10 +751,13 @@ var Game = function () {
         if (demon.type === 'mouthDemon' && demon.spawned) spawnedLvl1++;else if (demon.type === 'eyeDemon' && demon.spawned) spawnedLvl1++;else if (demon.type === 'faceDemon' && demon.spawned) spawnedLvl2++;else if (demon.type === 'bossDemon' && demon.spawned) spawnedLvl3++;
       }
 
-      if (spawnedLvl1 < 4 && this.lastTime - this.timeSinceLastLvl1Kill > 5000) {
+      if (spawnedLvl1 < 4 && this.lastTime - this.lvl1SpawnBuffer > 5000) {
         var toGet = Math.random() < 0.5 ? 'mouthDemon' : 'eyeDemon';
-        debugger;
         this.DemonPool.get(toGet);
+      }
+      if (spawnedLvl2 < 2 && this.lastTime - this.lvl2SpawnBuffer > 20000) {
+        this.DemonPool.get('faceDemon');
+        this.lvl2SpawnBuffer = Date.now();
       }
     }
   }, {
@@ -819,11 +836,11 @@ var Game = function () {
     key: 'calculateDemonKillTime',
     value: function calculateDemonKillTime(demon) {
       if (demon.type === 'mouthDemon' || demon.type === 'eyeDemon') {
-        this.timeSinceLastLvl1Kill = Date.now();
+        this.lvl1SpawnBuffer = Date.now();
       } else if (demon.type === 'faceDemon') {
-        this.timeSinceLastLvl2Kill = Date.now();
+        this.lvl2SpawnBuffer = Date.now();
       } else if (demon.type === 'bossDemon') {
-        this.timeSinceLastLvl3Kill = Date.now();
+        this.lvl3SpawnBuffer = Date.now();
       };
     }
   }, {

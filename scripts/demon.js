@@ -46,6 +46,15 @@ class Demon {
   }
 
   draw(BulletPool) {
+      if(this.type === 'faceDemon') {
+        if(this.radius > this.endRadius) {
+          this.radius -= Math.abs(this.speed * 100);
+        } else {
+          debugger
+          this.speed = this.endSpeed;
+        }
+      };
+
       this.theta -= this.speed;
       this.drawPoint = this.computeDrawPoint();
       this.sprite.draw(this.drawPoint.x, this.drawPoint.y);
@@ -101,8 +110,12 @@ class Demon {
       this.radius = getRandNum(265, 380); // The 'track' the demon moves along
       this.fireThreshold = 0.01;
     } else if(this.type === 'faceDemon') {
-      this.speed = Math.random() < 0.5 ? 0.011 : -0.011;
-
+      this.theta = (Math.PI / 2) * thetaMultiplier;
+      this.speed = (getRandNum(6, 9) / 1000) * speedMultiplier;
+      this.endSpeed = this.speed * 2;
+      this.radius = 400;
+      this.endRadius = getRandNum(125, 225);
+      this.fireThreshold = 0.02;
     } else if(this.type === 'bossDemon') {
       this.speed = 0.4;
 
