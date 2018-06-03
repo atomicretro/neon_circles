@@ -252,15 +252,16 @@ class Game {
       (demon) => demon.spawned );
 
     let spawnedDemons = spawnedlvl1Demons.concat(spawnedlvl2Demons);
-debugger
+
     for (let demonIdx = 0; demonIdx < spawnedDemons.length; demonIdx++) {
       let demon = spawnedDemons[demonIdx];
       for (let bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
         let bullet = spawnedPCBullets[bullIdx];
         let drawPoint = demon.drawPoint;
         if(
-          this.pcBulletHitsDemon(demon, drawPoint, bullet.startPoint) ||
-          this.pcBulletHitsDemon(demon, drawPoint, bullet.endPoint)
+          (this.pcBulletHitsDemon(demon, drawPoint, bullet.startPoint) ||
+          this.pcBulletHitsDemon(demon, drawPoint, bullet.endPoint)) &&
+          demon.invincibilityFrames > 50
         ) {
           this.field.updatePlayerScore();
           this.calculateDemonKillTime(demon);

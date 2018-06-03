@@ -289,6 +289,7 @@ var Demon = function () {
         }
       };
 
+      this.invincibilityFrames++;
       this.theta -= this.speed;
       this.drawPoint = this.computeDrawPoint();
       this.sprite.draw(this.drawPoint.x, this.drawPoint.y);
@@ -336,6 +337,7 @@ var Demon = function () {
     key: 'isHit',
     value: function isHit() {
       this.life -= 1;
+      this.invincibilityFrames = 0;
     }
   }, {
     key: 'setDefaultValues',
@@ -352,14 +354,15 @@ var Demon = function () {
       } else if (this.type === 'faceDemon') {
         this.theta = Math.PI / 2 * thetaMultiplier;
         this.speed = getRandNum(6, 9) / 1000 * speedMultiplier;
+        this.endSpeed = this.speed * 2;
         this.radius = 400;
         this.endRadius = getRandNum(125, 225);
-        this.endSpeed = this.endRadius / 9000;
         this.life = 2;
         this.fireThreshold = 0.02;
       } else if (this.type === 'bossDemon') {
         this.speed = 0.4;
       }
+      this.invincibilityFrames = 50;
       this.chanceToFire = 0;
       this.spawned = false;
       this.drawPoint = { x: 400, y: 250 };
@@ -855,13 +858,13 @@ var Game = function () {
       });
 
       var spawnedDemons = spawnedlvl1Demons.concat(spawnedlvl2Demons);
-      debugger;
+
       for (var demonIdx = 0; demonIdx < spawnedDemons.length; demonIdx++) {
         var demon = spawnedDemons[demonIdx];
         for (var bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
           var bullet = spawnedPCBullets[bullIdx];
           var drawPoint = demon.drawPoint;
-          if (this.pcBulletHitsDemon(demon, drawPoint, bullet.startPoint) || this.pcBulletHitsDemon(demon, drawPoint, bullet.endPoint)) {
+          if ((this.pcBulletHitsDemon(demon, drawPoint, bullet.startPoint) || this.pcBulletHitsDemon(demon, drawPoint, bullet.endPoint)) && demon.invincibilityFrames > 50) {
             this.field.updatePlayerScore();
             this.calculateDemonKillTime(demon);
             demon.isHit();
