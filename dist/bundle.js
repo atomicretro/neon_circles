@@ -1410,6 +1410,13 @@ var AssetStore = exports.AssetStore = function () {
       srcX: 0,
       srcY: 0
     };
+    this.faceDemonHurt = {
+      image: new Image(),
+      width: 30,
+      height: 40,
+      srcX: 0,
+      srcY: 0
+    };
     this.bossDemon = {
       image: new Image(),
       width: 50,
@@ -1419,7 +1426,7 @@ var AssetStore = exports.AssetStore = function () {
     };
     this.heart = { image: new Image() };
 
-    this.numAssets = 6;
+    this.numAssets = 7;
     this.numLoaded = 0;
 
     this.mouthDemon.image.onload = function () {
@@ -1429,6 +1436,9 @@ var AssetStore = exports.AssetStore = function () {
       _this.assetLoaded();
     };
     this.faceDemon.image.onload = function () {
+      _this.assetLoaded();
+    };
+    this.faceDemonHurt.image.onload = function () {
       _this.assetLoaded();
     };
     this.bossDemon.image.onload = function () {
@@ -1441,6 +1451,7 @@ var AssetStore = exports.AssetStore = function () {
     this.mouthDemon.image.src = 'assets/sprites/mouth_demon.png';
     this.eyeDemon.image.src = 'assets/sprites/eye_demon.png';
     this.faceDemon.image.src = 'assets/sprites/face_demon.png';
+    this.faceDemonHurt.image.src = 'assets/sprites/face_demon_hurt.png';
     this.bossDemon.image.src = 'assets/sprites/boss_demon.png';
     this.heart.image.src = 'assets/sprites/heart.png';
   }
