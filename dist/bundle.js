@@ -1133,7 +1133,7 @@ var Player = function () {
     this.maxSpeed = 0.3;
     this.radius = 50; // The 'track' the player moves along
     this.fireCharge = 0;
-    this.fireCooldown = 40;
+    this.fireCooldown = 20;
     this.invincibilityFrames = 50;
     this.life = 3;
 
