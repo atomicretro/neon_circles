@@ -8,7 +8,8 @@ class Field {
     AssetStore,
     demonBulletPool,
     pcBulletPool,
-    DemonPool,
+    lvl1DemonPool,
+    lvl2DemonPool,
     player
   ) {
     this.fgCanvas = fgCanvasObj;
@@ -18,7 +19,8 @@ class Field {
     this.AssetStore = AssetStore;
     this.demonBulletPool = demonBulletPool;
     this.pcBulletPool = pcBulletPool;
-    this.DemonPool = DemonPool;
+    this.lvl1DemonPool = lvl1DemonPool;
+    this.lvl2DemonPool = lvl2DemonPool;
 
     this.player = player;
 
@@ -37,7 +39,8 @@ class Field {
     this.updatePlayerCharge()
     this.drawPlayerRails('circle');
     this.player.draw();
-    this.DemonPool.draw();
+    this.lvl1DemonPool.draw();
+    this.lvl2DemonPool.draw();
     this.pcBulletPool.draw('player');
     this.demonBulletPool.draw();
   }

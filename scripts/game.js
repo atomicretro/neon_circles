@@ -64,9 +64,7 @@ class Game {
   setupNewGame() {
     this.demonBulletPool = new BulletPool(3, this.fgCanvas, 'demonBullet');
     this.pcBulletPool = new BulletPool(4, this.fgCanvas, 'player');
-    this.DemonPool = new DemonPool(
-      5, this.fgCanvas.ctx, this.AssetStore, this.demonBulletPool
-    );
+    this.setupDemonPools();
     this.player = new Player(this.pcCanvas, this.pcBulletPool);
     this.movementDirection = 'standard';
     this.muted = false;
@@ -86,6 +84,21 @@ class Game {
     this.statsCanvasCheckClick = this.statsCanvasCheckClick.bind(this);
   }
 
+  setupDemonPools() {
+    let lvl1Demons = [
+      'mouthDemon', 'mouthDemon', 'mouthDemon',
+      'eyeDemon', 'eyeDemon', 'eyeDemon'
+    ];
+    this.lvl1DemonPool = new DemonPool(
+      lvl1Demons, this.fgCanvas.ctx, this.AssetStore, this.demonBulletPool
+    );
+
+    let lvl2Demons = ['faceDemon', 'faceDemon']
+    this.lvl2DemonPool = new DemonPool(
+      lvl2Demons, this.fgCanvas.ctx, this.AssetStore, this.demonBulletPool
+    );
+  }
+
   setupNewField() {
     this.field = new Field(
       this.fgCanvas,
@@ -94,7 +107,8 @@ class Game {
       this.AssetStore,
       this.demonBulletPool,
       this.pcBulletPool,
-      this.DemonPool,
+      this.lvl1DemonPool,
+      this.lvl2DemonPool,
       this.player
     );
   }
@@ -106,22 +120,24 @@ class Game {
   }
 
   startGame() {
-    this.AssetStore.backgroundMusic.play();
     this.field.drawStatusBar();
     this.drawStartScreen();
   }
 
   startRound() {
+    this.AssetStore.backgroundMusic.play();
+
     this.clearOptsContext();
     this.optsCanvas.canvas.classList.add('hidden');
     this.gameStatus = 'playing';
+    this.startTime = Date.now();
     this.lastTime = Date.now();
     this.play();
   }
 
   play() {
     this.checkGameOver();
-    this.checkCollisions();
+    // this.checkCollisions();
     this.player.move(KEY_STATUS);
 
     let now = Date.now();
@@ -139,22 +155,40 @@ class Game {
 
   spawnDemons() {
     let spawnedLvl1 = 0;
-    let spawnedLvl2 = 0;
-    let spawnedLvl3 = 0;
-    for(let i = 0; i < this.DemonPool.pool.length; i++) {
-      let demon = this.DemonPool.pool[i];
+    // let spawnedLvl3 = 0;
+    for(let i = 0; i < this.lvl1DemonPool.pool.length; i++) {
+      let demon = this.lvl1DemonPool.pool[i];
       if(demon.type === 'mouthDemon' && demon.spawned) spawnedLvl1++;
       else if(demon.type === 'eyeDemon' && demon.spawned) spawnedLvl1++;
-      else if(demon.type === 'faceDemon' && demon.spawned) spawnedLvl2++;
-      else if(demon.type === 'bossDemon' && demon.spawned) spawnedLvl3++;
+      // else if(demon.type === 'bossDemon' && demon.spawned) spawnedLvl3++;
     }
 
-    if(spawnedLvl1 < 4 && this.lastTime - this.lvl1SpawnBuffer > 5000) {
-      let toGet = Math.random() < 0.5 ? 'mouthDemon' : 'eyeDemon';
-      this.DemonPool.get(toGet);
+    let spawnedLvl2 = 0;
+    for(let i = 0; i < this.lvl2DemonPool.pool.length; i++) {
+      let demon = this.lvl2DemonPool.pool[i];
+      if(demon.type === 'faceDemon' && demon.spawned) spawnedLvl2++;
     }
-    if(spawnedLvl2 < 2 && this.lastTime - this.lvl2SpawnBuffer > 20000) {
-      this.DemonPool.get('faceDemon');
+
+    if(this.lastTime - this.startTime < 10000) {
+      this.spawnLevelOneDemons(spawnedLvl1, 4);
+      this.spawnLevelTwoDemons(spawnedLvl2, 1);
+    } else {
+      this.spawnLevelOneDemons(spawnedLvl1, 6);
+      this.spawnLevelTwoDemons(spawnedLvl2, 2);
+    }
+  }
+
+  spawnLevelOneDemons(numDemons, max) {
+    if(numDemons < max && this.lastTime - this.lvl1SpawnBuffer > 5000) {
+      let toGet = Math.random() < 0.5 ? 'mouthDemon' : 'eyeDemon';
+      this.lvl1DemonPool.get(toGet);
+    }
+  }
+
+  spawnLevelTwoDemons(numDemons, max) {
+    if(numDemons < max && this.lastTime - this.lvl2SpawnBuffer > 20000) {
+      debugger
+      this.lvl2DemonPool.get('faceDemon');
       this.lvl2SpawnBuffer = Date.now();
     }
   }
@@ -213,7 +247,10 @@ class Game {
   }
 
   checkDemonCollision(spawnedPCBullets) {
-    let spawnedDemons = this.DemonPool.pool.filter(
+    let combinedDemonPools = Object.assign(
+      {}, this.lvl1DemonPool, this.lvl2DemonPool
+    );
+    let spawnedDemons = this.combinedDemonPools.pool.filter(
       (demon) => demon.spawned );
 
     for (let demonIdx = 0; demonIdx < spawnedDemons.length; demonIdx++) {

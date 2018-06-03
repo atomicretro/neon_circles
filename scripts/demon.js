@@ -5,17 +5,11 @@ const getRandNum = (min, max) => {
 };
 
 export default class DemonPool extends ObjectPool {
-  constructor(size, ctx, AssetStore, BulletPool) {
-    super(size, ctx);
+  constructor(demons, ctx, AssetStore, BulletPool) {
+    super(demons.length, ctx);
     this.BulletPool = BulletPool;
 
-    let demons = [
-      'mouthDemon', 'mouthDemon',
-      'eyeDemon', 'eyeDemon',
-      'faceDemon', 'faceDemon', 'bossDemon'
-    ]
-
-    for (let i = 0; i < size; i++) {
+    for (let i = 0; i < demons.length; i++) {
       let demon = new Demon(ctx, demons[i], AssetStore);
       this.pool.push(demon);
     }
@@ -50,7 +44,6 @@ class Demon {
         if(this.radius > this.endRadius) {
           this.radius -= Math.abs(this.speed * 100);
         } else {
-          debugger
           this.speed = this.endSpeed;
         }
       };

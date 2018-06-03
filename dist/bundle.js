@@ -239,16 +239,14 @@ var getRandNum = function getRandNum(min, max) {
 var DemonPool = function (_ObjectPool) {
   _inherits(DemonPool, _ObjectPool);
 
-  function DemonPool(size, ctx, AssetStore, BulletPool) {
+  function DemonPool(demons, ctx, AssetStore, BulletPool) {
     _classCallCheck(this, DemonPool);
 
-    var _this = _possibleConstructorReturn(this, (DemonPool.__proto__ || Object.getPrototypeOf(DemonPool)).call(this, size, ctx));
+    var _this = _possibleConstructorReturn(this, (DemonPool.__proto__ || Object.getPrototypeOf(DemonPool)).call(this, demons.length, ctx));
 
     _this.BulletPool = BulletPool;
 
-    var demons = ['mouthDemon', 'mouthDemon', 'eyeDemon', 'eyeDemon', 'faceDemon', 'faceDemon', 'bossDemon'];
-
-    for (var i = 0; i < size; i++) {
+    for (var i = 0; i < demons.length; i++) {
       var demon = new Demon(ctx, demons[i], AssetStore);
       _this.pool.push(demon);
     }
@@ -287,7 +285,6 @@ var Demon = function () {
         if (this.radius > this.endRadius) {
           this.radius -= Math.abs(this.speed * 100);
         } else {
-          debugger;
           this.speed = this.endSpeed;
         }
       };
@@ -397,7 +394,7 @@ var _utilities = __webpack_require__(/*! ./utilities */ "./scripts/utilities.js"
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Field = function () {
-  function Field(fgCanvasObj, statsCanvasObj, pcCanvasObj, AssetStore, demonBulletPool, pcBulletPool, DemonPool, player) {
+  function Field(fgCanvasObj, statsCanvasObj, pcCanvasObj, AssetStore, demonBulletPool, pcBulletPool, lvl1DemonPool, lvl2DemonPool, player) {
     _classCallCheck(this, Field);
 
     this.fgCanvas = fgCanvasObj;
@@ -407,7 +404,8 @@ var Field = function () {
     this.AssetStore = AssetStore;
     this.demonBulletPool = demonBulletPool;
     this.pcBulletPool = pcBulletPool;
-    this.DemonPool = DemonPool;
+    this.lvl1DemonPool = lvl1DemonPool;
+    this.lvl2DemonPool = lvl2DemonPool;
 
     this.player = player;
 
@@ -424,7 +422,8 @@ var Field = function () {
       this.updatePlayerCharge();
       this.drawPlayerRails('circle');
       this.player.draw();
-      this.DemonPool.draw();
+      this.lvl1DemonPool.draw();
+      this.lvl2DemonPool.draw();
       this.pcBulletPool.draw('player');
       this.demonBulletPool.draw();
     }
@@ -596,9 +595,9 @@ var _player2 = _interopRequireDefault(_player);
 
 var _utilities = __webpack_require__(/*! ./utilities */ "./scripts/utilities.js");
 
-var _demon = __webpack_require__(/*! ./demon */ "./scripts/demon.js");
+var _demon2 = __webpack_require__(/*! ./demon */ "./scripts/demon.js");
 
-var _demon2 = _interopRequireDefault(_demon);
+var _demon3 = _interopRequireDefault(_demon2);
 
 var _bullet2 = __webpack_require__(/*! ./bullet */ "./scripts/bullet.js");
 
@@ -674,7 +673,7 @@ var Game = function () {
     value: function setupNewGame() {
       this.demonBulletPool = new _bullet3.default(3, this.fgCanvas, 'demonBullet');
       this.pcBulletPool = new _bullet3.default(4, this.fgCanvas, 'player');
-      this.DemonPool = new _demon2.default(5, this.fgCanvas.ctx, this.AssetStore, this.demonBulletPool);
+      this.setupDemonPools();
       this.player = new _player2.default(this.pcCanvas, this.pcBulletPool);
       this.movementDirection = 'standard';
       this.muted = false;
@@ -694,9 +693,18 @@ var Game = function () {
       this.statsCanvasCheckClick = this.statsCanvasCheckClick.bind(this);
     }
   }, {
+    key: 'setupDemonPools',
+    value: function setupDemonPools() {
+      var lvl1Demons = ['mouthDemon', 'mouthDemon', 'mouthDemon', 'eyeDemon', 'eyeDemon', 'eyeDemon'];
+      this.lvl1DemonPool = new _demon3.default(lvl1Demons, this.fgCanvas.ctx, this.AssetStore, this.demonBulletPool);
+
+      var lvl2Demons = ['faceDemon', 'faceDemon'];
+      this.lvl2DemonPool = new _demon3.default(lvl2Demons, this.fgCanvas.ctx, this.AssetStore, this.demonBulletPool);
+    }
+  }, {
     key: 'setupNewField',
     value: function setupNewField() {
-      this.field = new _field2.default(this.fgCanvas, this.statsCanvas, this.pcCanvas, this.AssetStore, this.demonBulletPool, this.pcBulletPool, this.DemonPool, this.player);
+      this.field = new _field2.default(this.fgCanvas, this.statsCanvas, this.pcCanvas, this.AssetStore, this.demonBulletPool, this.pcBulletPool, this.lvl1DemonPool, this.lvl2DemonPool, this.player);
     }
   }, {
     key: 'drawLoadingScreen',
@@ -708,16 +716,18 @@ var Game = function () {
   }, {
     key: 'startGame',
     value: function startGame() {
-      this.AssetStore.backgroundMusic.play();
       this.field.drawStatusBar();
       this.drawStartScreen();
     }
   }, {
     key: 'startRound',
     value: function startRound() {
+      this.AssetStore.backgroundMusic.play();
+
       this.clearOptsContext();
       this.optsCanvas.canvas.classList.add('hidden');
       this.gameStatus = 'playing';
+      this.startTime = Date.now();
       this.lastTime = Date.now();
       this.play();
     }
@@ -725,7 +735,7 @@ var Game = function () {
     key: 'play',
     value: function play() {
       this.checkGameOver();
-      this.checkCollisions();
+      // this.checkCollisions();
       this.player.move(KEY_STATUS);
 
       var now = Date.now();
@@ -744,19 +754,41 @@ var Game = function () {
     key: 'spawnDemons',
     value: function spawnDemons() {
       var spawnedLvl1 = 0;
-      var spawnedLvl2 = 0;
-      var spawnedLvl3 = 0;
-      for (var i = 0; i < this.DemonPool.pool.length; i++) {
-        var demon = this.DemonPool.pool[i];
-        if (demon.type === 'mouthDemon' && demon.spawned) spawnedLvl1++;else if (demon.type === 'eyeDemon' && demon.spawned) spawnedLvl1++;else if (demon.type === 'faceDemon' && demon.spawned) spawnedLvl2++;else if (demon.type === 'bossDemon' && demon.spawned) spawnedLvl3++;
+      // let spawnedLvl3 = 0;
+      for (var i = 0; i < this.lvl1DemonPool.pool.length; i++) {
+        var demon = this.lvl1DemonPool.pool[i];
+        if (demon.type === 'mouthDemon' && demon.spawned) spawnedLvl1++;else if (demon.type === 'eyeDemon' && demon.spawned) spawnedLvl1++;
+        // else if(demon.type === 'bossDemon' && demon.spawned) spawnedLvl3++;
       }
 
-      if (spawnedLvl1 < 4 && this.lastTime - this.lvl1SpawnBuffer > 5000) {
-        var toGet = Math.random() < 0.5 ? 'mouthDemon' : 'eyeDemon';
-        this.DemonPool.get(toGet);
+      var spawnedLvl2 = 0;
+      for (var _i = 0; _i < this.lvl2DemonPool.pool.length; _i++) {
+        var _demon = this.lvl2DemonPool.pool[_i];
+        if (_demon.type === 'faceDemon' && _demon.spawned) spawnedLvl2++;
       }
-      if (spawnedLvl2 < 2 && this.lastTime - this.lvl2SpawnBuffer > 20000) {
-        this.DemonPool.get('faceDemon');
+
+      if (this.lastTime - this.startTime < 10000) {
+        this.spawnLevelOneDemons(spawnedLvl1, 4);
+        this.spawnLevelTwoDemons(spawnedLvl2, 1);
+      } else {
+        this.spawnLevelOneDemons(spawnedLvl1, 6);
+        this.spawnLevelTwoDemons(spawnedLvl2, 2);
+      }
+    }
+  }, {
+    key: 'spawnLevelOneDemons',
+    value: function spawnLevelOneDemons(numDemons, max) {
+      if (numDemons < max && this.lastTime - this.lvl1SpawnBuffer > 5000) {
+        var toGet = Math.random() < 0.5 ? 'mouthDemon' : 'eyeDemon';
+        this.lvl1DemonPool.get(toGet);
+      }
+    }
+  }, {
+    key: 'spawnLevelTwoDemons',
+    value: function spawnLevelTwoDemons(numDemons, max) {
+      if (numDemons < max && this.lastTime - this.lvl2SpawnBuffer > 20000) {
+        debugger;
+        this.lvl2DemonPool.get('faceDemon');
         this.lvl2SpawnBuffer = Date.now();
       }
     }
@@ -810,7 +842,8 @@ var Game = function () {
   }, {
     key: 'checkDemonCollision',
     value: function checkDemonCollision(spawnedPCBullets) {
-      var spawnedDemons = this.DemonPool.pool.filter(function (demon) {
+      var combinedDemonPools = Object.assign({}, this.lvl1DemonPool, this.lvl2DemonPool);
+      var spawnedDemons = this.combinedDemonPools.pool.filter(function (demon) {
         return demon.spawned;
       });
 
@@ -1272,6 +1305,7 @@ var ObjectPool = exports.ObjectPool = function () {
   _createClass(ObjectPool, [{
     key: 'get',
     value: function get(objectData) {
+      debugger;
       if (!this.pool[this.size - 1].spawned) {
         this.pool[this.size - 1].spawn(objectData);
         this.pool.unshift(this.pool.pop());
