@@ -121,7 +121,7 @@ class Game {
 
   play() {
     this.checkGameOver();
-    // this.checkCollisions();
+    this.checkCollisions();
     this.player.move(KEY_STATUS);
 
     let now = Date.now();

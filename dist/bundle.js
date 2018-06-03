@@ -349,9 +349,9 @@ var Demon = function () {
       } else if (this.type === 'faceDemon') {
         this.theta = Math.PI / 2 * thetaMultiplier;
         this.speed = getRandNum(6, 9) / 1000 * speedMultiplier;
-        this.endSpeed = this.speed * 2;
         this.radius = 400;
         this.endRadius = getRandNum(125, 225);
+        this.endSpeed = this.endRadius / 9000;
         this.fireThreshold = 0.02;
       } else if (this.type === 'bossDemon') {
         this.speed = 0.4;
@@ -725,7 +725,7 @@ var Game = function () {
     key: 'play',
     value: function play() {
       this.checkGameOver();
-      // this.checkCollisions();
+      this.checkCollisions();
       this.player.move(KEY_STATUS);
 
       var now = Date.now();
