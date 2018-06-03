@@ -149,23 +149,23 @@ class Field {
     let spawnedBadBullets = this.badBulletPool.pool.filter(
       (bullet) => bullet.spawned )
 
-    let hitbox = {
-      x: this.player.hitboxCenter.x,
-      y: this.player.hitboxCenter.y,
-      radius: 12
-    }
+      let hitbox = {
+        x: this.player.hitboxCenter.x,
+        y: this.player.hitboxCenter.y,
+        radius: 12
+      }
 
-    // for (let bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
-    //   let bullet = spawnedPCBullets[bullIdx];
-    //   if(
-    //     (this.bulletHitsPC(this.player, hitbox, bullet.startPoint) ||
-    //     this.bulletHitsPC(this.player, hitbox, bullet.endPoint)) &&
-    //     this.player.invincibilityFrames < 50
-    //   ) {
-    //     this.player.isHit();
-    //     this.drawPlayerHearts();
-    //   };
-    // }
+    for (let bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
+      let bullet = spawnedPCBullets[bullIdx];
+      if(
+        (this.bulletHitsPC(this.player, hitbox, bullet.startPoint) ||
+        this.bulletHitsPC(this.player, hitbox, bullet.endPoint)) &&
+        this.player.invincibilityFrames > 50
+      ) {
+        this.player.isHit();
+        this.drawPlayerHearts();
+      };
+    }
 
     for (let bullIdx = 0; bullIdx < spawnedBadBullets.length; bullIdx++) {
       let bullet = spawnedBadBullets[bullIdx];
@@ -181,11 +181,11 @@ class Field {
   }
 
   bulletHitsPC(player, hitbox, bullet) {
-    hitbox.x = hitbox.x - player.pcFieldWidth / 2 + this.fgCanvas.width / 2;
-    hitbox.y = hitbox.y - player.pcFieldHeight / 2 + this.fgCanvas.height / 2;
+    let newX = hitbox.x - player.pcFieldWidth / 2 + this.fgCanvas.width / 2;
+    let newY = hitbox.y - player.pcFieldHeight / 2 + this.fgCanvas.height / 2;
     let distanceFromHitboxToBullet =
       Math.sqrt(
-        Math.pow(hitbox.x - bullet.x, 2) + Math.pow(hitbox.y - bullet.y, 2)
+        Math.pow(newX - bullet.x, 2) + Math.pow(newY - bullet.y, 2)
       );
 
     return distanceFromHitboxToBullet <= hitbox.radius
