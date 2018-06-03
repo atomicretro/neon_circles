@@ -496,8 +496,8 @@ var Field = function () {
     }
   }, {
     key: 'updatePlayerScore',
-    value: function updatePlayerScore() {
-      this.playerScore += 100;
+    value: function updatePlayerScore(demon) {
+      if (demon === 'mouthDemon' || demon === 'eyeDemon') this.playerScore += 100;else if (demon === 'faceDemon') this.playerScore += 150;
       this.statsCanvas.ctx.clearRect(45, 20, 150, 40);
       this.statsCanvas.ctx.fillStyle = "rgba(255, 255, 255, 0.8";
       this.statsCanvas.ctx.fillRect(45, 20, 150, 40);
@@ -784,7 +784,7 @@ var Game = function () {
         if (_demon.type === 'faceDemon' && _demon.spawned) spawnedLvl2++;
       }
 
-      if (this.lastTime - this.startTime < 10000) {
+      if (this.lastTime - this.startTime < 30000) {
         this.spawnLevelOneDemons(spawnedLvl1, 4);
         this.spawnLevelTwoDemons(spawnedLvl2, 1);
       } else {
@@ -795,7 +795,11 @@ var Game = function () {
   }, {
     key: 'spawnLevelOneDemons',
     value: function spawnLevelOneDemons(numDemons, max) {
-      if (numDemons < max && this.lastTime - this.lvl1SpawnBuffer > 5000) {
+      if (numDemons === 0) {
+        this.lvl1DemonPool.get('mouthDemon');
+        this.lvl1DemonPool.get('eyeDemon');
+        this.lvl1SpawnBuffer = Date.now();
+      } else if (numDemons < max && this.lastTime - this.lvl1SpawnBuffer > 5000) {
         var toGet = Math.random() < 0.5 ? 'mouthDemon' : 'eyeDemon';
         this.lvl1DemonPool.get(toGet);
       }
@@ -803,7 +807,7 @@ var Game = function () {
   }, {
     key: 'spawnLevelTwoDemons',
     value: function spawnLevelTwoDemons(numDemons, max) {
-      if (numDemons < max && this.lastTime - this.lvl2SpawnBuffer > 10) {
+      if (numDemons < max && this.lastTime - this.lvl2SpawnBuffer > 10000) {
         this.lvl2DemonPool.get('faceDemon');
         this.lvl2SpawnBuffer = Date.now();
       }
@@ -873,7 +877,7 @@ var Game = function () {
           var bullet = spawnedPCBullets[bullIdx];
           var drawPoint = demon.drawPoint;
           if ((this.pcBulletHitsDemon(demon, drawPoint, bullet.startPoint) || this.pcBulletHitsDemon(demon, drawPoint, bullet.endPoint)) && demon.invincibilityFrames > 50) {
-            this.field.updatePlayerScore();
+            this.field.updatePlayerScore(demon.type);
             this.calculateDemonKillTime(demon);
             demon.isHit();
           };
@@ -1260,7 +1264,7 @@ var Player = function () {
         theta: this.bowTheta,
         startRadius: 12,
         endRadius: -8,
-        speed: 4
+        speed: 6
       };
       this.BulletPool.get(bulletData);
     }

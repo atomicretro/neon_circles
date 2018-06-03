@@ -77,7 +77,7 @@ class Player {
       theta: this.bowTheta,
       startRadius: 12,
       endRadius: -8,
-      speed: 4
+      speed: 6
     }
     this.BulletPool.get(bulletData);
   }

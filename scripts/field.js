@@ -95,8 +95,9 @@ class Field {
     }
   }
 
-  updatePlayerScore() {
-    this.playerScore += 100;
+  updatePlayerScore(demon) {
+    if(demon === 'mouthDemon' || demon === 'eyeDemon') this.playerScore += 100;
+    else if(demon === 'faceDemon') this.playerScore += 150;
     this.statsCanvas.ctx.clearRect(45, 20, 150, 40);
     this.statsCanvas.ctx.fillStyle = "rgba(255, 255, 255, 0.8";
     this.statsCanvas.ctx.fillRect(45, 20, 150, 40);
