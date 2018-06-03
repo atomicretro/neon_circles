@@ -1,7 +1,7 @@
 import Field from './field';
 import Player from './player';
 import { AssetStore, Sprite } from './utilities';
-import BaddiePool from './baddie';
+import DemonPool from './demon';
 import BulletPool from './bullet';
 
 const KEY_MAP = {
@@ -62,10 +62,10 @@ class Game {
   }
 
   setupNewGame() {
-    this.badBulletPool = new BulletPool(1, this.fgCanvas, 'demonBullet');
+    this.demonBulletPool = new BulletPool(1, this.fgCanvas, 'demonBullet');
     this.pcBulletPool = new BulletPool(4, this.fgCanvas, 'player');
-    this.BaddiePool = new BaddiePool(
-      1, this.fgCanvas.ctx, this.AssetStore, this.badBulletPool
+    this.DemonPool = new DemonPool(
+      1, this.fgCanvas.ctx, this.AssetStore, this.demonBulletPool
     );
     this.player = new Player(this.pcCanvas, this.pcBulletPool);
     this.movementDirection = 'standard';
@@ -85,9 +85,9 @@ class Game {
       this.statsCanvas,
       this.pcCanvas,
       this.AssetStore,
-      this.badBulletPool,
+      this.demonBulletPool,
       this.pcBulletPool,
-      this.BaddiePool,
+      this.DemonPool,
       this.player
     );
   }

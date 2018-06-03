@@ -29,7 +29,7 @@ Following with the above philosophy and the desire to keep Neon Circles simple, 
 The scripts that I foresee being necessary are:
 - field.js -- this will house the playing field itself, and will be responsible for things like the player's circle, bullets, and changing levels.
 - player.js -- this will be the player character. It will be responsible for its own movement, its hitbox, and receiving input from the player.
-- baddie.js -- this will be the enemies the player must fight. It will be responsible for their AI and movement patterns.
+- demon.js -- this will be the enemies the player must fight. It will be responsible for their AI and movement patterns.
 
 ### Wireframe
 ![wireframes](https://github.com/atomicretro/circles/blob/master/wireframes/gameplay_wireframe.png)

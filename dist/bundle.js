@@ -71,140 +71,6 @@
 /************************************************************************/
 /******/ ({
 
-/***/ "./scripts/baddie.js":
-/*!***************************!*\
-  !*** ./scripts/baddie.js ***!
-  \***************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _utilities = __webpack_require__(/*! ./utilities */ "./scripts/utilities.js");
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var BaddiePool = function (_ObjectPool) {
-  _inherits(BaddiePool, _ObjectPool);
-
-  function BaddiePool(size, ctx, AssetStore, BulletPool) {
-    _classCallCheck(this, BaddiePool);
-
-    var _this = _possibleConstructorReturn(this, (BaddiePool.__proto__ || Object.getPrototypeOf(BaddiePool)).call(this, size, ctx));
-
-    _this.BulletPool = BulletPool;
-
-    for (var i = 0; i < size; i++) {
-      var baddie = new Baddie(ctx, 'redDemon', AssetStore);
-      _this.pool.push(baddie);
-    }
-    return _this;
-  }
-
-  return BaddiePool;
-}(_utilities.ObjectPool);
-
-exports.default = BaddiePool;
-;
-
-var Baddie = function () {
-  function Baddie(ctx, type, AssetStore) {
-    _classCallCheck(this, Baddie);
-
-    this.ctx = ctx;
-    this.type = type;
-    this.setDefaultValues();
-    var storedAsset = AssetStore[type];
-    this.width = storedAsset.width;
-    this.height = storedAsset.height;
-    this.sprite = new _utilities.Sprite(ctx, storedAsset.image, this.width, this.height, storedAsset.srcX, storedAsset.srcY);
-  }
-
-  _createClass(Baddie, [{
-    key: 'spawn',
-    value: function spawn(baddieData) {
-      this.theta = baddieData.theta;
-      this.drawPoint = this.computeDrawPoint();
-      this.speed = baddieData.speed;
-      this.spawned = true;
-    }
-  }, {
-    key: 'draw',
-    value: function draw(BulletPool) {
-      this.theta -= this.speed;
-      this.drawPoint = this.computeDrawPoint();
-      this.sprite.draw(this.drawPoint.x, this.drawPoint.y);
-
-      this.chanceToFire = Math.floor(Math.random() * 101);
-      if (this.chanceToFire / 100 < this.fireThreshold) {
-        this.fire(BulletPool);
-      }
-    }
-  }, {
-    key: 'resetable',
-    value: function resetable() {
-      if (this.isHit) return true;
-      return false;
-    }
-  }, {
-    key: 'computeDrawPoint',
-    value: function computeDrawPoint() {
-      return {
-        x: Math.cos(this.theta) * -this.radius + 390,
-        y: Math.sin(this.theta) * -this.radius + 232
-      };
-    }
-  }, {
-    key: 'clear',
-    value: function clear() {
-      this.ctx.clearRect(this.drawPoint.x - 5, this.drawPoint.y - 5, this.width + 10, this.height + 10);
-    }
-  }, {
-    key: 'fire',
-    value: function fire(BulletPool) {
-      var bulletData = {
-        theta: this.theta,
-        startRadius: this.radius,
-        endRadius: this.radius - 20,
-        speed: 4,
-        startPoint: {
-          x: this.drawPoint.x + this.width / 2,
-          y: this.drawPoint.y + this.height / 2
-        }
-      };
-      BulletPool.get(bulletData);
-    }
-  }, {
-    key: 'setDefaultValues',
-    value: function setDefaultValues() {
-      this.isHit = false;
-      this.chanceToFire = 0;
-      this.fireThreshold = 0.01;
-      this.spawned = false;
-      this.drawPoint = { x: 400, y: 250 };
-      this.speed = 0.1;
-      this.radius = 300; // The 'track' the baddie moves along
-    }
-  }]);
-
-  return Baddie;
-}();
-
-;
-
-/***/ }),
-
 /***/ "./scripts/bullet.js":
 /*!***************************!*\
   !*** ./scripts/bullet.js ***!
@@ -342,6 +208,140 @@ var Bullet = function () {
 
 /***/ }),
 
+/***/ "./scripts/demon.js":
+/*!**************************!*\
+  !*** ./scripts/demon.js ***!
+  \**************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _utilities = __webpack_require__(/*! ./utilities */ "./scripts/utilities.js");
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var DemonPool = function (_ObjectPool) {
+  _inherits(DemonPool, _ObjectPool);
+
+  function DemonPool(size, ctx, AssetStore, BulletPool) {
+    _classCallCheck(this, DemonPool);
+
+    var _this = _possibleConstructorReturn(this, (DemonPool.__proto__ || Object.getPrototypeOf(DemonPool)).call(this, size, ctx));
+
+    _this.BulletPool = BulletPool;
+
+    for (var i = 0; i < size; i++) {
+      var demon = new Demon(ctx, 'mouthDemon', AssetStore);
+      _this.pool.push(demon);
+    }
+    return _this;
+  }
+
+  return DemonPool;
+}(_utilities.ObjectPool);
+
+exports.default = DemonPool;
+;
+
+var Demon = function () {
+  function Demon(ctx, type, AssetStore) {
+    _classCallCheck(this, Demon);
+
+    this.ctx = ctx;
+    this.type = type;
+    this.setDefaultValues();
+    var storedAsset = AssetStore[type];
+    this.width = storedAsset.width;
+    this.height = storedAsset.height;
+    this.sprite = new _utilities.Sprite(ctx, storedAsset.image, this.width, this.height, storedAsset.srcX, storedAsset.srcY);
+  }
+
+  _createClass(Demon, [{
+    key: 'spawn',
+    value: function spawn(demonData) {
+      this.theta = demonData.theta;
+      this.drawPoint = this.computeDrawPoint();
+      this.speed = demonData.speed;
+      this.spawned = true;
+    }
+  }, {
+    key: 'draw',
+    value: function draw(BulletPool) {
+      this.theta -= this.speed;
+      this.drawPoint = this.computeDrawPoint();
+      this.sprite.draw(this.drawPoint.x, this.drawPoint.y);
+
+      this.chanceToFire = Math.floor(Math.random() * 101);
+      if (this.chanceToFire / 100 < this.fireThreshold) {
+        this.fire(BulletPool);
+      }
+    }
+  }, {
+    key: 'resetable',
+    value: function resetable() {
+      if (this.isHit) return true;
+      return false;
+    }
+  }, {
+    key: 'computeDrawPoint',
+    value: function computeDrawPoint() {
+      return {
+        x: Math.cos(this.theta) * -this.radius + 390,
+        y: Math.sin(this.theta) * -this.radius + 232
+      };
+    }
+  }, {
+    key: 'clear',
+    value: function clear() {
+      this.ctx.clearRect(this.drawPoint.x - 5, this.drawPoint.y - 5, this.width + 10, this.height + 10);
+    }
+  }, {
+    key: 'fire',
+    value: function fire(BulletPool) {
+      var bulletData = {
+        theta: this.theta,
+        startRadius: this.radius,
+        endRadius: this.radius - 20,
+        speed: 4,
+        startPoint: {
+          x: this.drawPoint.x + this.width / 2,
+          y: this.drawPoint.y + this.height / 2
+        }
+      };
+      BulletPool.get(bulletData);
+    }
+  }, {
+    key: 'setDefaultValues',
+    value: function setDefaultValues() {
+      this.isHit = false;
+      this.chanceToFire = 0;
+      this.fireThreshold = 0.01;
+      this.spawned = false;
+      this.drawPoint = { x: 400, y: 250 };
+      this.speed = 0.1;
+      this.radius = 300; // The 'track' the demon moves along
+    }
+  }]);
+
+  return Demon;
+}();
+
+;
+
+/***/ }),
+
 /***/ "./scripts/field.js":
 /*!**************************!*\
   !*** ./scripts/field.js ***!
@@ -363,7 +363,7 @@ var _utilities = __webpack_require__(/*! ./utilities */ "./scripts/utilities.js"
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Field = function () {
-  function Field(fgCanvasObj, statsCanvasObj, pcCanvasObj, AssetStore, badBulletPool, pcBulletPool, BaddiePool, player) {
+  function Field(fgCanvasObj, statsCanvasObj, pcCanvasObj, AssetStore, demonBulletPool, pcBulletPool, DemonPool, player) {
     _classCallCheck(this, Field);
 
     this.fgCanvas = fgCanvasObj;
@@ -371,9 +371,9 @@ var Field = function () {
     this.pcCanvas = pcCanvasObj;
 
     this.AssetStore = AssetStore;
-    this.badBulletPool = badBulletPool;
+    this.demonBulletPool = demonBulletPool;
     this.pcBulletPool = pcBulletPool;
-    this.BaddiePool = BaddiePool;
+    this.DemonPool = DemonPool;
 
     this.player = player;
 
@@ -391,10 +391,10 @@ var Field = function () {
       this.drawPlayerRails('circle');
       this.checkCollisions();
       this.player.draw();
-      this.BaddiePool.get({ theta: Math.PI / 2, speed: 0.005 });
-      this.BaddiePool.draw();
+      this.DemonPool.get({ theta: Math.PI / 2, speed: 0.005 });
+      this.DemonPool.draw();
       this.pcBulletPool.draw('player');
-      this.badBulletPool.draw();
+      this.demonBulletPool.draw();
     }
   }, {
     key: 'drawStatusBar',
@@ -512,12 +512,12 @@ var Field = function () {
         return bullet.spawned;
       });
       this.checkPlayerCollision(spawnedPCBullets);
-      this.checkBaddieCollision(spawnedPCBullets);
+      this.checkDemonCollision(spawnedPCBullets);
     }
   }, {
     key: 'checkPlayerCollision',
     value: function checkPlayerCollision(spawnedPCBullets) {
-      var spawnedBadBullets = this.badBulletPool.pool.filter(function (bullet) {
+      var spawnedDemonBullets = this.demonBulletPool.pool.filter(function (bullet) {
         return bullet.spawned;
       });
 
@@ -535,8 +535,8 @@ var Field = function () {
         };
       }
 
-      for (var _bullIdx = 0; _bullIdx < spawnedBadBullets.length; _bullIdx++) {
-        var _bullet = spawnedBadBullets[_bullIdx];
+      for (var _bullIdx = 0; _bullIdx < spawnedDemonBullets.length; _bullIdx++) {
+        var _bullet = spawnedDemonBullets[_bullIdx];
         if ((this.bulletHitsPC(this.player, hitbox, _bullet.startPoint) || this.bulletHitsPC(this.player, hitbox, _bullet.endPoint)) && this.player.invincibilityFrames > 50) {
           this.player.isHit();
           this.drawPlayerHearts();
@@ -553,28 +553,28 @@ var Field = function () {
       return distanceFromHitboxToBullet <= hitbox.radius;
     }
   }, {
-    key: 'checkBaddieCollision',
-    value: function checkBaddieCollision(spawnedPCBullets) {
-      var spawnedBaddies = this.BaddiePool.pool.filter(function (baddie) {
-        return baddie.spawned;
+    key: 'checkDemonCollision',
+    value: function checkDemonCollision(spawnedPCBullets) {
+      var spawnedDemons = this.DemonPool.pool.filter(function (demon) {
+        return demon.spawned;
       });
 
-      for (var badIdx = 0; badIdx < spawnedBaddies.length; badIdx++) {
-        var baddie = spawnedBaddies[badIdx];
+      for (var demonIdx = 0; demonIdx < spawnedDemons.length; demonIdx++) {
+        var demon = spawnedDemons[demonIdx];
         for (var bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
           var bullet = spawnedPCBullets[bullIdx];
-          var drawPoint = baddie.drawPoint;
-          if (this.pcBulletHitsBaddie(baddie, drawPoint, bullet.startPoint) || this.pcBulletHitsBaddie(baddie, drawPoint, bullet.endPoint)) {
+          var drawPoint = demon.drawPoint;
+          if (this.pcBulletHitsDemon(demon, drawPoint, bullet.startPoint) || this.pcBulletHitsDemon(demon, drawPoint, bullet.endPoint)) {
             this.updatePlayerScore();
-            baddie.isHit = true;
+            demon.isHit = true;
           };
         }
       }
     }
   }, {
-    key: 'pcBulletHitsBaddie',
-    value: function pcBulletHitsBaddie(baddie, drawPoint, bullet) {
-      return drawPoint.x <= bullet.x && bullet.x <= drawPoint.x + baddie.width && drawPoint.y <= bullet.y && bullet.y <= drawPoint.y + baddie.height;
+    key: 'pcBulletHitsDemon',
+    value: function pcBulletHitsDemon(demon, drawPoint, bullet) {
+      return drawPoint.x <= bullet.x && bullet.x <= drawPoint.x + demon.width && drawPoint.y <= bullet.y && bullet.y <= drawPoint.y + demon.height;
     }
   }, {
     key: 'undrawFGContext',
@@ -635,9 +635,9 @@ var _player2 = _interopRequireDefault(_player);
 
 var _utilities = __webpack_require__(/*! ./utilities */ "./scripts/utilities.js");
 
-var _baddie = __webpack_require__(/*! ./baddie */ "./scripts/baddie.js");
+var _demon = __webpack_require__(/*! ./demon */ "./scripts/demon.js");
 
-var _baddie2 = _interopRequireDefault(_baddie);
+var _demon2 = _interopRequireDefault(_demon);
 
 var _bullet = __webpack_require__(/*! ./bullet */ "./scripts/bullet.js");
 
@@ -711,9 +711,9 @@ var Game = function () {
   _createClass(Game, [{
     key: 'setupNewGame',
     value: function setupNewGame() {
-      this.badBulletPool = new _bullet2.default(1, this.fgCanvas, 'demonBullet');
+      this.demonBulletPool = new _bullet2.default(1, this.fgCanvas, 'demonBullet');
       this.pcBulletPool = new _bullet2.default(4, this.fgCanvas, 'player');
-      this.BaddiePool = new _baddie2.default(1, this.fgCanvas.ctx, this.AssetStore, this.badBulletPool);
+      this.DemonPool = new _demon2.default(1, this.fgCanvas.ctx, this.AssetStore, this.demonBulletPool);
       this.player = new _player2.default(this.pcCanvas, this.pcBulletPool);
       this.movementDirection = 'standard';
       this.muted = false;
@@ -728,7 +728,7 @@ var Game = function () {
   }, {
     key: 'setupNewField',
     value: function setupNewField() {
-      this.field = new _field2.default(this.fgCanvas, this.statsCanvas, this.pcCanvas, this.AssetStore, this.badBulletPool, this.pcBulletPool, this.BaddiePool, this.player);
+      this.field = new _field2.default(this.fgCanvas, this.statsCanvas, this.pcCanvas, this.AssetStore, this.demonBulletPool, this.pcBulletPool, this.DemonPool, this.player);
     }
   }, {
     key: 'drawLoadingScreen',

@@ -1,18 +1,18 @@
 import { Sprite, ObjectPool } from './utilities';
 
-export default class BaddiePool extends ObjectPool {
+export default class DemonPool extends ObjectPool {
   constructor(size, ctx, AssetStore, BulletPool) {
     super(size, ctx);
     this.BulletPool = BulletPool;
 
     for (let i = 0; i < size; i++) {
-      let baddie = new Baddie(ctx, 'redDemon', AssetStore);
-      this.pool.push(baddie);
+      let demon = new Demon(ctx, 'mouthDemon', AssetStore);
+      this.pool.push(demon);
     }
   }
 };
 
-class Baddie {
+class Demon {
   constructor(ctx, type, AssetStore) {
     this.ctx = ctx;
     this.type = type;
@@ -30,10 +30,10 @@ class Baddie {
     );
   }
 
-  spawn(baddieData) {
-    this.theta = baddieData.theta;
+  spawn(demonData) {
+    this.theta = demonData.theta;
     this.drawPoint = this.computeDrawPoint();
-    this.speed = baddieData.speed;
+    this.speed = demonData.speed;
     this.spawned = true;
   }
 
@@ -90,6 +90,6 @@ class Baddie {
     this.spawned = false;
     this.drawPoint = {x: 400, y: 250};
     this.speed = 0.1;
-    this.radius = 300; // The 'track' the baddie moves along
+    this.radius = 300; // The 'track' the demon moves along
   }
 };

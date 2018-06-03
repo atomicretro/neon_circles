@@ -6,9 +6,9 @@ class Field {
     statsCanvasObj,
     pcCanvasObj,
     AssetStore,
-    badBulletPool,
+    demonBulletPool,
     pcBulletPool,
-    BaddiePool,
+    DemonPool,
     player
   ) {
     this.fgCanvas = fgCanvasObj;
@@ -16,9 +16,9 @@ class Field {
     this.pcCanvas = pcCanvasObj;
 
     this.AssetStore = AssetStore;
-    this.badBulletPool = badBulletPool;
+    this.demonBulletPool = demonBulletPool;
     this.pcBulletPool = pcBulletPool;
-    this.BaddiePool = BaddiePool;
+    this.DemonPool = DemonPool;
 
     this.player = player;
 
@@ -38,10 +38,10 @@ class Field {
     this.drawPlayerRails('circle');
     this.checkCollisions();
     this.player.draw();
-    this.BaddiePool.get({ theta: Math.PI / 2, speed: 0.005 });
-    this.BaddiePool.draw();
+    this.DemonPool.get({ theta: Math.PI / 2, speed: 0.005 });
+    this.DemonPool.draw();
     this.pcBulletPool.draw('player');
-    this.badBulletPool.draw();
+    this.demonBulletPool.draw();
   }
 
   drawStatusBar() {
@@ -153,11 +153,11 @@ class Field {
     let spawnedPCBullets = this.pcBulletPool.pool.filter(
       (bullet) => bullet.spawned )
     this.checkPlayerCollision(spawnedPCBullets);
-    this.checkBaddieCollision(spawnedPCBullets);
+    this.checkDemonCollision(spawnedPCBullets);
   }
 
   checkPlayerCollision(spawnedPCBullets) {
-    let spawnedBadBullets = this.badBulletPool.pool.filter(
+    let spawnedDemonBullets = this.demonBulletPool.pool.filter(
       (bullet) => bullet.spawned )
 
       let hitbox = {
@@ -178,8 +178,8 @@ class Field {
       };
     }
 
-    for (let bullIdx = 0; bullIdx < spawnedBadBullets.length; bullIdx++) {
-      let bullet = spawnedBadBullets[bullIdx];
+    for (let bullIdx = 0; bullIdx < spawnedDemonBullets.length; bullIdx++) {
+      let bullet = spawnedDemonBullets[bullIdx];
       if(
         (this.bulletHitsPC(this.player, hitbox, bullet.startPoint) ||
         this.bulletHitsPC(this.player, hitbox, bullet.endPoint)) &&
@@ -202,30 +202,30 @@ class Field {
     return distanceFromHitboxToBullet <= hitbox.radius
   }
 
-  checkBaddieCollision(spawnedPCBullets) {
-    let spawnedBaddies = this.BaddiePool.pool.filter(
-      (baddie) => baddie.spawned )
+  checkDemonCollision(spawnedPCBullets) {
+    let spawnedDemons = this.DemonPool.pool.filter(
+      (demon) => demon.spawned )
 
-    for (let badIdx = 0; badIdx < spawnedBaddies.length; badIdx++) {
-      let baddie = spawnedBaddies[badIdx];
+    for (let demonIdx = 0; demonIdx < spawnedDemons.length; demonIdx++) {
+      let demon = spawnedDemons[demonIdx];
       for (let bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
         let bullet = spawnedPCBullets[bullIdx];
-        let drawPoint = baddie.drawPoint;
+        let drawPoint = demon.drawPoint;
         if(
-          this.pcBulletHitsBaddie(baddie, drawPoint, bullet.startPoint) ||
-          this.pcBulletHitsBaddie(baddie, drawPoint, bullet.endPoint)
+          this.pcBulletHitsDemon(demon, drawPoint, bullet.startPoint) ||
+          this.pcBulletHitsDemon(demon, drawPoint, bullet.endPoint)
         ) {
           this.updatePlayerScore();
-          baddie.isHit = true;
+          demon.isHit = true;
         };
       }
     }
   }
 
-  pcBulletHitsBaddie(baddie, drawPoint, bullet) {
+  pcBulletHitsDemon(demon, drawPoint, bullet) {
     return (
-      (drawPoint.x <= bullet.x && bullet.x <= drawPoint.x + baddie.width) &&
-      (drawPoint.y <= bullet.y && bullet.y <= drawPoint.y + baddie.height)
+      (drawPoint.x <= bullet.x && bullet.x <= drawPoint.x + demon.width) &&
+      (drawPoint.y <= bullet.y && bullet.y <= drawPoint.y + demon.height)
     )
   }
 
