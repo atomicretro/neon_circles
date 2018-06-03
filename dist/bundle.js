@@ -147,7 +147,7 @@ var Baddie = function () {
       this.sprite.draw(this.drawPoint.x, this.drawPoint.y);
 
       this.chanceToFire = Math.floor(Math.random() * 101);
-      if (this.chanceToFire / 100 < 100) {
+      if (this.chanceToFire / 100 < this.fireThreshold) {
         this.fire(BulletPool);
       }
     }
@@ -410,7 +410,7 @@ var Field = function () {
       this.drawPlayerHearts();
 
       // Charge container
-      this.statsCanvas.ctx.strokeStyle = 'blue';
+      this.statsCanvas.ctx.strokeStyle = '#6816e0';
       this.statsCanvas.ctx.strokeRect(352, 30, 98, 13);
 
       // Mute / unmute button
@@ -457,9 +457,9 @@ var Field = function () {
         this.statsCanvas.ctx.clearRect(353, 31, 96, 11);
         this.statsCanvas.ctx.fillStyle = "rgba(255, 255, 255, 0.8";
         this.statsCanvas.ctx.fillRect(353, 31, 96, 11);
-      } else if (this.player.fireCharge < 25) {
-        this.statsCanvas.ctx.fillStyle = 'blue';
-        this.statsCanvas.ctx.fillRect(353, 31, this.player.fireCharge * 4, 11);
+      } else if (this.player.fireCharge < 40) {
+        this.statsCanvas.ctx.fillStyle = '#6816e0';
+        this.statsCanvas.ctx.fillRect(353, 31, this.player.fireCharge * 2.5, 11);
       }
     }
   }, {
@@ -483,13 +483,17 @@ var Field = function () {
     value: function drawPlayerRails(shape) {
       var xCenter = this.pcCanvas.width / 2;
       var yCenter = this.pcCanvas.height / 2;
+      if (this.player.fireCharge < 40) {
+        this.pcCanvas.ctx.strokeStyle = "white";
+      } else {
+        this.pcCanvas.ctx.strokeStyle = "#6816e0";
+      }
 
       switch (shape) {
         case 'circle':
         default:
           this.pcCanvas.ctx.beginPath();
           this.pcCanvas.ctx.arc(xCenter, yCenter, 60, 0, 2 * Math.PI, true);
-          this.pcCanvas.ctx.strokeStyle = "white";
           this.pcCanvas.ctx.lineWidth = 2;
           this.pcCanvas.ctx.stroke();
       }
@@ -700,7 +704,7 @@ var Game = function () {
     key: 'setupNewGame',
     value: function setupNewGame() {
       this.badBulletPool = new _bullet2.default(1, this.fgCanvas, 'demonBullet');
-      this.pcBulletPool = new _bullet2.default(8, this.fgCanvas, 'player');
+      this.pcBulletPool = new _bullet2.default(4, this.fgCanvas, 'player');
       this.BaddiePool = new _baddie2.default(1, this.fgCanvas.ctx, this.AssetStore, this.badBulletPool);
       this.player = new _player2.default(this.pcCanvas, this.pcBulletPool);
       this.movementDirection = 'standard';
@@ -790,7 +794,9 @@ var Game = function () {
       this.optsCanvas.ctx.fillText("PLAY", 320, 450);
 
       this.optsCanvas.ctx.font = "12px sf_alien_encountersitalic";
-      this.optsCanvas.ctx.fillText("m to mute!", 20, 480);
+      this.optsCanvas.ctx.fillText("enter to start!", 20, 480);
+      this.optsCanvas.ctx.font = "12px sf_alien_encountersitalic";
+      this.optsCanvas.ctx.fillText("m to mute!", 705, 460);
       this.optsCanvas.ctx.font = "12px sf_alien_encountersitalic";
       this.optsCanvas.ctx.fillText("p to pause!", 700, 480);
     }
@@ -885,6 +891,7 @@ var Game = function () {
     key: 'keydown',
     value: function keydown(e) {
       var keyCode = e.which || e.keyCode || 0;
+      if (keyCode === 13 && this.gameStatus === 'unbegun') this.startRound();
       if (keyCode === 77) this.clickMute();
       if (keyCode === 80) this.clickPause();
       if (KEY_MAP[keyCode]) {
@@ -1035,7 +1042,7 @@ var Player = function () {
     this.maxSpeed = 0.3;
     this.radius = 50; // The 'track' the player moves along
     this.fireCharge = 0;
-    this.fireCooldown = 25;
+    this.fireCooldown = 40;
     this.invincibilityFrames = 50;
     this.life = 3;
 

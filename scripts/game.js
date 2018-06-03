@@ -62,7 +62,7 @@ class Game {
 
   setupNewGame() {
     this.badBulletPool = new BulletPool(1, this.fgCanvas, 'demonBullet');
-    this.pcBulletPool = new BulletPool(8, this.fgCanvas, 'player');
+    this.pcBulletPool = new BulletPool(4, this.fgCanvas, 'player');
     this.BaddiePool = new BaddiePool(
       1, this.fgCanvas.ctx, this.AssetStore, this.badBulletPool
     );
@@ -156,7 +156,9 @@ class Game {
     this.optsCanvas.ctx.fillText("PLAY", 320, 450);
 
     this.optsCanvas.ctx.font = "12px sf_alien_encountersitalic";
-    this.optsCanvas.ctx.fillText("m to mute!", 20, 480);
+    this.optsCanvas.ctx.fillText("enter to start!", 20, 480);
+    this.optsCanvas.ctx.font = "12px sf_alien_encountersitalic";
+    this.optsCanvas.ctx.fillText("m to mute!", 705, 460);
     this.optsCanvas.ctx.font = "12px sf_alien_encountersitalic";
     this.optsCanvas.ctx.fillText("p to pause!", 700, 480);
   }
@@ -268,6 +270,7 @@ class Game {
 
   keydown(e) {
     let keyCode = e.which || e.keyCode || 0;
+    if(keyCode === 13 && this.gameStatus === 'unbegun') this.startRound();
     if(keyCode === 77) this.clickMute();
     if(keyCode === 80) this.clickPause();
     if (KEY_MAP[keyCode]) {

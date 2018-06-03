@@ -58,7 +58,7 @@ class Field {
     this.drawPlayerHearts();
 
     // Charge container
-    this.statsCanvas.ctx.strokeStyle = 'blue';
+    this.statsCanvas.ctx.strokeStyle = '#6816e0';
     this.statsCanvas.ctx.strokeRect(352, 30, 98, 13);
 
     // Mute / unmute button
@@ -102,9 +102,9 @@ class Field {
       this.statsCanvas.ctx.clearRect(353, 31, 96, 11);
       this.statsCanvas.ctx.fillStyle = "rgba(255, 255, 255, 0.8";
       this.statsCanvas.ctx.fillRect(353, 31, 96, 11);
-    } else if(this.player.fireCharge < 25) {
-      this.statsCanvas.ctx.fillStyle = 'blue';
-      this.statsCanvas.ctx.fillRect(353, 31, this.player.fireCharge * 4, 11);
+    } else if(this.player.fireCharge < 40) {
+      this.statsCanvas.ctx.fillStyle = '#6816e0';
+      this.statsCanvas.ctx.fillRect(353, 31, this.player.fireCharge * 2.5, 11);
     }
   }
 
@@ -126,13 +126,17 @@ class Field {
   drawPlayerRails(shape) {
     let xCenter = this.pcCanvas.width / 2;
     let yCenter = this.pcCanvas.height / 2;
+    if(this.player.fireCharge < 40) {
+      this.pcCanvas.ctx.strokeStyle = "white";
+    } else {
+      this.pcCanvas.ctx.strokeStyle = "#6816e0";
+    }
 
     switch (shape) {
       case 'circle':
       default:
       this.pcCanvas.ctx.beginPath();
       this.pcCanvas.ctx.arc(xCenter, yCenter, 60, 0, 2 * Math.PI, true);
-      this.pcCanvas.ctx.strokeStyle = "white";
       this.pcCanvas.ctx.lineWidth = 2;
       this.pcCanvas.ctx.stroke();
     }
