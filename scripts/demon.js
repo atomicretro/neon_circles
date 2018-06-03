@@ -92,18 +92,14 @@ class Demon {
   }
 
   setDefaultValues() {
-    if(this.type === 'mouthDemon') {
-      this.theta = Math.PI / 2
-      this.speed = this.speed = Math.random() < 0.5 ? 0.005 : 0.007;
+    let thetaMultiplier = Math.random() < 0.5 ? -1 : 1;
+    let speedMultiplier = Math.random() < 0.5 ? -1 : 1;
+
+    if(this.type === 'mouthDemon' || this.type === 'eyeDemon') {
+      this.theta = (Math.PI / 2) * thetaMultiplier;
+      this.speed = (getRandNum(4, 7) / 1000) * speedMultiplier;
       this.radius = getRandNum(265, 380); // The 'track' the demon moves along
       this.fireThreshold = 0.01;
-
-    } else if(this.type === 'eyeDemon') {
-      this.theta = -Math.PI / 2
-      this.speed = this.speed = Math.random() < 0.5 ? -0.005 : -0.007;
-      this.radius = getRandNum(265, 380);
-      this.fireThreshold = 0.01;
-
     } else if(this.type === 'faceDemon') {
       this.speed = Math.random() < 0.5 ? 0.011 : -0.011;
 
