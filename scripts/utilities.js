@@ -30,10 +30,10 @@ export class Sprite {
   constructor(context, image, srcWidth, srcHeight, srcX, srcY) {
     this.context = context;
     this.image = image;
-    this.srcX = srcX;
-    this.srcY = srcY;
     this.srcWidth = srcWidth;
     this.srcHeight = srcHeight;
+    this.srcX = srcX;
+    this.srcY = srcY;
 
     this.draw = this.draw.bind(this);
   }

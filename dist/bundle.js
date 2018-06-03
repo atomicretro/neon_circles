@@ -265,11 +265,13 @@ var Demon = function () {
 
     this.ctx = ctx;
     this.type = type;
-    this.setDefaultValues();
+
     var storedAsset = AssetStore[type];
+    this.image = storedAsset.image;
     this.width = storedAsset.width;
     this.height = storedAsset.height;
     this.sprite = new _utilities.Sprite(ctx, storedAsset.image, this.width, this.height, storedAsset.srcX, storedAsset.srcY);
+    this.setDefaultValues();
   }
 
   _createClass(Demon, [{
@@ -292,7 +294,12 @@ var Demon = function () {
       this.invincibilityFrames++;
       this.theta -= this.speed;
       this.drawPoint = this.computeDrawPoint();
-      this.sprite.draw(this.drawPoint.x, this.drawPoint.y);
+
+      if (this.type === 'faceDemon' && this.invincibilityFrames < 50) {
+        this.hurtSprite.draw(this.drawPoint.x, this.drawPoint.y);
+      } else {
+        this.sprite.draw(this.drawPoint.x, this.drawPoint.y);
+      }
 
       this.chanceToFire = Math.floor(Math.random() * 101);
       if (this.chanceToFire / 100 < this.fireThreshold) {
@@ -359,6 +366,7 @@ var Demon = function () {
         this.endRadius = getRandNum(125, 225);
         this.life = 2;
         this.fireThreshold = 0.02;
+        this.hurtSprite = new _utilities.Sprite(this.ctx, this.image, this.width, this.height, 31, 0);
       } else if (this.type === 'bossDemon') {
         this.speed = 0.4;
       }
@@ -1350,10 +1358,10 @@ var Sprite = exports.Sprite = function () {
 
     this.context = context;
     this.image = image;
-    this.srcX = srcX;
-    this.srcY = srcY;
     this.srcWidth = srcWidth;
     this.srcHeight = srcHeight;
+    this.srcX = srcX;
+    this.srcY = srcY;
 
     this.draw = this.draw.bind(this);
   }

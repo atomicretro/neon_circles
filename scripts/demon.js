@@ -20,8 +20,9 @@ class Demon {
   constructor(ctx, type, AssetStore) {
     this.ctx = ctx;
     this.type = type;
-    this.setDefaultValues();
+
     let storedAsset = AssetStore[type];
+    this.image = storedAsset.image;
     this.width = storedAsset.width;
     this.height = storedAsset.height;
     this.sprite = new Sprite(
@@ -32,6 +33,7 @@ class Demon {
       storedAsset.srcX,
       storedAsset.srcY
     );
+    this.setDefaultValues();
   }
 
   spawn() {
@@ -51,7 +53,12 @@ class Demon {
       this.invincibilityFrames++;
       this.theta -= this.speed;
       this.drawPoint = this.computeDrawPoint();
-      this.sprite.draw(this.drawPoint.x, this.drawPoint.y);
+
+      if(this.type === 'faceDemon' && this.invincibilityFrames < 50) {
+        this.hurtSprite.draw(this.drawPoint.x, this.drawPoint.y);
+      } else {
+        this.sprite.draw(this.drawPoint.x, this.drawPoint.y);
+      }
 
       this.chanceToFire = Math.floor(Math.random() * 101)
       if (this.chanceToFire/100 < this.fireThreshold) {
@@ -117,6 +124,15 @@ class Demon {
       this.endRadius = getRandNum(125, 225);
       this.life = 2;
       this.fireThreshold = 0.02;
+      this.hurtSprite = new Sprite(
+        this.ctx,
+        this.image,
+        this.width,
+        this.height,
+        31,
+        0
+      );
+      
     } else if(this.type === 'bossDemon') {
       this.speed = 0.4;
     }
