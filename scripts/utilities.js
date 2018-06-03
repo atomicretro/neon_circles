@@ -17,7 +17,7 @@ export class ObjectPool {
         this.pool[i].draw(this.BulletPool);
         if(this.pool[i].resetable()) {
           this.pool[i].setDefaultValues(type);
-          this.pool.push((this.pool.splice(i,1))[0]);
+          this.pool.push((this.pool.splice(i, 1))[0]);
         }
       } else {
           break;
@@ -51,7 +51,7 @@ export class Sprite {
       this.srcHeight  // drawn image height, same as src
     )
   }
-}
+};
 
 export class AssetStore {
   constructor(game) {
@@ -59,37 +59,55 @@ export class AssetStore {
 
     this.backgroundMusic = new Audio("assets/sounds/background_music.mp3");
     this.backgroundMusic.loop = true;
-    this.backgroundMusic.volume = .25;
+    this.backgroundMusic.volume = 0.25;
     this.backgroundMusic.load();
     this.checkReadyState = this.checkReadyState.bind(this);
     this.checkAudio = window.setInterval(() => {this.checkReadyState()}, 1000);
 
-    this.redDemon = {
+    this.mouthDemon = {
       image: new Image(),
-      width: 21,
+      width: 30,
       height: 30,
       srcX: 0,
       srcY: 0
     }
+    this.eyeDemon = {
+      image: new Image(),
+      width: 30,
+      height: 30,
+      srcX: 0,
+      srcY: 0
+    }
+    this.faceDemon = {
+      image: new Image(),
+      width: 30,
+      height: 40,
+      srcX: 0,
+      srcY: 0
+    }
+    this.bossDemon = {
+      image: new Image(),
+      width: 50,
+      height: 54,
+      srcX: 0,
+      srcY: 0
+    }
     this.heart = { image: new Image() }
-    this.numImages = 3;
+
+    this.numAssets = 6;
     this.numLoaded = 0;
-    this.ready = false;
 
-    this.redDemon.image.onload = () => {
-      this.assetLoaded();
-    }
-    this.heart.image.onload = () => {
-      this.assetLoaded();
-    }
+    this.mouthDemon.image.onload = () => { this.assetLoaded(); }
+    this.eyeDemon.image.onload = () => { this.assetLoaded(); }
+    this.faceDemon.image.onload = () => { this.assetLoaded(); }
+    this.bossDemon.image.onload = () => { this.assetLoaded(); }
+    this.heart.image.onload = () => { this.assetLoaded(); }
 
-    this.redDemon.image.src = 'assets/sprites/demon_test.png';
+    this.mouthDemon.image.src = 'assets/sprites/mouth_demon.png';
+    this.eyeDemon.image.src = 'assets/sprites/eye_demon.png';
+    this.faceDemon.image.src = 'assets/sprites/face_demon.png';
+    this.bossDemon.image.src = 'assets/sprites/boss_demon.png';
     this.heart.image.src = 'assets/sprites/heart.png';
-  }
-
-  assetLoaded() {
-    this.numLoaded++;
-    if(this.numLoaded === this.numImages) this.game.startGame();
   }
 
   checkReadyState() {
@@ -98,4 +116,9 @@ export class AssetStore {
       this.assetLoaded();
     }
   }
-}
+
+  assetLoaded() {
+    this.numLoaded++;
+    if(this.numLoaded === this.numAssets) this.game.startGame();
+  }
+};

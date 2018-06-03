@@ -1249,6 +1249,8 @@ var Sprite = exports.Sprite = function () {
   return Sprite;
 }();
 
+;
+
 var AssetStore = exports.AssetStore = function () {
   function AssetStore(game) {
     var _this = this;
@@ -1259,43 +1261,70 @@ var AssetStore = exports.AssetStore = function () {
 
     this.backgroundMusic = new Audio("assets/sounds/background_music.mp3");
     this.backgroundMusic.loop = true;
-    this.backgroundMusic.volume = .25;
+    this.backgroundMusic.volume = 0.25;
     this.backgroundMusic.load();
     this.checkReadyState = this.checkReadyState.bind(this);
     this.checkAudio = window.setInterval(function () {
       _this.checkReadyState();
     }, 1000);
 
-    this.redDemon = {
+    this.mouthDemon = {
       image: new Image(),
-      width: 21,
+      width: 30,
       height: 30,
       srcX: 0,
       srcY: 0
     };
+    this.eyeDemon = {
+      image: new Image(),
+      width: 30,
+      height: 30,
+      srcX: 0,
+      srcY: 0
+    };
+    this.faceDemon = {
+      image: new Image(),
+      width: 30,
+      height: 40,
+      srcX: 0,
+      srcY: 0
+    };
+    this.bossDemon = {
+      image: new Image(),
+      width: 50,
+      height: 54,
+      srcX: 0,
+      srcY: 0
+    };
     this.heart = { image: new Image() };
-    this.numImages = 3;
-    this.numLoaded = 0;
-    this.ready = false;
 
-    this.redDemon.image.onload = function () {
+    this.numAssets = 6;
+    this.numLoaded = 0;
+
+    this.mouthDemon.image.onload = function () {
+      _this.assetLoaded();
+    };
+    this.eyeDemon.image.onload = function () {
+      _this.assetLoaded();
+    };
+    this.faceDemon.image.onload = function () {
+      _this.assetLoaded();
+    };
+    this.bossDemon.image.onload = function () {
       _this.assetLoaded();
     };
     this.heart.image.onload = function () {
       _this.assetLoaded();
     };
 
-    this.redDemon.image.src = 'assets/sprites/demon_test.png';
+    this.mouthDemon.image.src = 'assets/sprites/mouth_demon.png';
+    this.eyeDemon.image.src = 'assets/sprites/eye_demon.png';
+    this.faceDemon.image.src = 'assets/sprites/face_demon.png';
+    this.bossDemon.image.src = 'assets/sprites/boss_demon.png';
     this.heart.image.src = 'assets/sprites/heart.png';
   }
 
   _createClass(AssetStore, [{
-    key: 'assetLoaded',
-    value: function assetLoaded() {
-      this.numLoaded++;
-      if (this.numLoaded === this.numImages) this.game.startGame();
-    }
-  }, {
     key: 'checkReadyState',
     value: function checkReadyState() {
       if (this.backgroundMusic.readyState === 4) {
@@ -1303,10 +1332,18 @@ var AssetStore = exports.AssetStore = function () {
         this.assetLoaded();
       }
     }
+  }, {
+    key: 'assetLoaded',
+    value: function assetLoaded() {
+      this.numLoaded++;
+      if (this.numLoaded === this.numAssets) this.game.startGame();
+    }
   }]);
 
   return AssetStore;
 }();
+
+;
 
 /***/ })
 
