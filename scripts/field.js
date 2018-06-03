@@ -36,9 +36,7 @@ class Field {
     this.clearPCContext();
     this.updatePlayerCharge()
     this.drawPlayerRails('circle');
-    this.checkCollisions();
     this.player.draw();
-    this.DemonPool.get({ theta: Math.PI / 2, speed: 0.005 });
     this.DemonPool.draw();
     this.pcBulletPool.draw('player');
     this.demonBulletPool.draw();
@@ -147,86 +145,6 @@ class Field {
       this.pcCanvas.ctx.lineWidth = 2;
       this.pcCanvas.ctx.stroke();
     }
-  }
-
-  checkCollisions() {
-    let spawnedPCBullets = this.pcBulletPool.pool.filter(
-      (bullet) => bullet.spawned )
-    this.checkPlayerCollision(spawnedPCBullets);
-    this.checkDemonCollision(spawnedPCBullets);
-  }
-
-  checkPlayerCollision(spawnedPCBullets) {
-    let spawnedDemonBullets = this.demonBulletPool.pool.filter(
-      (bullet) => bullet.spawned )
-
-      let hitbox = {
-        x: this.player.hitboxCenter.x,
-        y: this.player.hitboxCenter.y,
-        radius: 12
-      }
-
-    for (let bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
-      let bullet = spawnedPCBullets[bullIdx];
-      if(
-        (this.bulletHitsPC(this.player, hitbox, bullet.startPoint) ||
-        this.bulletHitsPC(this.player, hitbox, bullet.endPoint)) &&
-        this.player.invincibilityFrames > 50
-      ) {
-        this.player.isHit();
-        this.drawPlayerHearts();
-      };
-    }
-
-    for (let bullIdx = 0; bullIdx < spawnedDemonBullets.length; bullIdx++) {
-      let bullet = spawnedDemonBullets[bullIdx];
-      if(
-        (this.bulletHitsPC(this.player, hitbox, bullet.startPoint) ||
-        this.bulletHitsPC(this.player, hitbox, bullet.endPoint)) &&
-        this.player.invincibilityFrames > 50
-      ) {
-        this.player.isHit();
-        this.drawPlayerHearts();
-      };
-    }
-  }
-
-  bulletHitsPC(player, hitbox, bullet) {
-    let newX = hitbox.x - player.pcFieldWidth / 2 + this.fgCanvas.width / 2;
-    let newY = hitbox.y - player.pcFieldHeight / 2 + this.fgCanvas.height / 2;
-    let distanceFromHitboxToBullet =
-      Math.sqrt(
-        Math.pow(newX - bullet.x, 2) + Math.pow(newY - bullet.y, 2)
-      );
-
-    return distanceFromHitboxToBullet <= hitbox.radius
-  }
-
-  checkDemonCollision(spawnedPCBullets) {
-    let spawnedDemons = this.DemonPool.pool.filter(
-      (demon) => demon.spawned )
-
-    for (let demonIdx = 0; demonIdx < spawnedDemons.length; demonIdx++) {
-      let demon = spawnedDemons[demonIdx];
-      for (let bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
-        let bullet = spawnedPCBullets[bullIdx];
-        let drawPoint = demon.drawPoint;
-        if(
-          this.pcBulletHitsDemon(demon, drawPoint, bullet.startPoint) ||
-          this.pcBulletHitsDemon(demon, drawPoint, bullet.endPoint)
-        ) {
-          this.updatePlayerScore();
-          demon.isHit = true;
-        };
-      }
-    }
-  }
-
-  pcBulletHitsDemon(demon, drawPoint, bullet) {
-    return (
-      (drawPoint.x <= bullet.x && bullet.x <= drawPoint.x + demon.width) &&
-      (drawPoint.y <= bullet.y && bullet.y <= drawPoint.y + demon.height)
-    )
   }
 
   undrawFGContext() {

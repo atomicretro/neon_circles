@@ -1,12 +1,22 @@
 import { Sprite, ObjectPool } from './utilities';
 
+const getRandNum = (min, max) => {
+  return Math.floor(Math.random() * (max - min + 1) ) + min;
+};
+
 export default class DemonPool extends ObjectPool {
   constructor(size, ctx, AssetStore, BulletPool) {
     super(size, ctx);
     this.BulletPool = BulletPool;
 
+    let demons = [
+      'mouthDemon', 'mouthDemon',
+      'eyeDemon', 'eyeDemon',
+      'faceDemon', 'faceDemon', 'bossDemon'
+    ]
+
     for (let i = 0; i < size; i++) {
-      let demon = new Demon(ctx, 'mouthDemon', AssetStore);
+      let demon = new Demon(ctx, demons[i], AssetStore);
       this.pool.push(demon);
     }
   }
@@ -30,10 +40,8 @@ class Demon {
     );
   }
 
-  spawn(demonData) {
-    this.theta = demonData.theta;
+  spawn() {
     this.drawPoint = this.computeDrawPoint();
-    this.speed = demonData.speed;
     this.spawned = true;
   }
 
@@ -84,12 +92,34 @@ class Demon {
   }
 
   setDefaultValues() {
+    if(this.type === 'mouthDemon') {
+      this.theta = Math.PI / 2
+      this.speed = this.speed = Math.random() < 0.5 ? 0.005 : 0.007;
+      this.radius = getRandNum(265, 380); // The 'track' the demon moves along
+      this.fireThreshold = 0.01;
+
+    } else if(this.type === 'eyeDemon') {
+      this.theta = -Math.PI / 2
+      this.speed = this.speed = Math.random() < 0.5 ? -0.005 : -0.007;
+      this.radius = getRandNum(265, 380);
+      this.fireThreshold = 0.01;
+
+    } else if(this.type === 'faceDemon') {
+      this.speed = Math.random() < 0.5 ? 0.011 : -0.011;
+
+    } else if(this.type === 'bossDemon') {
+      this.speed = 0.4;
+
+    }
     this.isHit = false;
     this.chanceToFire = 0;
-    this.fireThreshold = 0.01;
     this.spawned = false;
     this.drawPoint = {x: 400, y: 250};
-    this.speed = 0.1;
-    this.radius = 300; // The 'track' the demon moves along
   }
 };
+
+// class MouthDemon extends Demon {
+//   constructor(ctx, type, AssetStore) {
+//     super(ctx, type, AssetStore);
+//   }
+// };

@@ -62,16 +62,23 @@ class Game {
   }
 
   setupNewGame() {
-    this.demonBulletPool = new BulletPool(1, this.fgCanvas, 'demonBullet');
+    this.demonBulletPool = new BulletPool(3, this.fgCanvas, 'demonBullet');
     this.pcBulletPool = new BulletPool(4, this.fgCanvas, 'player');
     this.DemonPool = new DemonPool(
-      1, this.fgCanvas.ctx, this.AssetStore, this.demonBulletPool
+      4, this.fgCanvas.ctx, this.AssetStore, this.demonBulletPool
     );
     this.player = new Player(this.pcCanvas, this.pcBulletPool);
     this.movementDirection = 'standard';
     this.muted = false;
     this.paused = false;
     this.gameStatus = 'unbegun';
+
+    this.timeSinceLastLvl1Kill = Date.now() - 5000;
+    this.timeSinceLastLvl2Kill = Date.now();
+    this.timeSinceLastLvl3Kill = Date.now();
+    this.numLvl1DemonsKilled = 0;
+    this.numLvl2DemonsKilled = 0;
+    this.numLvl3DemonsKilled = 0;
 
     this.play = this.play.bind(this);
     this.startRound = this.startRound.bind(this);
@@ -108,21 +115,136 @@ class Game {
     this.clearOptsContext();
     this.optsCanvas.canvas.classList.add('hidden');
     this.gameStatus = 'playing';
+    this.lastTime = Date.now();
     this.play();
   }
 
   play() {
     this.checkGameOver();
+    this.checkCollisions();
     this.player.move(KEY_STATUS);
-    // let now = Date.now();
-    // let dt = (now - this.lastTime) / 1000.0;
+
+    let now = Date.now();
+    let dt = (now - this.lastTime) / 1000.0;
 
     // update(dt);
-    // this.drawStatusBar();
+    this.spawnDemons();
     this.field.render();
 
-    // this.lastTime = now;
-    if(!this.paused) requestAnimationFrame(this.play);
+    if(!this.paused) {
+      this.lastTime = now;
+      requestAnimationFrame(this.play);
+    }
+  }
+
+  spawnDemons() {
+    let spawnedLvl1 = 0;
+    let spawnedLvl2 = 0;
+    let spawnedLvl3 = 0;
+    for(let i = 0; i < this.DemonPool.pool.length; i++) {
+      let demon = this.DemonPool.pool[i];
+      if(demon.type === 'mouthDemon' && demon.spawned) spawnedLvl1++;
+      else if(demon.type === 'eyeDemon' && demon.spawned) spawnedLvl1++;
+      else if(demon.type === 'faceDemon' && demon.spawned) spawnedLvl2++;
+      else if(demon.type === 'bossDemon' && demon.spawned) spawnedLvl3++;
+    }
+
+    if(spawnedLvl1 < 4 && this.lastTime - this.timeSinceLastLvl1Kill > 5000) {
+      let toGet = Math.random() < 0.5 ? 'mouthDemon' : 'eyeDemon';
+      debugger
+      this.DemonPool.get(toGet);
+    }
+  }
+
+  checkCollisions() {
+    let spawnedPCBullets = this.pcBulletPool.pool.filter(
+      (bullet) => bullet.spawned );
+    this.checkPlayerCollision(spawnedPCBullets);
+    this.checkDemonCollision(spawnedPCBullets);
+  }
+
+  checkPlayerCollision(spawnedPCBullets) {
+    let spawnedDemonBullets = this.demonBulletPool.pool.filter(
+      (bullet) => bullet.spawned );
+
+      let hitbox = {
+        x: this.player.hitboxCenter.x,
+        y: this.player.hitboxCenter.y,
+        radius: 12
+      }
+
+    for (let bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
+      let bullet = spawnedPCBullets[bullIdx];
+      if(
+        (this.bulletHitsPC(this.player, hitbox, bullet.startPoint) ||
+        this.bulletHitsPC(this.player, hitbox, bullet.endPoint)) &&
+        this.player.invincibilityFrames > 50
+      ) {
+        this.player.isHit();
+        this.field.drawPlayerHearts();
+      };
+    }
+
+    for (let bullIdx = 0; bullIdx < spawnedDemonBullets.length; bullIdx++) {
+      let bullet = spawnedDemonBullets[bullIdx];
+      if(
+        (this.bulletHitsPC(this.player, hitbox, bullet.startPoint) ||
+        this.bulletHitsPC(this.player, hitbox, bullet.endPoint)) &&
+        this.player.invincibilityFrames > 50
+      ) {
+        this.player.isHit();
+        this.field.drawPlayerHearts();
+      };
+    }
+  }
+
+  bulletHitsPC(player, hitbox, bullet) {
+    let newX = hitbox.x - player.pcFieldWidth / 2 + this.fgCanvas.width / 2;
+    let newY = hitbox.y - player.pcFieldHeight / 2 + this.fgCanvas.height / 2;
+    let distanceFromHitboxToBullet =
+      Math.sqrt(
+        Math.pow(newX - bullet.x, 2) + Math.pow(newY - bullet.y, 2)
+      );
+
+    return distanceFromHitboxToBullet <= hitbox.radius
+  }
+
+  checkDemonCollision(spawnedPCBullets) {
+    let spawnedDemons = this.DemonPool.pool.filter(
+      (demon) => demon.spawned );
+
+    for (let demonIdx = 0; demonIdx < spawnedDemons.length; demonIdx++) {
+      let demon = spawnedDemons[demonIdx];
+      for (let bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
+        let bullet = spawnedPCBullets[bullIdx];
+        let drawPoint = demon.drawPoint;
+        if(
+          this.pcBulletHitsDemon(demon, drawPoint, bullet.startPoint) ||
+          this.pcBulletHitsDemon(demon, drawPoint, bullet.endPoint)
+        ) {
+          this.field.updatePlayerScore();
+          this.calculateDemonKillTime(demon);
+          demon.isHit = true;
+        };
+      }
+    }
+  }
+
+  pcBulletHitsDemon(demon, drawPoint, bullet) {
+    return (
+      (drawPoint.x <= bullet.x && bullet.x <= drawPoint.x + demon.width) &&
+      (drawPoint.y <= bullet.y && bullet.y <= drawPoint.y + demon.height)
+    )
+  }
+
+  calculateDemonKillTime(demon) {
+    if(demon.type === 'mouthDemon' || demon.type === 'eyeDemon') {
+      this.timeSinceLastLvl1Kill = Date.now();
+    } else if(demon.type === 'faceDemon') {
+      this.timeSinceLastLvl2Kill = Date.now();
+    } else if(demon.type === 'bossDemon') {
+      this.timeSinceLastLvl3Kill = Date.now();
+    };
   }
 
   checkGameOver() {
