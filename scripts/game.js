@@ -5,8 +5,6 @@ import BaddiePool from './baddie';
 import BulletPool from './bullet';
 
 const KEY_MAP = {
-  80: 'pause',     // p
-  77: 'mute',      // m
   74: 'left',     // j
   76: 'right',    // l
   68: 'right',    // d
@@ -126,6 +124,11 @@ class Game {
     this.optsCanvas.ctx.strokeRect(300,385,205,87);
     this.optsCanvas.ctx.font = "60px sf_alien_encountersitalic";
     this.optsCanvas.ctx.fillText("PLAY", 320, 450);
+
+    this.optsCanvas.ctx.font = "12px sf_alien_encountersitalic";
+    this.optsCanvas.ctx.fillText("m to mute!", 20, 480);
+    this.optsCanvas.ctx.font = "12px sf_alien_encountersitalic";
+    this.optsCanvas.ctx.fillText("p to pause!", 700, 480);
   }
 
   drawControls() {
@@ -231,6 +234,8 @@ class Game {
 
   keydown(e) {
     let keyCode = e.which || e.keyCode || 0;
+    if(keyCode === 77) this.clickMute();
+    if(keyCode === 80) this.clickPause();
     if (KEY_MAP[keyCode]) {
       e.preventDefault();
       KEY_STATUS[KEY_MAP[keyCode]] = true;
@@ -248,7 +253,6 @@ class Game {
   statsCanvasCheckClick(e, boundingRect) {
     let clickPosX = e.clientX - boundingRect.left;
     let clickPosY = e.clientY - boundingRect.top;
-    console.log('stats');
 
     if(
       (530 <= clickPosX && clickPosX <= 630) &&

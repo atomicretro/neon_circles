@@ -626,8 +626,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var KEY_MAP = {
-  80: 'pause', // p
-  77: 'mute', // m
   74: 'left', // j
   76: 'right', // l
   68: 'right', // d
@@ -740,6 +738,11 @@ var Game = function () {
       this.optsCanvas.ctx.strokeRect(300, 385, 205, 87);
       this.optsCanvas.ctx.font = "60px sf_alien_encountersitalic";
       this.optsCanvas.ctx.fillText("PLAY", 320, 450);
+
+      this.optsCanvas.ctx.font = "12px sf_alien_encountersitalic";
+      this.optsCanvas.ctx.fillText("m to mute!", 20, 480);
+      this.optsCanvas.ctx.font = "12px sf_alien_encountersitalic";
+      this.optsCanvas.ctx.fillText("p to pause!", 700, 480);
     }
   }, {
     key: 'drawControls',
@@ -837,6 +840,8 @@ var Game = function () {
     key: 'keydown',
     value: function keydown(e) {
       var keyCode = e.which || e.keyCode || 0;
+      if (keyCode === 77) this.clickMute();
+      if (keyCode === 80) this.clickPause();
       if (KEY_MAP[keyCode]) {
         e.preventDefault();
         KEY_STATUS[KEY_MAP[keyCode]] = true;
@@ -856,7 +861,6 @@ var Game = function () {
     value: function statsCanvasCheckClick(e, boundingRect) {
       var clickPosX = e.clientX - boundingRect.left;
       var clickPosY = e.clientY - boundingRect.top;
-      console.log('stats');
 
       if (530 <= clickPosX && clickPosX <= 630 && 10 <= clickPosY && clickPosY <= 40) {
         this.clickMute();
