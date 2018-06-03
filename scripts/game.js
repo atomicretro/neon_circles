@@ -156,11 +156,11 @@ class Game {
     this.optsCanvas.ctx.fillText("PLAY", 320, 450);
 
     this.optsCanvas.ctx.font = "12px sf_alien_encountersitalic";
-    this.optsCanvas.ctx.fillText("enter to start!", 20, 480);
-    this.optsCanvas.ctx.font = "12px sf_alien_encountersitalic";
     this.optsCanvas.ctx.fillText("m to mute!", 705, 460);
-    this.optsCanvas.ctx.font = "12px sf_alien_encountersitalic";
     this.optsCanvas.ctx.fillText("p to pause!", 700, 480);
+    if(this.gameStatus !== 'playing') {
+      this.optsCanvas.ctx.fillText("enter to start!", 20, 480);
+    }
   }
 
   drawStartScreenMessage() {
@@ -270,7 +270,7 @@ class Game {
 
   keydown(e) {
     let keyCode = e.which || e.keyCode || 0;
-    if(keyCode === 13 && this.gameStatus === 'unbegun') this.startRound();
+    if(keyCode === 13 && this.gameStatus !== 'playing') this.newGame();
     if(keyCode === 77) this.clickMute();
     if(keyCode === 80) this.clickPause();
     if (KEY_MAP[keyCode]) {
@@ -322,12 +322,7 @@ class Game {
       } else if(this.gameStatus === 'playing') {
         this.clickPause();
       } else if(this.gameStatus === 'over') {
-        this.field.clearAllContexts();
-        this.setupNewGame();
-        this.setupNewField();
-        this.field.drawStatusBar();
-        console.log(this.paused);
-        this.startRound();
+        this.newGame();
       }
     }
   }
@@ -344,14 +339,22 @@ class Game {
   }
 
   clickPause() {
-    if(this.paused && this.gameStatus !== 'over') {
+    if(this.paused && this.gameStatus === 'playing') {
       this.paused = false;
       this.clearOptsContext();
       this.play();
-    } else {
+    } else if (!this.paused && this.gameStatus === 'playing') {
       this.paused = true;
       this.drawStartScreen();
     };
+  }
+
+  newGame() {
+    this.field.clearAllContexts();
+    this.setupNewGame();
+    this.setupNewField();
+    this.field.drawStatusBar();
+    this.startRound();
   }
 
   swapMovementDirection() {
