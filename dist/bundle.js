@@ -698,7 +698,7 @@ var Game = function () {
     this.paused = false;
     this.gameStatus = 'unbegun';
 
-    this.playRound = this.playRound.bind(this);
+    this.play = this.play.bind(this);
     this.startRound = this.startRound.bind(this);
     this.optsCanvasCheckClick = this.optsCanvasCheckClick.bind(this);
     this.statsCanvasCheckClick = this.statsCanvasCheckClick.bind(this);
@@ -734,11 +734,11 @@ var Game = function () {
     value: function startRound() {
       this.clearOptsContext();
       this.gameStatus = 'playing';
-      this.playRound();
+      this.play();
     }
   }, {
-    key: 'playRound',
-    value: function playRound() {
+    key: 'play',
+    value: function play() {
       this.player.move(KEY_STATUS);
       // let now = Date.now();
       // let dt = (now - this.lastTime) / 1000.0;
@@ -748,7 +748,7 @@ var Game = function () {
       this.field.render();
 
       // this.lastTime = now;
-      requestAnimationFrame(this.playRound);
+      if (!this.paused) requestAnimationFrame(this.play);
     }
   }, {
     key: 'drawStartScreen',
@@ -927,6 +927,7 @@ var Game = function () {
       if (this.paused) {
         this.paused = false;
         this.clearOptsContext();
+        this.play();
       } else {
         this.paused = true;
         this.drawStartScreen();
