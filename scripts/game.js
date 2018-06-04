@@ -73,10 +73,10 @@ class Game {
 
     this.lvl1SpawnBuffer = Date.now() - 5000;
     this.lvl2SpawnBuffer = Date.now();
-    this.lvl3SpawnBuffer = Date.now();
+    // this.lvl3SpawnBuffer = Date.now();
     this.numLvl1DemonsKilled = 0;
     this.numLvl2DemonsKilled = 0;
-    this.numLvl3DemonsKilled = 0;
+    // this.numLvl3DemonsKilled = 0;
 
     this.play = this.play.bind(this);
     this.startRound = this.startRound.bind(this);

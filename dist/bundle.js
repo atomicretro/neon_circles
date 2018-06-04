@@ -699,10 +699,10 @@ var Game = function () {
 
       this.lvl1SpawnBuffer = Date.now() - 5000;
       this.lvl2SpawnBuffer = Date.now();
-      this.lvl3SpawnBuffer = Date.now();
+      // this.lvl3SpawnBuffer = Date.now();
       this.numLvl1DemonsKilled = 0;
       this.numLvl2DemonsKilled = 0;
-      this.numLvl3DemonsKilled = 0;
+      // this.numLvl3DemonsKilled = 0;
 
       this.play = this.play.bind(this);
       this.startRound = this.startRound.bind(this);
@@ -1186,11 +1186,11 @@ var Player = function () {
     this.BulletPool = BulletPool;
 
     this.velocity = 0;
-    this.acceleration = 0.02;
-    this.maxSpeed = 0.3;
+    this.acceleration = 0.015;
+    this.maxSpeed = 0.2;
     this.radius = 50; // The 'track' the player moves along
     this.fireCharge = 0;
-    this.fireCooldown = 20;
+    this.fireCooldown = 25;
     this.invincibilityFrames = 50;
     this.life = 3;
 
