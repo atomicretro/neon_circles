@@ -452,7 +452,7 @@ var Field = function () {
 
       // Charge container
       this.statsCanvas.ctx.strokeStyle = '#6816e0';
-      this.statsCanvas.ctx.strokeRect(352, 30, 98, 13);
+      this.statsCanvas.ctx.strokeRect(352, 30, 97, 13);
 
       // Player life
       this.drawPlayerHearts();
@@ -509,12 +509,12 @@ var Field = function () {
     key: 'updatePlayerCharge',
     value: function updatePlayerCharge() {
       if (this.player.fireCharge === 0) {
-        this.statsCanvas.ctx.clearRect(353, 31, 96, 11);
+        this.statsCanvas.ctx.clearRect(353, 31, 95, 11);
         this.statsCanvas.ctx.fillStyle = "rgba(255, 255, 255, 0.8";
-        this.statsCanvas.ctx.fillRect(353, 31, 96, 11);
-      } else if (this.player.fireCharge < 40) {
+        this.statsCanvas.ctx.fillRect(353, 31, 95, 11);
+      } else if (this.player.fireCharge < 20) {
         this.statsCanvas.ctx.fillStyle = '#6816e0';
-        this.statsCanvas.ctx.fillRect(353, 31, this.player.fireCharge * 2.5, 11);
+        this.statsCanvas.ctx.fillRect(353, 31, this.player.fireCharge * 5, 11);
       }
     }
   }, {
@@ -538,7 +538,7 @@ var Field = function () {
     value: function drawPlayerRails(shape) {
       var xCenter = this.pcCanvas.width / 2;
       var yCenter = this.pcCanvas.height / 2;
-      if (this.player.fireCharge < 40) {
+      if (this.player.fireCharge < 20) {
         this.pcCanvas.ctx.strokeStyle = "white";
       } else {
         this.pcCanvas.ctx.strokeStyle = "#6816e0";
