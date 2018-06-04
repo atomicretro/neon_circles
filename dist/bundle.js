@@ -748,7 +748,7 @@ var Game = function () {
       }, 5000);
       this.lvl2Timer = new _utilities.Timer(function () {
         _this2.spawnLvl2Demons();
-      }, 20000);
+      }, 15000);
 
       this.clearOptsContext();
       this.optsCanvas.canvas.classList.add('hidden');
@@ -798,11 +798,9 @@ var Game = function () {
     key: 'checkLevel1Demons',
     value: function checkLevel1Demons() {
       var spawnedLvl1 = 0;
-      // let spawnedLvl3 = 0;
       for (var i = 0; i < this.lvl1DemonPool.pool.length; i++) {
         var demon = this.lvl1DemonPool.pool[i];
         if (demon.type === 'mouthDemon' && demon.spawned) spawnedLvl1++;else if (demon.type === 'eyeDemon' && demon.spawned) spawnedLvl1++;
-        // else if(demon.type === 'bossDemon' && demon.spawned) spawnedLvl3++;
       }
 
       if (spawnedLvl1 < 1) {
@@ -812,22 +810,14 @@ var Game = function () {
       }
 
       return spawnedLvl1;
-
-      // if(this.lastTime - this.startTime < 30000) {
-      //   this.spawnLvl1Demons(spawnedLvl1, 4);
-      //   this.spawnLvl2Demons(spawnedLvl2, 1);
-      // } else {
-      //   this.spawnLvl1Demons(spawnedLvl1, 6);
-      //   this.spawnLvl2Demons(spawnedLvl2, 2);
-      // }
     }
   }, {
     key: 'spawnLvl1Demons',
     value: function spawnLvl1Demons() {
       var _this3 = this;
 
-      console.log('lvl 1 ' + new Date().getMinutes() + ' : ' + new Date().getSeconds());
-      if (this.checkLevel1Demons() < 4) {
+      var maxDemons = this.getMaxDemons('lvl1');
+      if (this.checkLevel1Demons() < maxDemons) {
         var toGet = Math.random() < 0.5 ? 'mouthDemon' : 'eyeDemon';
         this.lvl1DemonPool.get(toGet);
         this.lvl1SpawnBuffer = Date.now();
@@ -842,21 +832,32 @@ var Game = function () {
     value: function spawnLvl2Demons() {
       var _this4 = this;
 
-      console.log('lvl 2 ' + new Date().getMinutes() + ' : ' + new Date().getSeconds());
       var spawnedLvl2 = 0;
       for (var i = 0; i < this.lvl2DemonPool.pool.length; i++) {
         var demon = this.lvl2DemonPool.pool[i];
         if (demon.type === 'faceDemon' && demon.spawned) spawnedLvl2++;
       };
 
-      if (spawnedLvl2 < 2) {
+      var maxDemons = this.getMaxDemons('lvl2');
+      if (spawnedLvl2 < maxDemons) {
         this.lvl2DemonPool.get('faceDemon');
         this.lvl2SpawnBuffer = Date.now();
       };
 
       this.lvl2Timer = new _utilities.Timer(function () {
         _this4.spawnLvl2Demons();
-      }, 20000);
+      }, 15000);
+    }
+  }, {
+    key: 'getMaxDemons',
+    value: function getMaxDemons(level) {
+      if (this.lastTime - this.startTime < 40000) {
+        if (level === 'lvl1') return 4;
+        if (level === 'lvl2') return 1;
+      } else {
+        if (level === 'lvl1') return 6;
+        if (level === 'lvl2') return 2;
+      };
     }
   }, {
     key: 'checkCollisions',
