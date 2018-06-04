@@ -739,21 +739,9 @@ var Game = function () {
   }, {
     key: 'startRound',
     value: function startRound() {
-      this.AssetStore.backgroundMusic.play();
-
-      this.setSpawnTimers();
-
-      this.clearOptsContext();
-      this.optsCanvas.canvas.classList.add('hidden');
-      this.gameStatus = 'playing';
-      this.startTime = Date.now();
-      this.lastTime = Date.now();
-      this.play();
-    }
-  }, {
-    key: 'setSpawnTimers',
-    value: function setSpawnTimers() {
       var _this2 = this;
+
+      this.AssetStore.backgroundMusic.play();
 
       this.lvl1Timer = new _utilities.Timer(function () {
         _this2.spawnLvl1Demons();
@@ -761,6 +749,13 @@ var Game = function () {
       this.lvl2Timer = new _utilities.Timer(function () {
         _this2.spawnLvl2Demons();
       }, 20000);
+
+      this.clearOptsContext();
+      this.optsCanvas.canvas.classList.add('hidden');
+      this.gameStatus = 'playing';
+      this.startTime = Date.now();
+      this.lastTime = Date.now();
+      this.play();
     }
   }, {
     key: 'pauseSpawnTimers',
@@ -829,17 +824,25 @@ var Game = function () {
   }, {
     key: 'spawnLvl1Demons',
     value: function spawnLvl1Demons() {
-      console.log('hi');
+      var _this3 = this;
+
+      console.log('lvl 1 ' + new Date().getMinutes() + ' : ' + new Date().getSeconds());
       if (this.checkLevel1Demons() < 4) {
         var toGet = Math.random() < 0.5 ? 'mouthDemon' : 'eyeDemon';
         this.lvl1DemonPool.get(toGet);
         this.lvl1SpawnBuffer = Date.now();
       };
-      this.setSpawnTimers();
+
+      this.lvl1Timer = new _utilities.Timer(function () {
+        _this3.spawnLvl1Demons();
+      }, 5000);
     }
   }, {
     key: 'spawnLvl2Demons',
     value: function spawnLvl2Demons() {
+      var _this4 = this;
+
+      console.log('lvl 2 ' + new Date().getMinutes() + ' : ' + new Date().getSeconds());
       var spawnedLvl2 = 0;
       for (var i = 0; i < this.lvl2DemonPool.pool.length; i++) {
         var demon = this.lvl2DemonPool.pool[i];
@@ -850,7 +853,10 @@ var Game = function () {
         this.lvl2DemonPool.get('faceDemon');
         this.lvl2SpawnBuffer = Date.now();
       };
-      this.setSpawnTimers();
+
+      this.lvl2Timer = new _utilities.Timer(function () {
+        _this4.spawnLvl2Demons();
+      }, 20000);
     }
   }, {
     key: 'checkCollisions',

@@ -127,7 +127,8 @@ class Game {
   startRound() {
     this.AssetStore.backgroundMusic.play();
 
-    this.setSpawnTimers();
+    this.lvl1Timer = new Timer(() => { this.spawnLvl1Demons() }, 5000);
+    this.lvl2Timer = new Timer(() => { this.spawnLvl2Demons() }, 20000);
 
     this.clearOptsContext();
     this.optsCanvas.canvas.classList.add('hidden');
@@ -135,11 +136,6 @@ class Game {
     this.startTime = Date.now();
     this.lastTime = Date.now();
     this.play();
-  }
-
-  setSpawnTimers() {
-    this.lvl1Timer = new Timer(() => { this.spawnLvl1Demons() }, 5000);
-    this.lvl2Timer = new Timer(() => { this.spawnLvl2Demons() }, 20000);
   }
 
   pauseSpawnTimers() {
@@ -203,16 +199,18 @@ class Game {
   }
 
   spawnLvl1Demons() {
-    console.log('hi');
+    console.log(`lvl 1 ${new Date().getMinutes()} : ${new Date().getSeconds()}`)
     if(this.checkLevel1Demons() < 4) {
       let toGet = Math.random() < 0.5 ? 'mouthDemon' : 'eyeDemon';
       this.lvl1DemonPool.get(toGet);
       this.lvl1SpawnBuffer = Date.now();
     };
-    this.setSpawnTimers();
+
+    this.lvl1Timer = new Timer(() => { this.spawnLvl1Demons() }, 5000);
   }
 
   spawnLvl2Demons() {
+    console.log(`lvl 2 ${new Date().getMinutes()} : ${new Date().getSeconds()}`)
     let spawnedLvl2 = 0;
     for(let i = 0; i < this.lvl2DemonPool.pool.length; i++) {
       let demon = this.lvl2DemonPool.pool[i];
@@ -223,7 +221,8 @@ class Game {
       this.lvl2DemonPool.get('faceDemon');
       this.lvl2SpawnBuffer = Date.now();
     };
-    this.setSpawnTimers();
+
+    this.lvl2Timer = new Timer(() => { this.spawnLvl2Demons() }, 20000);
   }
 
   checkCollisions() {
