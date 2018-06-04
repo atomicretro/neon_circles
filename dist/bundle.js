@@ -612,9 +612,9 @@ var _player2 = _interopRequireDefault(_player);
 
 var _utilities = __webpack_require__(/*! ./utilities */ "./scripts/utilities.js");
 
-var _demon2 = __webpack_require__(/*! ./demon */ "./scripts/demon.js");
+var _demon = __webpack_require__(/*! ./demon */ "./scripts/demon.js");
 
-var _demon3 = _interopRequireDefault(_demon2);
+var _demon2 = _interopRequireDefault(_demon);
 
 var _bullet2 = __webpack_require__(/*! ./bullet */ "./scripts/bullet.js");
 
@@ -697,7 +697,7 @@ var Game = function () {
       this.paused = false;
       this.gameStatus = 'unbegun';
 
-      this.lvl1SpawnBuffer = Date.now() - 5000;
+      this.lvl1SpawnBuffer = Date.now();
       this.lvl2SpawnBuffer = Date.now();
       // this.lvl3SpawnBuffer = Date.now();
       this.numLvl1DemonsKilled = 0;
@@ -713,10 +713,10 @@ var Game = function () {
     key: 'setupDemonPools',
     value: function setupDemonPools() {
       var lvl1Demons = ['mouthDemon', 'mouthDemon', 'mouthDemon', 'eyeDemon', 'eyeDemon', 'eyeDemon'];
-      this.lvl1DemonPool = new _demon3.default(lvl1Demons, this.fgCanvas.ctx, this.AssetStore, this.demonBulletPool);
+      this.lvl1DemonPool = new _demon2.default(lvl1Demons, this.fgCanvas.ctx, this.AssetStore, this.demonBulletPool);
 
       var lvl2Demons = ['faceDemon', 'faceDemon'];
-      this.lvl2DemonPool = new _demon3.default(lvl2Demons, this.fgCanvas.ctx, this.AssetStore, this.demonBulletPool);
+      this.lvl2DemonPool = new _demon2.default(lvl2Demons, this.fgCanvas.ctx, this.AssetStore, this.demonBulletPool);
     }
   }, {
     key: 'setupNewField',
@@ -741,12 +741,44 @@ var Game = function () {
     value: function startRound() {
       this.AssetStore.backgroundMusic.play();
 
+      this.setSpawnTimers();
+
       this.clearOptsContext();
       this.optsCanvas.canvas.classList.add('hidden');
       this.gameStatus = 'playing';
       this.startTime = Date.now();
       this.lastTime = Date.now();
       this.play();
+    }
+  }, {
+    key: 'setSpawnTimers',
+    value: function setSpawnTimers() {
+      var _this2 = this;
+
+      this.lvl1Timer = new _utilities.Timer(function () {
+        _this2.spawnLvl1Demons();
+      }, 5000);
+      this.lvl2Timer = new _utilities.Timer(function () {
+        _this2.spawnLvl2Demons();
+      }, 20000);
+    }
+  }, {
+    key: 'pauseSpawnTimers',
+    value: function pauseSpawnTimers() {
+      this.lvl1Timer.pause();
+      this.lvl2Timer.pause();
+    }
+  }, {
+    key: 'resumeSpawnTimers',
+    value: function resumeSpawnTimers() {
+      this.lvl1Timer.resume();
+      this.lvl2Timer.resume();
+    }
+  }, {
+    key: 'removeSpawnTimers',
+    value: function removeSpawnTimers() {
+      this.lvl1Timer.clear();
+      this.lvl2Timer.clear();
     }
   }, {
     key: 'play',
@@ -759,7 +791,7 @@ var Game = function () {
       var dt = (now - this.lastTime) / 1000.0;
 
       // update(dt);
-      this.spawnDemons();
+      this.checkLevel1Demons();
       this.field.render();
 
       if (!this.paused) {
@@ -768,8 +800,8 @@ var Game = function () {
       }
     }
   }, {
-    key: 'spawnDemons',
-    value: function spawnDemons() {
+    key: 'checkLevel1Demons',
+    value: function checkLevel1Demons() {
       var spawnedLvl1 = 0;
       // let spawnedLvl3 = 0;
       for (var i = 0; i < this.lvl1DemonPool.pool.length; i++) {
@@ -778,39 +810,47 @@ var Game = function () {
         // else if(demon.type === 'bossDemon' && demon.spawned) spawnedLvl3++;
       }
 
-      var spawnedLvl2 = 0;
-      for (var _i = 0; _i < this.lvl2DemonPool.pool.length; _i++) {
-        var _demon = this.lvl2DemonPool.pool[_i];
-        if (_demon.type === 'faceDemon' && _demon.spawned) spawnedLvl2++;
-      }
-
-      if (this.lastTime - this.startTime < 30000) {
-        this.spawnLevelOneDemons(spawnedLvl1, 4);
-        this.spawnLevelTwoDemons(spawnedLvl2, 1);
-      } else {
-        this.spawnLevelOneDemons(spawnedLvl1, 6);
-        this.spawnLevelTwoDemons(spawnedLvl2, 2);
-      }
-    }
-  }, {
-    key: 'spawnLevelOneDemons',
-    value: function spawnLevelOneDemons(numDemons, max) {
-      if (numDemons === 0) {
+      if (spawnedLvl1 < 1) {
         this.lvl1DemonPool.get('mouthDemon');
         this.lvl1DemonPool.get('eyeDemon');
         this.lvl1SpawnBuffer = Date.now();
-      } else if (numDemons < max && this.lastTime - this.lvl1SpawnBuffer > 5000) {
-        var toGet = Math.random() < 0.5 ? 'mouthDemon' : 'eyeDemon';
-        this.lvl1DemonPool.get(toGet);
       }
+
+      return spawnedLvl1;
+
+      // if(this.lastTime - this.startTime < 30000) {
+      //   this.spawnLvl1Demons(spawnedLvl1, 4);
+      //   this.spawnLvl2Demons(spawnedLvl2, 1);
+      // } else {
+      //   this.spawnLvl1Demons(spawnedLvl1, 6);
+      //   this.spawnLvl2Demons(spawnedLvl2, 2);
+      // }
     }
   }, {
-    key: 'spawnLevelTwoDemons',
-    value: function spawnLevelTwoDemons(numDemons, max) {
-      if (numDemons < max && this.lastTime - this.lvl2SpawnBuffer > 10000) {
+    key: 'spawnLvl1Demons',
+    value: function spawnLvl1Demons() {
+      console.log('hi');
+      if (this.checkLevel1Demons() < 4) {
+        var toGet = Math.random() < 0.5 ? 'mouthDemon' : 'eyeDemon';
+        this.lvl1DemonPool.get(toGet);
+        this.lvl1SpawnBuffer = Date.now();
+      };
+      this.setSpawnTimers();
+    }
+  }, {
+    key: 'spawnLvl2Demons',
+    value: function spawnLvl2Demons() {
+      var spawnedLvl2 = 0;
+      for (var i = 0; i < this.lvl2DemonPool.pool.length; i++) {
+        var demon = this.lvl2DemonPool.pool[i];
+        if (demon.type === 'faceDemon' && demon.spawned) spawnedLvl2++;
+      };
+
+      if (spawnedLvl2 < 2) {
         this.lvl2DemonPool.get('faceDemon');
         this.lvl2SpawnBuffer = Date.now();
-      }
+      };
+      this.setSpawnTimers();
     }
   }, {
     key: 'checkCollisions',
@@ -905,6 +945,7 @@ var Game = function () {
     value: function checkGameOver() {
       if (this.player.life <= 0) {
         this.paused = true;
+        this.removeSpawnTimers();
         this.gameStatus = 'over';
         this.drawStartScreen();
       }
@@ -1054,6 +1095,7 @@ var Game = function () {
   }, {
     key: 'statsCanvasCheckClick',
     value: function statsCanvasCheckClick(e, boundingRect) {
+      e.preventDefault();
       var clickPosX = e.clientX - boundingRect.left;
       var clickPosY = e.clientY - boundingRect.top;
 
@@ -1066,6 +1108,7 @@ var Game = function () {
   }, {
     key: 'optsCanvasCheckClick',
     value: function optsCanvasCheckClick(e, boundingRect) {
+      e.preventDefault();
       var clickPosX = e.clientX - boundingRect.left;
       var clickPosY = e.clientY - boundingRect.top;
 
@@ -1098,11 +1141,13 @@ var Game = function () {
     value: function clickPause() {
       if (this.paused && this.gameStatus === 'playing') {
         this.paused = false;
+        this.resumeSpawnTimers();
         this.clearOptsContext();
         this.optsCanvas.canvas.classList.add('hidden');
         this.play();
       } else if (!this.paused && this.gameStatus === 'playing') {
         this.paused = true;
+        this.pauseSpawnTimers();
         this.drawStartScreen();
       };
     }
@@ -1316,6 +1361,8 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+exports.Timer = Timer;
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var ObjectPool = exports.ObjectPool = function () {
@@ -1488,6 +1535,29 @@ var AssetStore = exports.AssetStore = function () {
 }();
 
 ;
+
+function Timer(callback, delay) {
+  var timerId,
+      start,
+      remaining = delay;
+
+  this.pause = function () {
+    window.clearTimeout(timerId);
+    remaining -= new Date() - start;
+  };
+
+  this.resume = function () {
+    start = new Date();
+    window.clearTimeout(timerId);
+    timerId = window.setTimeout(callback, remaining);
+  };
+
+  this.clear = function () {
+    window.clearTimeout(timerId);
+  };
+
+  this.resume();
+}
 
 /***/ })
 

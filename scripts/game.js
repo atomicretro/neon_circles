@@ -1,6 +1,6 @@
 import Field from './field';
 import Player from './player';
-import { AssetStore, Sprite } from './utilities';
+import { AssetStore, Sprite, Timer } from './utilities';
 import DemonPool from './demon';
 import BulletPool from './bullet';
 
@@ -71,7 +71,7 @@ class Game {
     this.paused = false;
     this.gameStatus = 'unbegun';
 
-    this.lvl1SpawnBuffer = Date.now() - 5000;
+    this.lvl1SpawnBuffer = Date.now();
     this.lvl2SpawnBuffer = Date.now();
     // this.lvl3SpawnBuffer = Date.now();
     this.numLvl1DemonsKilled = 0;
@@ -127,12 +127,34 @@ class Game {
   startRound() {
     this.AssetStore.backgroundMusic.play();
 
+    this.setSpawnTimers();
+
     this.clearOptsContext();
     this.optsCanvas.canvas.classList.add('hidden');
     this.gameStatus = 'playing';
     this.startTime = Date.now();
     this.lastTime = Date.now();
     this.play();
+  }
+
+  setSpawnTimers() {
+    this.lvl1Timer = new Timer(() => { this.spawnLvl1Demons() }, 5000);
+    this.lvl2Timer = new Timer(() => { this.spawnLvl2Demons() }, 20000);
+  }
+
+  pauseSpawnTimers() {
+    this.lvl1Timer.pause();
+    this.lvl2Timer.pause();
+  }
+
+  resumeSpawnTimers() {
+    this.lvl1Timer.resume();
+    this.lvl2Timer.resume();
+  }
+
+  removeSpawnTimers() {
+    this.lvl1Timer.clear();
+    this.lvl2Timer.clear();
   }
 
   play() {
@@ -144,7 +166,7 @@ class Game {
     let dt = (now - this.lastTime) / 1000.0;
 
     // update(dt);
-    this.spawnDemons();
+    this.checkLevel1Demons();
     this.field.render();
 
     if(!this.paused) {
@@ -153,7 +175,7 @@ class Game {
     }
   }
 
-  spawnDemons() {
+  checkLevel1Demons() {
     let spawnedLvl1 = 0;
     // let spawnedLvl3 = 0;
     for(let i = 0; i < this.lvl1DemonPool.pool.length; i++) {
@@ -163,37 +185,45 @@ class Game {
       // else if(demon.type === 'bossDemon' && demon.spawned) spawnedLvl3++;
     }
 
+    if(spawnedLvl1 < 1) {
+      this.lvl1DemonPool.get('mouthDemon');
+      this.lvl1DemonPool.get('eyeDemon');
+      this.lvl1SpawnBuffer = Date.now();
+    }
+
+    return spawnedLvl1;
+
+    // if(this.lastTime - this.startTime < 30000) {
+    //   this.spawnLvl1Demons(spawnedLvl1, 4);
+    //   this.spawnLvl2Demons(spawnedLvl2, 1);
+    // } else {
+    //   this.spawnLvl1Demons(spawnedLvl1, 6);
+    //   this.spawnLvl2Demons(spawnedLvl2, 2);
+    // }
+  }
+
+  spawnLvl1Demons() {
+    console.log('hi');
+    if(this.checkLevel1Demons() < 4) {
+      let toGet = Math.random() < 0.5 ? 'mouthDemon' : 'eyeDemon';
+      this.lvl1DemonPool.get(toGet);
+      this.lvl1SpawnBuffer = Date.now();
+    };
+    this.setSpawnTimers();
+  }
+
+  spawnLvl2Demons() {
     let spawnedLvl2 = 0;
     for(let i = 0; i < this.lvl2DemonPool.pool.length; i++) {
       let demon = this.lvl2DemonPool.pool[i];
       if(demon.type === 'faceDemon' && demon.spawned) spawnedLvl2++;
-    }
+    };
 
-    if(this.lastTime - this.startTime < 30000) {
-      this.spawnLevelOneDemons(spawnedLvl1, 4);
-      this.spawnLevelTwoDemons(spawnedLvl2, 1);
-    } else {
-      this.spawnLevelOneDemons(spawnedLvl1, 6);
-      this.spawnLevelTwoDemons(spawnedLvl2, 2);
-    }
-  }
-
-  spawnLevelOneDemons(numDemons, max) {
-    if(numDemons === 0) {
-      this.lvl1DemonPool.get('mouthDemon');
-      this.lvl1DemonPool.get('eyeDemon');
-      this.lvl1SpawnBuffer = Date.now();
-    } else if(numDemons < max && this.lastTime - this.lvl1SpawnBuffer > 5000) {
-      let toGet = Math.random() < 0.5 ? 'mouthDemon' : 'eyeDemon';
-      this.lvl1DemonPool.get(toGet);
-    }
-  }
-
-  spawnLevelTwoDemons(numDemons, max) {
-    if(numDemons < max && this.lastTime - this.lvl2SpawnBuffer > 10000) {
+    if(spawnedLvl2 < 2) {
       this.lvl2DemonPool.get('faceDemon');
       this.lvl2SpawnBuffer = Date.now();
-    }
+    };
+    this.setSpawnTimers();
   }
 
   checkCollisions() {
@@ -295,6 +325,7 @@ class Game {
   checkGameOver() {
     if(this.player.life <= 0) {
       this.paused = true;
+      this.removeSpawnTimers();
       this.gameStatus = 'over';
       this.drawStartScreen();
     }
@@ -444,6 +475,7 @@ class Game {
   }
 
   statsCanvasCheckClick(e, boundingRect) {
+    e.preventDefault();
     let clickPosX = e.clientX - boundingRect.left;
     let clickPosY = e.clientY - boundingRect.top;
 
@@ -461,6 +493,7 @@ class Game {
   }
 
   optsCanvasCheckClick(e, boundingRect) {
+    e.preventDefault();
     let clickPosX = e.clientX - boundingRect.left;
     let clickPosY = e.clientY - boundingRect.top;
 
@@ -497,11 +530,13 @@ class Game {
   clickPause() {
     if(this.paused && this.gameStatus === 'playing') {
       this.paused = false;
+      this.resumeSpawnTimers();
       this.clearOptsContext();
       this.optsCanvas.canvas.classList.add('hidden');
       this.play();
     } else if (!this.paused && this.gameStatus === 'playing') {
       this.paused = true;
+      this.pauseSpawnTimers();
       this.drawStartScreen();
     };
   }
