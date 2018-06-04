@@ -11,13 +11,12 @@ body {
   background-position: center top;
   display: flex;
   flex-direction: column;
-  /* background-size: contain; */
+  font-family: sf_alien_encountersitalic;
 }
 
 h1 {
-  font-weight: normal;
   font-size: 48px;
-  font-family: sf_alien_encountersitalic;
+  font-weight: normal;
   padding: 0;
   margin-left: auto;
   margin-right: auto;
@@ -25,23 +24,25 @@ h1 {
   margin-bottom: 0;
 }
 
-h6 {
-  font-size: 30px;
-  display: block;
-  margin: auto;
-  padding-top: 20px;
-  color: white;
+h2 {
+  font-weight: normal;
+  padding: 0;
+  margin: 0;
+}
+
+h2 a:hover {
+  color: purple;
 }
 
 .game-area {
   position: relative;
-  height: 525px;
+  height: 550px;
   width: 800px;;
   display: block;
   margin-left: auto;
   margin-right: auto;
   margin-top: 10px;
-  margin-bottom: 100px;
+  margin-bottom: 50px;
   padding: 0;
 }
 
@@ -80,34 +81,63 @@ h6 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 200px;
+  margin-bottom: 30px;
 }
 
 .info-background {
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
-  height: 125px;
+  height: 140px;
   width: 300px;
   border-radius: 25px;
   background-color: rgba(255,255,255,0.8);
 }
 
+.info-area a {
+  color: black;
+  text-decoration: none;
+}
+
+.info-area a:hover {
+  text-decoration: none;
+}
+
 .name-area {
-  font-family: sf_alien_encountersitalic;
   font-size: 24px;
 }
 
-.info-background a {
-  color: black;
+.icon-area {
+  padding: 15px 0 20px 0;
+}
+
+.icon-area a {
   font-size: 36px;
   padding-left: 20px;
   padding-right: 20px;
 }
 
-.info-background a:hover {
+.icon-area a:hover {
   color: purple;
+}
+
+.info-background span {
+  font-size: 12px;
+}
+
+.info-background span a:hover {
+  color: purple;
+}
+
+.farewell {
+  margin: auto;
+}
+
+.farewell h6 {
+  color: white;
+  font-size: 30px;
+  margin: 0;
 }
 
 .hidden {
