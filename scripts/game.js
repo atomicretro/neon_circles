@@ -47,6 +47,8 @@ class Game {
     this.AssetStore = new AssetStore(this);
 
     this.gamePadConnected = false;
+    this.gamePadToggle = false;
+
     this.drawLoadingScreen();
     this.setupNewGame();
 
@@ -161,9 +163,9 @@ class Game {
   play() {
     this.checkGameOver();
     this.checkCollisions();
-    this.buttonDown();
+    if(this.gamePadToggle) this.buttonDown();
     this.player.move(KEY_STATUS);
-    this.buttonUp();
+    if(this.gamePadToggle) this.buttonUp();
 
     let now = Date.now();
     let dt = (now - this.lastTime) / 1000.0;
@@ -350,23 +352,40 @@ class Game {
 
     // for checking centeredness of start screen items
     // this.optsCanvas.ctx.beginPath();
-    // this.optsCanvas.ctx.moveTo(270,0);
-    // this.optsCanvas.ctx.lineTo(270,500);
+    // this.optsCanvas.ctx.moveTo(20,410);
+    // this.optsCanvas.ctx.lineTo(20,490);
     // this.optsCanvas.ctx.stroke();
     // this.optsCanvas.ctx.beginPath();
-    // this.optsCanvas.ctx.moveTo(530,0);
-    // this.optsCanvas.ctx.lineTo(530,500);
+    // this.optsCanvas.ctx.moveTo(170,410);
+    // this.optsCanvas.ctx.lineTo(170,490);
     // this.optsCanvas.ctx.stroke();
 
     this.optsCanvas.ctx.strokeRect(300,385,205,87);
     this.optsCanvas.ctx.font = "60px sf_alien_encountersitalic";
     this.optsCanvas.ctx.fillText("PLAY", 320, 450);
 
+    this.drawGamePadToggleButton();
+
     this.optsCanvas.ctx.font = "12px sf_alien_encountersitalic";
-    this.optsCanvas.ctx.fillText("m to mute!", 705, 460);
-    this.optsCanvas.ctx.fillText("p to pause!", 700, 480);
+    this.optsCanvas.ctx.fillText("m to mute!", 705, 440);
+    this.optsCanvas.ctx.fillText("p to pause!", 700, 460);
     if(this.gameStatus !== 'playing') {
-      this.optsCanvas.ctx.fillText("enter to start!", 20, 480);
+      this.optsCanvas.ctx.fillText("enter to start!", 670, 480);
+    }
+  }
+
+  drawGamePadToggleButton() {
+    if(this.gamePadConnected) {
+      this.optsCanvas.ctx.clearRect(20,410,150,80);
+      this.optsCanvas.ctx.fillStyle = "rgba(0, 0, 0, 0.8";
+      this.optsCanvas.ctx.fillRect(20,410,150,80);
+      this.optsCanvas.ctx.fillStyle = "white";
+      this.optsCanvas.ctx.font = "24px sf_alien_encountersitalic";
+      if(this.gamePadToggle) this.optsCanvas.ctx.fillText("gamepad", 33, 435);
+      else this.optsCanvas.ctx.fillText("keyboard", 27, 435);
+      this.optsCanvas.ctx.font = "12px sf_alien_encountersitalic";
+      this.optsCanvas.ctx.fillText("click here to toggle", 20, 460);
+      this.optsCanvas.ctx.fillText("gamepad input!", 20, 480);
     }
   }
 
@@ -454,7 +473,7 @@ class Game {
     this.optsCanvas.ctx.font = "24px sf_alien_encountersitalic";
     this.optsCanvas.ctx.fillText(
       "SPACE TO FIRE WHEN POWER IS FULL!", 148, 340
-);
+    );
     this.optsCanvas.ctx.beginPath();
     this.optsCanvas.ctx.moveTo(148,347);
     this.optsCanvas.ctx.lineTo(650,347);
@@ -462,15 +481,8 @@ class Game {
   }
 
   buttonDown() {
-    console.log(KEY_MAP);
-    console.log(KEY_STATUS);
     let gamepads = navigator.getGamepads ? navigator.getGamepads() :
       (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
-
-    navigator.getGamepads()[0].buttons[0]
-    navigator.getGamepads()[0].buttons[1]
-    navigator.getGamepads()[0].buttons[2]
-    navigator.getGamepads()[0].buttons[3]
 
     if(navigator.getGamepads()[0].buttons[14].pressed) {
       KEY_STATUS[KEY_MAP['controllerLeft']] = true;
@@ -492,11 +504,6 @@ class Game {
     let gamepads = navigator.getGamepads ? navigator.getGamepads() :
       (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
 
-    navigator.getGamepads()[0].buttons[0]
-    navigator.getGamepads()[0].buttons[1]
-    navigator.getGamepads()[0].buttons[2]
-    navigator.getGamepads()[0].buttons[3]
-
     if(!navigator.getGamepads()[0].buttons[14].pressed) {
       KEY_STATUS[KEY_MAP['controllerLeft']] = false;
     }
@@ -514,7 +521,6 @@ class Game {
   }
 
   keydown(e) {
-    this.buttonDown();
     let keyCode = e.which || e.keyCode || 0;
     if(keyCode === 13 && this.gameStatus !== 'playing') this.newGame();
     if(keyCode === 77) this.clickMute();
@@ -561,7 +567,7 @@ class Game {
       (165 <= clickPosY && clickPosY <= 200)
     ) {
       this.swapMovementDirection();
-    } else if (
+    } else if(
       (300 <= clickPosX && clickPosX <= 505) &&
       (385 <= clickPosY && clickPosY <= 472)
     ) {
@@ -572,6 +578,12 @@ class Game {
       } else if(this.gameStatus === 'over') {
         this.newGame();
       }
+    } else if(
+      (20 <= clickPosX && clickPosX <= 170) &&
+      (410 <= clickPosY && clickPosY <= 490)
+    ) {
+      this.gamePadToggle = this.gamePadToggle ? false : true;
+      this.drawGamePadToggleButton();
     }
   }
 
@@ -629,15 +641,6 @@ class Game {
     this.drawStartScreen()
   }
 
-  clearOptsContext() {
-    this.optsCanvas.ctx.clearRect(
-      0,
-      0,
-      this.optsCanvas.width,
-      this.optsCanvas.height
-    );
-  }
-
   mapGamePadButtons(e) {
     KEY_MAP['controllerFire'] = 'fire';
     KEY_MAP['controllerLeft'] = 'left';
@@ -645,6 +648,15 @@ class Game {
     KEY_STATUS['controllerFire'] = false;
     KEY_STATUS['controllerLeft'] = false;
     KEY_STATUS['controllerRight'] = false;
+  }
+
+  clearOptsContext() {
+    this.optsCanvas.ctx.clearRect(
+      0,
+      0,
+      this.optsCanvas.width,
+      this.optsCanvas.height
+    );
   }
 }
 
