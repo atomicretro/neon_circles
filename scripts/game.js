@@ -17,7 +17,7 @@ const KEY_MAP = {
 
 const KEY_STATUS = {};
 for (let code in KEY_MAP) {
-  KEY_STATUS[ KEY_MAP[ code ]] = false;
+  KEY_STATUS[KEY_MAP[code]] = false;
 }
 
 class Game {
@@ -46,6 +46,7 @@ class Game {
 
     this.AssetStore = new AssetStore(this);
 
+    this.gamePadConnected = false;
     this.drawLoadingScreen();
     this.setupNewGame();
 
@@ -56,6 +57,10 @@ class Game {
     });
     statsCanvas.addEventListener('click', (e) => {
       this.statsCanvasCheckClick(e, statsCanvas.getBoundingClientRect());
+    });
+    window.addEventListener("gamepadconnected", (e) => {
+      this.mapGamePadButtons(e);
+      this.gamePadConnected = true;
     });
 
     this.setupNewField();
@@ -156,7 +161,9 @@ class Game {
   play() {
     this.checkGameOver();
     this.checkCollisions();
+    this.buttonDown();
     this.player.move(KEY_STATUS);
+    this.buttonUp();
 
     let now = Date.now();
     let dt = (now - this.lastTime) / 1000.0;
@@ -454,12 +461,65 @@ class Game {
     this.optsCanvas.ctx.stroke();
   }
 
+  buttonDown() {
+    console.log(KEY_MAP);
+    console.log(KEY_STATUS);
+    let gamepads = navigator.getGamepads ? navigator.getGamepads() :
+      (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
+
+    navigator.getGamepads()[0].buttons[0]
+    navigator.getGamepads()[0].buttons[1]
+    navigator.getGamepads()[0].buttons[2]
+    navigator.getGamepads()[0].buttons[3]
+
+    if(navigator.getGamepads()[0].buttons[14].pressed) {
+      KEY_STATUS[KEY_MAP['controllerLeft']] = true;
+    }
+    if(navigator.getGamepads()[0].buttons[15].pressed) {
+      KEY_STATUS[KEY_MAP['controllerRight']] = true;
+    };
+    if(
+      navigator.getGamepads()[0].buttons[0].pressed ||
+      navigator.getGamepads()[0].buttons[1].pressed ||
+      navigator.getGamepads()[0].buttons[2].pressed ||
+      navigator.getGamepads()[0].buttons[3].pressed
+    ) {
+      KEY_STATUS[KEY_MAP['controllerFire']] = true;
+    };
+  }
+
+  buttonUp() {
+    let gamepads = navigator.getGamepads ? navigator.getGamepads() :
+      (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
+
+    navigator.getGamepads()[0].buttons[0]
+    navigator.getGamepads()[0].buttons[1]
+    navigator.getGamepads()[0].buttons[2]
+    navigator.getGamepads()[0].buttons[3]
+
+    if(!navigator.getGamepads()[0].buttons[14].pressed) {
+      KEY_STATUS[KEY_MAP['controllerLeft']] = false;
+    }
+    if(!navigator.getGamepads()[0].buttons[15].pressed) {
+      KEY_STATUS[KEY_MAP['controllerRight']] = false;
+    };
+    if(
+      !navigator.getGamepads()[0].buttons[0].pressed &&
+      !navigator.getGamepads()[0].buttons[1].pressed &&
+      !navigator.getGamepads()[0].buttons[2].pressed &&
+      !navigator.getGamepads()[0].buttons[3].pressed
+    ) {
+      KEY_STATUS[KEY_MAP['controllerFire']] = false;
+    };
+  }
+
   keydown(e) {
+    this.buttonDown();
     let keyCode = e.which || e.keyCode || 0;
     if(keyCode === 13 && this.gameStatus !== 'playing') this.newGame();
     if(keyCode === 77) this.clickMute();
     if(keyCode === 80) this.clickPause();
-    if (KEY_MAP[keyCode]) {
+    if(KEY_MAP[keyCode]) {
       e.preventDefault();
       KEY_STATUS[KEY_MAP[keyCode]] = true;
     }
@@ -467,7 +527,7 @@ class Game {
 
   keyup(e) {
     let keyCode = e.which || e.keyCode || 0;
-    if (KEY_MAP[keyCode]) {
+    if(KEY_MAP[keyCode]) {
       e.preventDefault();
       KEY_STATUS[KEY_MAP[keyCode]] = false;
     }
@@ -576,6 +636,15 @@ class Game {
       this.optsCanvas.width,
       this.optsCanvas.height
     );
+  }
+
+  mapGamePadButtons(e) {
+    KEY_MAP['controllerFire'] = 'fire';
+    KEY_MAP['controllerLeft'] = 'left';
+    KEY_MAP['controllerRight'] = 'right';
+    KEY_STATUS['controllerFire'] = false;
+    KEY_STATUS['controllerLeft'] = false;
+    KEY_STATUS['controllerRight'] = false;
   }
 }
 
