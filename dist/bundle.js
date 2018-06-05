@@ -688,6 +688,10 @@ var Game = function () {
       _this.mapGamePadButtons(e);
       _this.gamePadConnected = true;
     });
+    window.addEventListener("gamepaddisconnected", function (e) {
+      _this.gamePadConnected = false;
+      _this.gamePadToggle = false;
+    });
 
     this.setupNewField();
   }

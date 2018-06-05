@@ -64,6 +64,10 @@ class Game {
       this.mapGamePadButtons(e);
       this.gamePadConnected = true;
     });
+    window.addEventListener("gamepaddisconnected", (e) => {
+      this.gamePadConnected = false;
+      this.gamePadToggle = false;
+    });
 
     this.setupNewField();
   }
