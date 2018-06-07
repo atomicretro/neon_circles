@@ -1113,13 +1113,13 @@ var Game = function () {
     value: function buttonDown() {
       var gamepads = navigator.getGamepads ? navigator.getGamepads() : navigator.webkitGetGamepads ? navigator.webkitGetGamepads : [];
 
-      if (navigator.getGamepads()[0].buttons[14].pressed) {
+      if (navigator.getGamepads()[0].buttons[14].pressed || navigator.getGamepads()[0].axes[0] < -0.1) {
         KEY_STATUS[KEY_MAP['controllerLeft']] = true;
       }
-      if (navigator.getGamepads()[0].buttons[15].pressed) {
+      if (navigator.getGamepads()[0].buttons[15].pressed || navigator.getGamepads()[0].axes[0] > 0.1) {
         KEY_STATUS[KEY_MAP['controllerRight']] = true;
       };
-      if (navigator.getGamepads()[0].buttons[0].pressed || navigator.getGamepads()[0].buttons[1].pressed || navigator.getGamepads()[0].buttons[2].pressed || navigator.getGamepads()[0].buttons[3].pressed) {
+      if (navigator.getGamepads()[0].buttons[0].pressed || navigator.getGamepads()[0].buttons[1].pressed || navigator.getGamepads()[0].buttons[2].pressed || navigator.getGamepads()[0].buttons[3].pressed || navigator.getGamepads()[0].buttons[4].pressed || navigator.getGamepads()[0].buttons[5].pressed) {
         KEY_STATUS[KEY_MAP['controllerFire']] = true;
       };
     }
@@ -1134,7 +1134,7 @@ var Game = function () {
       if (!navigator.getGamepads()[0].buttons[15].pressed) {
         KEY_STATUS[KEY_MAP['controllerRight']] = false;
       };
-      if (!navigator.getGamepads()[0].buttons[0].pressed && !navigator.getGamepads()[0].buttons[1].pressed && !navigator.getGamepads()[0].buttons[2].pressed && !navigator.getGamepads()[0].buttons[3].pressed) {
+      if (!navigator.getGamepads()[0].buttons[0].pressed && !navigator.getGamepads()[0].buttons[1].pressed && !navigator.getGamepads()[0].buttons[2].pressed && !navigator.getGamepads()[0].buttons[3].pressed && !navigator.getGamepads()[0].buttons[4].pressed && !navigator.getGamepads()[0].buttons[5].pressed) {
         KEY_STATUS[KEY_MAP['controllerFire']] = false;
       };
     }
