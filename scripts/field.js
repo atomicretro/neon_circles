@@ -5,16 +5,19 @@ class Field {
     fgCanvasObj,
     statsCanvasObj,
     pcCanvasObj,
+    optsCanvasObj,
     AssetStore,
     demonBulletPool,
     pcBulletPool,
     lvl1DemonPool,
     lvl2DemonPool,
-    player
+    player,
+    movementDirection
   ) {
     this.fgCanvas = fgCanvasObj;
     this.statsCanvas = statsCanvasObj;
     this.pcCanvas = pcCanvasObj;
+    this.optsCanvas = optsCanvasObj;
 
     this.AssetStore = AssetStore;
     this.demonBulletPool = demonBulletPool;
@@ -23,6 +26,7 @@ class Field {
     this.lvl2DemonPool = lvl2DemonPool;
 
     this.player = player;
+    this.movementDirection = movementDirection;
 
     this.lastTime = Date.now;
     this.playerScore = 0;
@@ -31,6 +35,151 @@ class Field {
       this.AssetStore.heart.image,
       13, 13, 0, 0
     );
+  }
+
+  updateMovementDirection(newDirection) {
+    this.movementDirection = newDirection;
+  }
+
+  drawStartScreen() {
+    this.optsCanvas.canvas.classList.remove('hidden');
+    this.clearOptsContext();
+    this.optsCanvas.ctx.fillStyle = "rgba(0, 0, 0, 0.8";
+    this.optsCanvas.ctx.fillRect(0,0,800,500);
+
+    this.optsCanvas.ctx.fillStyle = 'white';
+
+    this.drawStartScreenMessage();
+    this.drawControls();
+
+    // for checking centeredness of start screen items
+    // this.optsCanvas.ctx.beginPath();
+    // this.optsCanvas.ctx.moveTo(20,410);
+    // this.optsCanvas.ctx.lineTo(20,490);
+    // this.optsCanvas.ctx.stroke();
+    // this.optsCanvas.ctx.beginPath();
+    // this.optsCanvas.ctx.moveTo(170,410);
+    // this.optsCanvas.ctx.lineTo(170,490);
+    // this.optsCanvas.ctx.stroke();
+
+    this.optsCanvas.ctx.strokeRect(300,385,205,87);
+    this.optsCanvas.ctx.font = "60px sf_alien_encountersitalic";
+    this.optsCanvas.ctx.fillText("PLAY", 320, 450);
+
+    this.drawGamePadToggleButton();
+
+    this.optsCanvas.ctx.font = "12px sf_alien_encountersitalic";
+    this.optsCanvas.ctx.fillText("m to mute!", 705, 440);
+    this.optsCanvas.ctx.fillText("p to pause!", 700, 460);
+    if(this.gameStatus !== 'playing') {
+      this.optsCanvas.ctx.fillText("enter to start!", 670, 480);
+    }
+  }
+
+  drawStartScreenMessage() {
+    if(this.gameStatus === 'over') {
+      this.optsCanvas.ctx.font = "36px sf_alien_encountersitalic";
+      this.optsCanvas.ctx.fillText("GAME OVER", 285, 70);
+      this.optsCanvas.ctx.font = "22px sf_alien_encountersitalic";
+      this.optsCanvas.ctx.fillText(
+        "fight! fight! don't let demons win!", 176, 105
+      );
+    } else {
+      this.optsCanvas.ctx.font = "36px sf_alien_encountersitalic";
+      this.optsCanvas.ctx.fillText("SHOOT ALL DEMONS", 207, 70);
+      this.optsCanvas.ctx.font = "22px sf_alien_encountersitalic";
+      this.optsCanvas.ctx.fillText(
+        "careful! demon power is strong!", 182, 105
+      );
+    }
+  }
+
+  drawControls() {
+    let cw;     // clockwise
+    let ccw;    // counterclockwise
+    if(this.movementDirection === 'standard') {
+      ccw = {
+        descPos: 70,
+        circlePos: 160
+      };
+      cw = {
+        descPos: 590,
+        circlePos: -640
+      };
+    } else {
+      ccw = {
+        descPos: 545,
+        circlePos: 640
+      };
+      cw = {
+        descPos: 109,
+        circlePos: -160
+      };
+    };
+
+    this.optsCanvas.ctx.strokeStyle = "white";
+
+    this.optsCanvas.ctx.strokeRect(240,165,320,35);
+    this.optsCanvas.ctx.font = "20px sf_alien_encountersitalic";
+    this.optsCanvas.ctx.fillText("swap movement direction", 250, 190);
+
+    this.optsCanvas.ctx.font = "18px sf_alien_encountersitalic";
+    this.optsCanvas.ctx.fillText("counterclockwise", ccw.descPos, 250);
+    this.optsCanvas.ctx.font = "20px sf_alien_encountersitalic";
+    this.optsCanvas.ctx.fillText("a   j   left", 90, 280);
+
+    this.optsCanvas.ctx.beginPath();
+    this.optsCanvas.ctx.arc(ccw.circlePos, 190, 30, Math.PI / 2, Math.PI, true);
+    this.optsCanvas.ctx.lineWidth = 2;
+    this.optsCanvas.ctx.stroke();
+    this.optsCanvas.ctx.beginPath();
+    this.optsCanvas.ctx.moveTo(Math.abs(ccw.circlePos - 30), 190);
+    this.optsCanvas.ctx.lineTo(Math.abs(ccw.circlePos - 20), 180);
+    this.optsCanvas.ctx.stroke();
+    this.optsCanvas.ctx.moveTo(Math.abs(ccw.circlePos - 30), 190);
+    this.optsCanvas.ctx.lineTo(Math.abs(ccw.circlePos - 35), 175);
+    this.optsCanvas.ctx.stroke();
+
+    this.optsCanvas.ctx.font = "18px sf_alien_encountersitalic";
+    this.optsCanvas.ctx.fillText("clockwise", cw.descPos, 250);
+    this.optsCanvas.ctx.font = "20px sf_alien_encountersitalic";
+    this.optsCanvas.ctx.fillText("d   l   right", 566, 280);
+
+    this.optsCanvas.ctx.beginPath();
+    this.optsCanvas.ctx.arc(Math.abs(cw.circlePos),190,30,Math.PI/2,0,false);
+    this.optsCanvas.ctx.lineWidth = 2;
+    this.optsCanvas.ctx.stroke();
+    this.optsCanvas.ctx.beginPath();
+    this.optsCanvas.ctx.moveTo(Math.abs(cw.circlePos - 30), 190);
+    this.optsCanvas.ctx.lineTo(Math.abs(cw.circlePos - 20), 180);
+    this.optsCanvas.ctx.stroke();
+    this.optsCanvas.ctx.moveTo(Math.abs(cw.circlePos - 30), 190);
+    this.optsCanvas.ctx.lineTo(Math.abs(cw.circlePos - 35), 175);
+    this.optsCanvas.ctx.stroke();
+
+    this.optsCanvas.ctx.font = "24px sf_alien_encountersitalic";
+    this.optsCanvas.ctx.fillText(
+      "SPACE TO FIRE WHEN POWER IS FULL!", 148, 340
+    );
+    this.optsCanvas.ctx.beginPath();
+    this.optsCanvas.ctx.moveTo(148,347);
+    this.optsCanvas.ctx.lineTo(650,347);
+    this.optsCanvas.ctx.stroke();
+  }
+
+  drawGamePadToggleButton() {
+    if(this.gamePadConnected) {
+      this.optsCanvas.ctx.clearRect(20,410,150,80);
+      this.optsCanvas.ctx.fillStyle = "rgba(0, 0, 0, 0.8";
+      this.optsCanvas.ctx.fillRect(20,410,150,80);
+      this.optsCanvas.ctx.fillStyle = "white";
+      this.optsCanvas.ctx.font = "24px sf_alien_encountersitalic";
+      if(this.gamePadToggle) this.optsCanvas.ctx.fillText("gamepad", 33, 435);
+      else this.optsCanvas.ctx.fillText("keyboard", 27, 435);
+      this.optsCanvas.ctx.font = "12px sf_alien_encountersitalic";
+      this.optsCanvas.ctx.fillText("click here to toggle", 20, 460);
+      this.optsCanvas.ctx.fillText("gamepad input!", 20, 480);
+    };
   }
 
   render()  {
@@ -168,6 +317,15 @@ class Field {
 
   clearPCContext() {
     this.pcCanvas.ctx.clearRect(0,0,this.pcCanvas.width,this.pcCanvas.height);
+  }
+
+  clearOptsContext() {
+    this.optsCanvas.ctx.clearRect(
+      0,
+      0,
+      this.optsCanvas.width,
+      this.optsCanvas.height
+    );
   }
 
   clearAllContexts() {
