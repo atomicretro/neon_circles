@@ -44,14 +44,29 @@ class Game {
       height: 500
     }
 
+    this.play = this.play.bind(this);
+    this.startRound = this.startRound.bind(this);
+    this.optsCanvasCheckClick = this.optsCanvasCheckClick.bind(this);
+    this.statsCanvasCheckClick = this.statsCanvasCheckClick.bind(this);
+
     this.AssetStore = new AssetStore(this);
 
     this.gamePadConnected = false;
     this.gamePadToggle = false;
 
     this.drawLoadingScreen();
+    this.setupEventListners(fgCanvas, statsCanvas, optsCanvas);
     this.setupNewGame();
+    this.setupNewField();
+  }
 
+  drawLoadingScreen() {
+    this.optsCanvas.ctx.fillStyle = 'black';
+    this.optsCanvas.ctx.font = "16px Courier";
+    this.optsCanvas.ctx.fillText("Loading...", 50,50);
+  }
+
+  setupEventListners(fgCanvas, statsCanvas, optsCanvas) {
     document.addEventListener('keydown', this.keydown.bind(this));
     document.addEventListener('keyup', this.keyup.bind(this));
     optsCanvas.addEventListener('click', (e) => {
@@ -60,6 +75,13 @@ class Game {
     statsCanvas.addEventListener('click', (e) => {
       this.statsCanvasCheckClick(e, statsCanvas.getBoundingClientRect());
     });
+
+    fgCanvas.addEventListener("touchstart", this.handleStart, false);
+    fgCanvas.addEventListener("touchend", this.handleEnd, false);
+    fgCanvas.addEventListener("touchcancel", this.handleCancel, false);
+    fgCanvas.addEventListener("touchmove", this.handleMove, false);
+    this.ongoingTouches = [];
+
     window.addEventListener("gamepadconnected", (e) => {
       this.mapGamePadButtons(e);
       this.gamePadConnected = true;
@@ -68,8 +90,6 @@ class Game {
       this.gamePadConnected = false;
       this.gamePadToggle = false;
     });
-
-    this.setupNewField();
   }
 
   setupNewGame() {
@@ -88,11 +108,6 @@ class Game {
     this.numLvl1DemonsKilled = 0;
     this.numLvl2DemonsKilled = 0;
     // this.numLvl3DemonsKilled = 0;
-
-    this.play = this.play.bind(this);
-    this.startRound = this.startRound.bind(this);
-    this.optsCanvasCheckClick = this.optsCanvasCheckClick.bind(this);
-    this.statsCanvasCheckClick = this.statsCanvasCheckClick.bind(this);
   }
 
   setupDemonPools() {
@@ -122,12 +137,6 @@ class Game {
       this.lvl2DemonPool,
       this.player
     );
-  }
-
-  drawLoadingScreen() {
-    this.optsCanvas.ctx.fillStyle = 'black';
-    this.optsCanvas.ctx.font = "16px Courier";
-    this.optsCanvas.ctx.fillText("Loading...", 50,50);
   }
 
   startGame() {

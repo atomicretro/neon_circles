@@ -642,8 +642,6 @@ for (var code in KEY_MAP) {
 
 var Game = function () {
   function Game(fgCanvas, statsCanvas, pcCanvas, optsCanvas) {
-    var _this = this;
-
     _classCallCheck(this, Game);
 
     this.fgCanvas = {
@@ -668,35 +666,59 @@ var Game = function () {
       height: 500
     };
 
+    this.play = this.play.bind(this);
+    this.startRound = this.startRound.bind(this);
+    this.optsCanvasCheckClick = this.optsCanvasCheckClick.bind(this);
+    this.statsCanvasCheckClick = this.statsCanvasCheckClick.bind(this);
+
     this.AssetStore = new _utilities.AssetStore(this);
 
     this.gamePadConnected = false;
     this.gamePadToggle = false;
 
     this.drawLoadingScreen();
+    this.setupEventListners(fgCanvas, statsCanvas, optsCanvas);
     this.setupNewGame();
-
-    document.addEventListener('keydown', this.keydown.bind(this));
-    document.addEventListener('keyup', this.keyup.bind(this));
-    optsCanvas.addEventListener('click', function (e) {
-      _this.optsCanvasCheckClick(e, optsCanvas.getBoundingClientRect());
-    });
-    statsCanvas.addEventListener('click', function (e) {
-      _this.statsCanvasCheckClick(e, statsCanvas.getBoundingClientRect());
-    });
-    window.addEventListener("gamepadconnected", function (e) {
-      _this.mapGamePadButtons(e);
-      _this.gamePadConnected = true;
-    });
-    window.addEventListener("gamepaddisconnected", function (e) {
-      _this.gamePadConnected = false;
-      _this.gamePadToggle = false;
-    });
-
     this.setupNewField();
   }
 
   _createClass(Game, [{
+    key: 'drawLoadingScreen',
+    value: function drawLoadingScreen() {
+      this.optsCanvas.ctx.fillStyle = 'black';
+      this.optsCanvas.ctx.font = "16px Courier";
+      this.optsCanvas.ctx.fillText("Loading...", 50, 50);
+    }
+  }, {
+    key: 'setupEventListners',
+    value: function setupEventListners(fgCanvas, statsCanvas, optsCanvas) {
+      var _this = this;
+
+      document.addEventListener('keydown', this.keydown.bind(this));
+      document.addEventListener('keyup', this.keyup.bind(this));
+      optsCanvas.addEventListener('click', function (e) {
+        _this.optsCanvasCheckClick(e, optsCanvas.getBoundingClientRect());
+      });
+      statsCanvas.addEventListener('click', function (e) {
+        _this.statsCanvasCheckClick(e, statsCanvas.getBoundingClientRect());
+      });
+
+      fgCanvas.addEventListener("touchstart", this.handleStart, false);
+      fgCanvas.addEventListener("touchend", this.handleEnd, false);
+      fgCanvas.addEventListener("touchcancel", this.handleCancel, false);
+      fgCanvas.addEventListener("touchmove", this.handleMove, false);
+      this.ongoingTouches = [];
+
+      window.addEventListener("gamepadconnected", function (e) {
+        _this.mapGamePadButtons(e);
+        _this.gamePadConnected = true;
+      });
+      window.addEventListener("gamepaddisconnected", function (e) {
+        _this.gamePadConnected = false;
+        _this.gamePadToggle = false;
+      });
+    }
+  }, {
     key: 'setupNewGame',
     value: function setupNewGame() {
       this.demonBulletPool = new _bullet3.default(3, this.fgCanvas, 'demonBullet');
@@ -714,11 +736,6 @@ var Game = function () {
       this.numLvl1DemonsKilled = 0;
       this.numLvl2DemonsKilled = 0;
       // this.numLvl3DemonsKilled = 0;
-
-      this.play = this.play.bind(this);
-      this.startRound = this.startRound.bind(this);
-      this.optsCanvasCheckClick = this.optsCanvasCheckClick.bind(this);
-      this.statsCanvasCheckClick = this.statsCanvasCheckClick.bind(this);
     }
   }, {
     key: 'setupDemonPools',
@@ -733,13 +750,6 @@ var Game = function () {
     key: 'setupNewField',
     value: function setupNewField() {
       this.field = new _field2.default(this.fgCanvas, this.statsCanvas, this.pcCanvas, this.AssetStore, this.demonBulletPool, this.pcBulletPool, this.lvl1DemonPool, this.lvl2DemonPool, this.player);
-    }
-  }, {
-    key: 'drawLoadingScreen',
-    value: function drawLoadingScreen() {
-      this.optsCanvas.ctx.fillStyle = 'black';
-      this.optsCanvas.ctx.font = "16px Courier";
-      this.optsCanvas.ctx.fillText("Loading...", 50, 50);
     }
   }, {
     key: 'startGame',
