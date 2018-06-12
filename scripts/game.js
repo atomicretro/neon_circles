@@ -479,6 +479,7 @@ class Game {
       this.muted = true;
       this.AssetStore.backgroundMusic.volume = 0;
     }
+
     this.field.updateMuteButton(this.muted);
   }
 

@@ -1226,6 +1226,7 @@ var Game = function () {
         this.muted = true;
         this.AssetStore.backgroundMusic.volume = 0;
       }
+
       this.field.updateMuteButton(this.muted);
     }
   }, {
@@ -1418,11 +1419,7 @@ var Player = function () {
       this.computeAllVerticies();
       this.ctx.beginPath();
 
-      if (this.invincibilityFrames < 50) {
-        this.ctx.fillStyle = 'red';
-      } else {
-        this.ctx.fillStyle = 'white';
-      }
+      if (this.invincibilityFrames < 50) this.ctx.fillStyle = 'red';else this.ctx.fillStyle = 'white';
 
       this.ctx.moveTo(this.starboardVertex.x, this.starboardVertex.y);
       this.ctx.lineTo(this.portVertex.x, this.portVertex.y);
