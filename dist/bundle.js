@@ -892,13 +892,6 @@ var Game = function () {
       this.muted = false;
       this.paused = false;
       this.gameStatus = 'unbegun';
-
-      this.lvl1SpawnBuffer = Date.now();
-      this.lvl2SpawnBuffer = Date.now();
-      // this.lvl3SpawnBuffer = Date.now();
-      this.numLvl1DemonsKilled = 0;
-      this.numLvl2DemonsKilled = 0;
-      // this.numLvl3DemonsKilled = 0;
     }
   }, {
     key: 'setupDemonPools',
@@ -993,7 +986,6 @@ var Game = function () {
       if (spawnedLvl1 < 1) {
         this.lvl1DemonPool.get('mouthDemon');
         this.lvl1DemonPool.get('eyeDemon');
-        this.lvl1SpawnBuffer = Date.now();
       }
 
       return spawnedLvl1;
@@ -1007,7 +999,6 @@ var Game = function () {
       if (this.checkLevel1Demons() < maxDemons) {
         var toGet = Math.random() < 0.5 ? 'mouthDemon' : 'eyeDemon';
         this.lvl1DemonPool.get(toGet);
-        this.lvl1SpawnBuffer = Date.now();
       };
 
       this.lvl1Timer = new _utilities.Timer(function () {
@@ -1026,10 +1017,7 @@ var Game = function () {
       };
 
       var maxDemons = this.getMaxDemons('lvl2');
-      if (spawnedLvl2 < maxDemons) {
-        this.lvl2DemonPool.get('faceDemon');
-        this.lvl2SpawnBuffer = Date.now();
-      };
+      if (spawnedLvl2 < maxDemons) this.lvl2DemonPool.get('faceDemon');
 
       this.lvl2Timer = new _utilities.Timer(function () {
         _this4.spawnLvl2Demons();
@@ -1112,7 +1100,6 @@ var Game = function () {
           var drawPoint = demon.drawPoint;
           if ((this.pcBulletHitsDemon(demon, drawPoint, bullet.startPoint) || this.pcBulletHitsDemon(demon, drawPoint, bullet.endPoint)) && demon.invincibilityFrames > 50) {
             this.field.updatePlayerScore(demon.type);
-            this.calculateDemonKillTime(demon);
             demon.isHit();
           };
         };
@@ -1122,17 +1109,6 @@ var Game = function () {
     key: 'pcBulletHitsDemon',
     value: function pcBulletHitsDemon(demon, drawPoint, bullet) {
       return drawPoint.x <= bullet.x && bullet.x <= drawPoint.x + demon.width && drawPoint.y <= bullet.y && bullet.y <= drawPoint.y + demon.height;
-    }
-  }, {
-    key: 'calculateDemonKillTime',
-    value: function calculateDemonKillTime(demon) {
-      if (demon.type === 'mouthDemon' || demon.type === 'eyeDemon') {
-        this.lvl1SpawnBuffer = Date.now();
-      } else if (demon.type === 'faceDemon') {
-        this.lvl2SpawnBuffer = Date.now();
-      } else if (demon.type === 'bossDemon') {
-        this.lvl3SpawnBuffer = Date.now();
-      };
     }
   }, {
     key: 'checkGameOver',
