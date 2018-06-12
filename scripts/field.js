@@ -12,7 +12,8 @@ class Field {
     lvl1DemonPool,
     lvl2DemonPool,
     player,
-    movementDirection
+    movementDirection,
+    gameStatus
   ) {
     this.fgCanvas = fgCanvasObj;
     this.statsCanvas = statsCanvasObj;
@@ -27,6 +28,7 @@ class Field {
 
     this.player = player;
     this.movementDirection = movementDirection;
+    this.gameStatus = gameStatus;
 
     this.lastTime = Date.now;
     this.playerScore = 0;
@@ -39,6 +41,10 @@ class Field {
 
   updateMovementDirection(newDirection) {
     this.movementDirection = newDirection;
+  }
+
+  updateGameStatus(gameStatus) {
+    this.gameStatus = gameStatus;
   }
 
   drawStartScreen() {

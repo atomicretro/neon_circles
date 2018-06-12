@@ -411,7 +411,7 @@ var _utilities = __webpack_require__(/*! ./utilities */ "./scripts/utilities.js"
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Field = function () {
-  function Field(fgCanvasObj, statsCanvasObj, pcCanvasObj, optsCanvasObj, AssetStore, demonBulletPool, pcBulletPool, lvl1DemonPool, lvl2DemonPool, player, movementDirection) {
+  function Field(fgCanvasObj, statsCanvasObj, pcCanvasObj, optsCanvasObj, AssetStore, demonBulletPool, pcBulletPool, lvl1DemonPool, lvl2DemonPool, player, movementDirection, gameStatus) {
     _classCallCheck(this, Field);
 
     this.fgCanvas = fgCanvasObj;
@@ -427,6 +427,7 @@ var Field = function () {
 
     this.player = player;
     this.movementDirection = movementDirection;
+    this.gameStatus = gameStatus;
 
     this.lastTime = Date.now;
     this.playerScore = 0;
@@ -437,6 +438,11 @@ var Field = function () {
     key: 'updateMovementDirection',
     value: function updateMovementDirection(newDirection) {
       this.movementDirection = newDirection;
+    }
+  }, {
+    key: 'updateGameStatus',
+    value: function updateGameStatus(gameStatus) {
+      this.gameStatus = gameStatus;
     }
   }, {
     key: 'drawStartScreen',
@@ -906,7 +912,7 @@ var Game = function () {
   }, {
     key: 'setupNewField',
     value: function setupNewField() {
-      this.field = new _field2.default(this.fgCanvas, this.statsCanvas, this.pcCanvas, this.optsCanvas, this.AssetStore, this.demonBulletPool, this.pcBulletPool, this.lvl1DemonPool, this.lvl2DemonPool, this.player, this.movementDirection);
+      this.field = new _field2.default(this.fgCanvas, this.statsCanvas, this.pcCanvas, this.optsCanvas, this.AssetStore, this.demonBulletPool, this.pcBulletPool, this.lvl1DemonPool, this.lvl2DemonPool, this.player, this.movementDirection, this.gameStatus);
     }
   }, {
     key: 'startGame',
@@ -931,6 +937,7 @@ var Game = function () {
       this.field.clearOptsContext();
       this.optsCanvas.canvas.classList.add('hidden');
       this.gameStatus = 'playing';
+      this.field.updateGameStatus(this.gameStatus);
       this.startTime = Date.now();
       this.lastTime = Date.now();
       this.play();
@@ -1134,6 +1141,7 @@ var Game = function () {
         this.paused = true;
         this.removeSpawnTimers();
         this.gameStatus = 'over';
+        this.field.updateGameStatus(this.gameStatus);
         this.field.drawStartScreen();
       };
     }

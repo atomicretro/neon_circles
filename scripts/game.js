@@ -144,7 +144,8 @@ class Game {
       this.lvl1DemonPool,
       this.lvl2DemonPool,
       this.player,
-      this.movementDirection
+      this.movementDirection,
+      this.gameStatus
     );
   }
 
@@ -162,6 +163,7 @@ class Game {
     this.field.clearOptsContext();
     this.optsCanvas.canvas.classList.add('hidden');
     this.gameStatus = 'playing';
+    this.field.updateGameStatus(this.gameStatus);
     this.startTime = Date.now();
     this.lastTime = Date.now();
     this.play();
@@ -357,6 +359,7 @@ class Game {
       this.paused = true;
       this.removeSpawnTimers();
       this.gameStatus = 'over';
+      this.field.updateGameStatus(this.gameStatus);
       this.field.drawStartScreen();
     };
   }
