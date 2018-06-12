@@ -12,7 +12,10 @@ const KEY_MAP = {
   39: 'right',    // left arrow
   37: 'left',     // right arrow
   32: 'fire',     // space bar
-  13: 'start'     // enter
+  13: 'start',    // enter
+  touchLeft: 'left',
+  touchRight: 'right',
+  touchFire: 'fire'
 };
 
 const KEY_STATUS = {};
@@ -76,10 +79,14 @@ class Game {
       this.statsCanvasCheckClick(e, statsCanvas.getBoundingClientRect());
     });
 
-    fgCanvas.addEventListener("touchstart", this.handleStart, false);
-    fgCanvas.addEventListener("touchend", this.handleEnd, false);
+    fgCanvas.addEventListener("touchstart", (e) => {
+      this.handleStart(e, fgCanvas.getBoundingClientRect());
+    }, false);
+    fgCanvas.addEventListener("touchend", (e) => {
+      this.handleEnd(e, fgCanvas.getBoundingClientRect());
+    }, false);
     fgCanvas.addEventListener("touchcancel", this.handleCancel, false);
-    fgCanvas.addEventListener("touchmove", this.handleMove, false);
+    // fgCanvas.addEventListener("touchmove", this.handleMove, false);
     this.ongoingTouches = [];
 
     window.addEventListener("gamepadconnected", (e) => {
@@ -421,6 +428,55 @@ class Game {
       e.preventDefault();
       KEY_STATUS[KEY_MAP[keyCode]] = false;
     }
+  }
+
+  handleStart(e, boundingRect) {
+    e.preventDefault();
+    let touches = e.changedTouches;
+    for (let i = 0; i < touches.length; i++) {
+      let touch = touches[i];
+      let posX = touch.pageX - boundingRect.left;
+      let posY = touch.pageY - boundingRect.top;
+
+      if(posY < 250) KEY_STATUS[KEY_MAP['touchFire']] = true;
+      if(posX < 400 && posY > 250) KEY_STATUS[KEY_MAP['touchLeft']] = true;
+      if(posX > 400 && posY > 250) KEY_STATUS[KEY_MAP['touchRight']] = true;
+
+      this.ongoingTouches.push(this.copyTouch(touches[i], posX, posY));
+    };
+  }
+
+  handleEnd(e, boundingRect) {
+    e.preventDefault();
+    let touches = e.changedTouches;
+    for (let i = 0; i < touches.length; i++) {
+      let touch = touches[i];
+      let posX = touch.pageX - boundingRect.left;
+      let posY = touch.pageY - boundingRect.top;
+
+      if(posY < 250) KEY_STATUS[KEY_MAP['touchFire']] = false;
+      if(posX < 400 && posY > 250) KEY_STATUS[KEY_MAP['touchLeft']] = false;
+      if(posX > 400 && posY > 250) KEY_STATUS[KEY_MAP['touchRight']] = false;
+
+      let touchIdx = this.ongoingTouchIndexById(touch.identifier);
+      this.ongoingTouches.splice(touchIdx, 1);
+    };
+  }
+
+  copyTouch(touch, posX, posY) {
+    return {
+      identifier: touch.identifier,
+      posX,
+      posY
+    };
+  }
+
+  ongoingTouchIndexById(idToFind) {
+    for(let i = 0; i < this.ongoingTouches.length; i++) {
+      let id = this.ongoingTouches[i].identifier;
+      if(id == idToFind) return i;
+    }
+    return -1;    // not found
   }
 
   statsCanvasCheckClick(e, boundingRect) {

@@ -782,7 +782,10 @@ var KEY_MAP = {
   39: 'right', // left arrow
   37: 'left', // right arrow
   32: 'fire', // space bar
-  13: 'start' // enter
+  13: 'start', // enter
+  touchLeft: 'left',
+  touchRight: 'right',
+  touchFire: 'fire'
 };
 
 var KEY_STATUS = {};
@@ -853,10 +856,14 @@ var Game = function () {
         _this.statsCanvasCheckClick(e, statsCanvas.getBoundingClientRect());
       });
 
-      fgCanvas.addEventListener("touchstart", this.handleStart, false);
-      fgCanvas.addEventListener("touchend", this.handleEnd, false);
+      fgCanvas.addEventListener("touchstart", function (e) {
+        _this.handleStart(e, fgCanvas.getBoundingClientRect());
+      }, false);
+      fgCanvas.addEventListener("touchend", function (e) {
+        _this.handleEnd(e, fgCanvas.getBoundingClientRect());
+      }, false);
       fgCanvas.addEventListener("touchcancel", this.handleCancel, false);
-      fgCanvas.addEventListener("touchmove", this.handleMove, false);
+      // fgCanvas.addEventListener("touchmove", this.handleMove, false);
       this.ongoingTouches = [];
 
       window.addEventListener("gamepadconnected", function (e) {
@@ -1180,6 +1187,59 @@ var Game = function () {
         e.preventDefault();
         KEY_STATUS[KEY_MAP[keyCode]] = false;
       }
+    }
+  }, {
+    key: 'handleStart',
+    value: function handleStart(e, boundingRect) {
+      e.preventDefault();
+      var touches = e.changedTouches;
+      for (var i = 0; i < touches.length; i++) {
+        var touch = touches[i];
+        var posX = touch.pageX - boundingRect.left;
+        var posY = touch.pageY - boundingRect.top;
+
+        if (posY < 250) KEY_STATUS[KEY_MAP['touchFire']] = true;
+        if (posX < 400 && posY > 250) KEY_STATUS[KEY_MAP['touchLeft']] = true;
+        if (posX > 400 && posY > 250) KEY_STATUS[KEY_MAP['touchRight']] = true;
+
+        this.ongoingTouches.push(this.copyTouch(touches[i], posX, posY));
+      };
+    }
+  }, {
+    key: 'handleEnd',
+    value: function handleEnd(e, boundingRect) {
+      e.preventDefault();
+      var touches = e.changedTouches;
+      for (var i = 0; i < touches.length; i++) {
+        var touch = touches[i];
+        var posX = touch.pageX - boundingRect.left;
+        var posY = touch.pageY - boundingRect.top;
+
+        if (posY < 250) KEY_STATUS[KEY_MAP['touchFire']] = false;
+        if (posX < 400 && posY > 250) KEY_STATUS[KEY_MAP['touchLeft']] = false;
+        if (posX > 400 && posY > 250) KEY_STATUS[KEY_MAP['touchRight']] = false;
+
+        var touchIdx = this.ongoingTouchIndexById(touch.identifier);
+        this.ongoingTouches.splice(touchIdx, 1);
+      };
+    }
+  }, {
+    key: 'copyTouch',
+    value: function copyTouch(touch, posX, posY) {
+      return {
+        identifier: touch.identifier,
+        posX: posX,
+        posY: posY
+      };
+    }
+  }, {
+    key: 'ongoingTouchIndexById',
+    value: function ongoingTouchIndexById(idToFind) {
+      for (var i = 0; i < this.ongoingTouches.length; i++) {
+        var id = this.ongoingTouches[i].identifier;
+        if (id == idToFind) return i;
+      }
+      return -1; // not found
     }
   }, {
     key: 'statsCanvasCheckClick',
