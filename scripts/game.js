@@ -580,6 +580,11 @@ document.addEventListener("DOMContentLoaded", () => {
   let statsCanvas = document.getElementById("stats-canvas");
   let optionsCanvas = document.getElementById("options-canvas");
 
+  function isMobileDevice() {
+    return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
+  };
+  console.log(isMobileDevice());
+
   let game = new Game(
     foregroundCanvas,
     statsCanvas,

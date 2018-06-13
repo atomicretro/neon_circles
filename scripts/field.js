@@ -198,6 +198,14 @@ class Field {
     this.lvl2DemonPool.draw();
     this.pcBulletPool.draw('player');
     this.demonBulletPool.draw();
+
+    this.fgCanvas.ctx.strokeStyle = "red";
+    this.fgCanvas.ctx.strokeRect(0,400,200,100);
+    this.fgCanvas.ctx.strokeRect(0,300,200,100);
+    this.fgCanvas.ctx.strokeRect(0,200,200,100);
+    this.fgCanvas.ctx.strokeRect(600,400,200,100);
+    this.fgCanvas.ctx.strokeRect(600,300,200,100);
+    this.fgCanvas.ctx.strokeRect(600,200,200,100);
   }
 
   drawStatusBar() {
