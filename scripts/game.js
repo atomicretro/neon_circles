@@ -24,7 +24,7 @@ for (let code in KEY_MAP) {
 }
 
 class Game {
-  constructor(fgCanvas, statsCanvas, pcCanvas, optsCanvas) {
+  constructor(fgCanvas, statsCanvas, pcCanvas, optsCanvas, mobileCanvas) {
     this.fgCanvas = {
       ctx: fgCanvas.getContext("2d"),
       width: 800,
@@ -46,6 +46,14 @@ class Game {
       width: 800,
       height: 500
     }
+    if(mobileCanvas != null) {
+      this.mobileCanvas = {
+        canvas: mobileCanvas,
+        ctx: mobileCanvas.getContext("2d"),
+        width: 800,
+        height: 500
+      }
+    };
 
     this.play = this.play.bind(this);
     this.startRound = this.startRound.bind(this);
@@ -138,7 +146,8 @@ class Game {
       this.lvl2DemonPool,
       this.player,
       this.movementDirection,
-      this.gameStatus
+      this.gameStatus,
+      this.mobileCanvas
     );
   }
 
@@ -579,11 +588,24 @@ document.addEventListener("DOMContentLoaded", () => {
   let playerCanvas = document.getElementById("player-canvas");
   let statsCanvas = document.getElementById("stats-canvas");
   let optionsCanvas = document.getElementById("options-canvas");
+  let mobileCanvas = null;
+
+  if(
+    (typeof window.orientation !== "undefined") ||
+    (navigator.userAgent.indexOf('IEMobile') !== -1)
+  ) {
+    mobileCanvas = document.createElement("canvas");
+    mobileCanvas.id = "mobile-canvas";
+    mobileCanvas.width = "800";
+    mobileCanvas.height = "500";
+    document.getElementsByClassName("game-area")[0].appendChild(mobileCanvas);
+  };
 
   let game = new Game(
     foregroundCanvas,
     statsCanvas,
     playerCanvas,
-    optionsCanvas
+    optionsCanvas,
+    mobileCanvas
   );
 });
