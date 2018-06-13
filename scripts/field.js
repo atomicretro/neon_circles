@@ -58,7 +58,7 @@ class Field {
     this.optsCanvas.ctx.fillStyle = 'white';
 
     this.drawStartScreenMessage();
-    if(this.mobileCanvas != null) this.drawControls();
+    if(this.mobileCanvas == null) this.drawControls();
     else this.drawMobileControls();
 
     // for checking centeredness of start screen items

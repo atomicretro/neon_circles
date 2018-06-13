@@ -456,7 +456,7 @@ var Field = function () {
       this.optsCanvas.ctx.fillStyle = 'white';
 
       this.drawStartScreenMessage();
-      if (this.mobileCanvas != null) this.drawControls();else this.drawMobileControls();
+      if (this.mobileCanvas == null) this.drawControls();else this.drawMobileControls();
 
       // for checking centeredness of start screen items
       // this.optsCanvas.ctx.beginPath();
