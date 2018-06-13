@@ -595,13 +595,20 @@ var Field = function () {
       this.pcBulletPool.draw('player');
       this.demonBulletPool.draw();
 
-      this.fgCanvas.ctx.strokeStyle = "red";
-      this.fgCanvas.ctx.strokeRect(0, 400, 200, 100);
-      this.fgCanvas.ctx.strokeRect(0, 300, 200, 100);
-      this.fgCanvas.ctx.strokeRect(0, 200, 200, 100);
-      this.fgCanvas.ctx.strokeRect(600, 400, 200, 100);
-      this.fgCanvas.ctx.strokeRect(600, 300, 200, 100);
-      this.fgCanvas.ctx.strokeRect(600, 200, 200, 100);
+      function isMobileDevice() {
+        return typeof window.orientation !== "undefined" || navigator.userAgent.indexOf('IEMobile') !== -1;
+      };
+
+      if (isMobileDevice()) {
+
+        this.fgCanvas.ctx.strokeStyle = "red";
+        this.fgCanvas.ctx.strokeRect(0, 400, 200, 100);
+        this.fgCanvas.ctx.strokeRect(0, 300, 200, 100);
+        this.fgCanvas.ctx.strokeRect(0, 200, 200, 100);
+        this.fgCanvas.ctx.strokeRect(600, 400, 200, 100);
+        this.fgCanvas.ctx.strokeRect(600, 300, 200, 100);
+        this.fgCanvas.ctx.strokeRect(600, 200, 200, 100);
+      };
     }
   }, {
     key: 'drawStatusBar',
@@ -1349,11 +1356,6 @@ document.addEventListener("DOMContentLoaded", function () {
   var playerCanvas = document.getElementById("player-canvas");
   var statsCanvas = document.getElementById("stats-canvas");
   var optionsCanvas = document.getElementById("options-canvas");
-
-  function isMobileDevice() {
-    return typeof window.orientation !== "undefined" || navigator.userAgent.indexOf('IEMobile') !== -1;
-  };
-  console.log(isMobileDevice());
 
   var game = new Game(foregroundCanvas, statsCanvas, playerCanvas, optionsCanvas);
 });

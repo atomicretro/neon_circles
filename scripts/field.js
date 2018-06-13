@@ -199,6 +199,12 @@ class Field {
     this.pcBulletPool.draw('player');
     this.demonBulletPool.draw();
 
+    function isMobileDevice() {
+      return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
+    };
+
+    if(isMobileDevice()) {
+
     this.fgCanvas.ctx.strokeStyle = "red";
     this.fgCanvas.ctx.strokeRect(0,400,200,100);
     this.fgCanvas.ctx.strokeRect(0,300,200,100);
@@ -206,6 +212,7 @@ class Field {
     this.fgCanvas.ctx.strokeRect(600,400,200,100);
     this.fgCanvas.ctx.strokeRect(600,300,200,100);
     this.fgCanvas.ctx.strokeRect(600,200,200,100);
+  };
   }
 
   drawStatusBar() {
