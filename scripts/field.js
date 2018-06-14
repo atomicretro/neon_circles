@@ -14,7 +14,8 @@ class Field {
     player,
     movementDirection,
     gameStatus,
-    mobileCanvasObj
+    mobileCanvasObj,
+    firePosition
   ) {
     this.fgCanvas = fgCanvasObj;
     this.statsCanvas = statsCanvasObj;
@@ -30,6 +31,7 @@ class Field {
 
     this.player = player;
     this.movementDirection = movementDirection;
+    this.firePosition = firePosition;
     this.gameStatus = gameStatus;
 
     this.lastTime = Date.now;
@@ -45,21 +47,47 @@ class Field {
     this.movementDirection = newDirection;
   }
 
+  updateFirePosition(newPosition) {
+    this.firePosition = newPosition;
+  }
+
   updateGameStatus(gameStatus) {
     this.gameStatus = gameStatus;
   }
 
-  drawStartScreen() {
-    this.optsCanvas.canvas.classList.remove('hidden');
-    this.clearOptsContext();
-    this.optsCanvas.ctx.fillStyle = "rgba(0, 0, 0, 0.8";
-    this.optsCanvas.ctx.fillRect(0,0,800,500);
+  drawStandardStartScreen() {
+    this.setupStartScreen();
 
-    this.optsCanvas.ctx.fillStyle = 'white';
+    let primaryText;     // clockwise
+    let secondaryText;    // counterclockwise
+    if(this.gameStatus === 'over') {
+      primaryText = {
+        text: "GAME OVER", size: "36px", x: 285, y: 70
+      };
+      secondaryText = {
+        text: "fight! fight! don't let demons win!", size: "22px", x: 176, y: 105
+      };
+    } else {
+      primaryText = {
+        text: "SHOOT ALL DEMONS!", size: "36px", x: 207, y: 70
+      };
+      secondaryText = {
+        text: "careful! demon power is strong!", size: "22px", x: 182, y: 105
+      };
+    };
+    this.drawStartScreenMessage(primaryText, secondaryText);
 
-    this.drawStartScreenMessage();
-    if(this.mobileCanvas == null) this.drawControls();
-    else this.drawMobileControls();
+    let cw;     // clockwise
+    let ccw;    // counterclockwise
+    if(this.movementDirection === 'standard') {
+      ccw = { descX: 70,
+            circleX: 160 };
+      cw = { descX: 590, circleX: -640 };
+    } else {
+      ccw = { descX: 545, circleX: 640 };
+      cw = { descX: 109, circleX: -160 };
+    };
+    this.drawControls();
 
     // for checking centeredness of start screen items
     // this.optsCanvas.ctx.beginPath();
@@ -70,77 +98,125 @@ class Field {
     // this.optsCanvas.ctx.moveTo(170,410);
     // this.optsCanvas.ctx.lineTo(170,490);
     // this.optsCanvas.ctx.stroke();
+  }
 
+  drawMobileStartScreen() {
+    this.setupStartScreen();
+
+    let primaryText;
+    let secondaryText;
+    if(this.gameStatus === 'over') {
+      primaryText = {
+        text: "GAME OVER", size: "36px", x: 285, y: 70
+      };
+      secondaryText = {
+        text: "fight! fight! don't let demons win!", size: "19px", x: 204, y: 105
+      };
+    } else {
+      primaryText = {
+        text: "SHOOT ALL DEMONS!", size: "34px", x: 212, y: 70
+      };
+      secondaryText = {
+        text: "careful! demon power is strong!", size: "20px", x: 202, y: 105
+      };
+    };
+    this.drawStartScreenMessage(primaryText, secondaryText);
+
+    this.drawMobileControls();
+  }
+
+  setupStartScreen() {
+    this.optsCanvas.canvas.classList.remove('hidden');
+    this.clearOptsContext();
+    this.optsCanvas.ctx.fillStyle = "rgba(0, 0, 0, 0.8";
+    this.optsCanvas.ctx.fillRect(0,0,800,500);
+
+    this.optsCanvas.ctx.fillStyle = 'white';
+    this.optsCanvas.ctx.strokeStyle = "white";
     this.optsCanvas.ctx.strokeRect(300,385,205,87);
     this.optsCanvas.ctx.font = "60px sf_alien_encountersitalic";
     this.optsCanvas.ctx.fillText("PLAY", 320, 450);
   }
 
-  drawStartScreenMessage() {
-    if(this.gameStatus === 'over') {
-      this.optsCanvas.ctx.font = "36px sf_alien_encountersitalic";
-      this.optsCanvas.ctx.fillText("GAME OVER", 285, 70);
-      this.optsCanvas.ctx.font = "22px sf_alien_encountersitalic";
-      this.optsCanvas.ctx.fillText(
-        "fight! fight! don't let demons win!", 176, 105
-      );
-    } else {
-      this.optsCanvas.ctx.font = "36px sf_alien_encountersitalic";
-      this.optsCanvas.ctx.fillText("SHOOT ALL DEMONS", 207, 70);
-      this.optsCanvas.ctx.font = "22px sf_alien_encountersitalic";
-      this.optsCanvas.ctx.fillText(
-        "careful! demon power is strong!", 182, 105
-      );
-    }
+  drawStartScreenMessage(primaryText, secondaryText) {
+    this.optsCanvas.ctx.fillStyle = 'white';
+    this.optsCanvas.ctx.font = `${primaryText.size} sf_alien_encountersitalic`;
+    this.optsCanvas.ctx.fillText(
+      primaryText.text, primaryText.x, primaryText.y);
+    this.optsCanvas.ctx.font = `${secondaryText.size} sf_alien_encountersitalic`;
+    this.optsCanvas.ctx.fillText(
+      secondaryText.text, secondaryText.x, secondaryText.y
+    );
   }
 
   drawControls() {
     let cw;     // clockwise
     let ccw;    // counterclockwise
     if(this.movementDirection === 'standard') {
-      ccw = { descX: 70, circleX: 160 };
-      cw = { descX: 590, circleX: -640 };
+      ccw = {
+        desc1X: 70, desc1Y: 250,
+        desc2X: 90, desc2Y: 280,
+        circleX: 160, circleY: 190
+      };
+      cw = {
+        desc1X: 590, desc1Y: 250,
+        desc2X: 566, desc2Y: 280,
+        circleX: -640, circleY: 190
+      };
     } else {
-      ccw = { descX: 545, circleX: 640 };
-      cw = { descX: 109, circleX: -160 };
+      ccw = {
+        desc1X: 545, desc1Y: 250,
+        desc2X: 90, desc2Y: 280,
+        circleX: 640, circleY: 190
+      };
+      cw = {
+        desc1X: 109, desc1Y: 250,
+        desc2X: 566, desc2Y: 280,
+        circleX: -160, circleY: 190
+      };
     };
 
     this.drawSwapMovementButton();
 
+    this.optsCanvas.ctx.fillStyle = 'white';
     this.optsCanvas.ctx.strokeStyle = "white";
 
     this.optsCanvas.ctx.font = "18px sf_alien_encountersitalic";
-    this.optsCanvas.ctx.fillText("counterclockwise", ccw.descX, 250);
+    this.optsCanvas.ctx.fillText("counterclockwise", ccw.desc1X, ccw.desc1Y);
     this.optsCanvas.ctx.font = "20px sf_alien_encountersitalic";
-    this.optsCanvas.ctx.fillText("a   j   left", 90, 280);
+    this.optsCanvas.ctx.fillText("a   j   left", ccw.desc2X, ccw.desc2Y);
 
     this.optsCanvas.ctx.beginPath();
-    this.optsCanvas.ctx.arc(ccw.circleX, 190, 30, Math.PI / 2, Math.PI, true);
+    this.optsCanvas.ctx.arc(
+      ccw.circleX, ccw.circleY, 30, Math.PI / 2, Math.PI, true
+    );
     this.optsCanvas.ctx.lineWidth = 2;
     this.optsCanvas.ctx.stroke();
     this.optsCanvas.ctx.beginPath();
-    this.optsCanvas.ctx.moveTo(Math.abs(ccw.circleX - 30), 190);
-    this.optsCanvas.ctx.lineTo(Math.abs(ccw.circleX - 20), 180);
+    this.optsCanvas.ctx.moveTo(Math.abs(ccw.circleX - 30), ccw.circleY);
+    this.optsCanvas.ctx.lineTo(Math.abs(ccw.circleX - 20), (ccw.circleY - 10));
     this.optsCanvas.ctx.stroke();
-    this.optsCanvas.ctx.moveTo(Math.abs(ccw.circleX - 30), 190);
-    this.optsCanvas.ctx.lineTo(Math.abs(ccw.circleX - 35), 175);
+    this.optsCanvas.ctx.moveTo(Math.abs(ccw.circleX - 30), ccw.circleY);
+    this.optsCanvas.ctx.lineTo(Math.abs(ccw.circleX - 35), (ccw.circleY - 15));
     this.optsCanvas.ctx.stroke();
 
     this.optsCanvas.ctx.font = "18px sf_alien_encountersitalic";
-    this.optsCanvas.ctx.fillText("clockwise", cw.descX, 250);
+    this.optsCanvas.ctx.fillText("clockwise", cw.desc1X, cw.desc1Y);
     this.optsCanvas.ctx.font = "20px sf_alien_encountersitalic";
-    this.optsCanvas.ctx.fillText("d   l   right", 566, 280);
+    this.optsCanvas.ctx.fillText("d   l   right", cw.desc2X, cw.desc2Y);
 
     this.optsCanvas.ctx.beginPath();
-    this.optsCanvas.ctx.arc(Math.abs(cw.circleX),190,30,Math.PI/2,0,false);
+    this.optsCanvas.ctx.arc(
+      Math.abs(cw.circleX), cw.circleY, 30,Math.PI/2, 0, false
+    );
     this.optsCanvas.ctx.lineWidth = 2;
     this.optsCanvas.ctx.stroke();
     this.optsCanvas.ctx.beginPath();
-    this.optsCanvas.ctx.moveTo(Math.abs(cw.circleX - 30), 190);
-    this.optsCanvas.ctx.lineTo(Math.abs(cw.circleX - 20), 180);
+    this.optsCanvas.ctx.moveTo(Math.abs(cw.circleX - 30), cw.circleY);
+    this.optsCanvas.ctx.lineTo(Math.abs(cw.circleX - 20), (cw.circleY - 10));
     this.optsCanvas.ctx.stroke();
-    this.optsCanvas.ctx.moveTo(Math.abs(cw.circleX - 30), 190);
-    this.optsCanvas.ctx.lineTo(Math.abs(cw.circleX - 35), 175);
+    this.optsCanvas.ctx.moveTo(Math.abs(cw.circleX - 30), cw.circleY);
+    this.optsCanvas.ctx.lineTo(Math.abs(cw.circleX - 35), (cw.circleY - 15));
     this.optsCanvas.ctx.stroke();
 
     this.optsCanvas.ctx.font = "24px sf_alien_encountersitalic";
@@ -165,44 +241,103 @@ class Field {
   drawMobileControls() {
     let cw;     // clockwise
     let ccw;    // counterclockwise
-    if(this.movementDirection === 'standard') {
-      ccw = { descX: 70, circleX: 160 };
-      cw = { descX: 590, circleX: -640 };
-    } else {
-      ccw = { descX: 545, circleX: 640 };
-      cw = { descX: 109, circleX: -160 };
+    let firePos;
+    if(
+      this.movementDirection === 'standard' && this.firePosition === 'standard'
+    ) {
+      ccw = { descY: 130, circleY: 70 };
+      cw = { descY: 470, circleY: 410 };
+      firePos = 265;
+    } else if(
+      this.movementDirection === 'inverted' && this.firePosition === 'standard'
+    ) {
+      ccw = { descY: 470, circleY: 410 };
+      cw = { descY: 130, circleY: 70 };
+      firePos = 265;
+    } else if(
+      this.movementDirection === 'standard' && this.firePosition === 'inverted'
+    ) {
+      ccw = { descY: 296, circleY: 236 };
+      cw = { descY: 470, circleY: 410 };
+      firePos = 108;
+    } else if(
+      this.movementDirection === 'inverted' && this.firePosition === 'inverted'
+    ) {
+      ccw = { descY: 470, circleY: 410 };
+      cw = { descY: 296, circleY: 236 };
+      firePos = 108;
     };
 
     this.drawSwapMovementButton();
+    this.drawSwapFireButton();
 
+    this.optsCanvas.ctx.fillStyle = 'white';
     this.optsCanvas.ctx.strokeStyle = "white";
 
+    // counterclockwise description titles
+    this.optsCanvas.ctx.font = "18px sf_alien_encountersitalic";
+    this.optsCanvas.ctx.fillText("counterclockwise", 5, ccw.descY);
+    this.optsCanvas.ctx.fillText("counterclockwise", 605, ccw.descY);
+
+    // fire description titles
     this.optsCanvas.ctx.font = "42px sf_alien_encountersitalic";
-    this.optsCanvas.ctx.fillText("FIRE!", 46, 265);
-    this.optsCanvas.ctx.fillText("FIRE!", 650, 265);
+    this.optsCanvas.ctx.fillText("FIRE!", 46, firePos);
+    this.optsCanvas.ctx.fillText("FIRE!", 650, firePos);
 
-    this.optsCanvas.ctx.font = "20px sf_alien_encountersitalic";
-    this.optsCanvas.ctx.fillText("counterclockwise", ccw.descX, 280);
+    // clockwise description titles
+    this.optsCanvas.ctx.font = "18px sf_alien_encountersitalic";
+    this.optsCanvas.ctx.fillText("clockwise", 45, cw.descY);
+    this.optsCanvas.ctx.fillText("clockwise", 645, cw.descY);
 
+    // counterclockwise circles
     this.optsCanvas.ctx.beginPath();
-    this.optsCanvas.ctx.arc(ccw.circleX, 190, 30, Math.PI / 2, Math.PI, true);
+    this.optsCanvas.ctx.arc(100, ccw.circleY, 30, Math.PI / 2, Math.PI, true);
     this.optsCanvas.ctx.lineWidth = 2;
     this.optsCanvas.ctx.stroke();
     this.optsCanvas.ctx.beginPath();
-    this.optsCanvas.ctx.moveTo(Math.abs(ccw.circleX - 30), 190);
-    this.optsCanvas.ctx.lineTo(Math.abs(ccw.circleX - 20), 180);
+    this.optsCanvas.ctx.moveTo(70, ccw.circleY);
+    this.optsCanvas.ctx.lineTo(80, (ccw.circleY - 10));
     this.optsCanvas.ctx.stroke();
-    this.optsCanvas.ctx.moveTo(Math.abs(ccw.circleX - 30), 190);
-    this.optsCanvas.ctx.lineTo(Math.abs(ccw.circleX - 35), 175);
+    this.optsCanvas.ctx.moveTo(70, ccw.circleY);
+    this.optsCanvas.ctx.lineTo(65, (ccw.circleY - 15));
     this.optsCanvas.ctx.stroke();
 
-    this.optsCanvas.ctx.strokeStyle = "red";
-    this.optsCanvas.ctx.strokeRect(0,400,200,100);
-    this.optsCanvas.ctx.strokeRect(0,300,200,100);
-    this.optsCanvas.ctx.strokeRect(0,200,200,100);
-    this.optsCanvas.ctx.strokeRect(600,400,200,100);
-    this.optsCanvas.ctx.strokeRect(600,300,200,100);
-    this.optsCanvas.ctx.strokeRect(600,200,200,100);
+    this.optsCanvas.ctx.beginPath();
+    this.optsCanvas.ctx.arc(700, ccw.circleY, 30, Math.PI / 2, Math.PI, true);
+    this.optsCanvas.ctx.lineWidth = 2;
+    this.optsCanvas.ctx.stroke();
+    this.optsCanvas.ctx.beginPath();
+    this.optsCanvas.ctx.moveTo(670, ccw.circleY);
+    this.optsCanvas.ctx.lineTo(680, (ccw.circleY - 10));
+    this.optsCanvas.ctx.stroke();
+    this.optsCanvas.ctx.moveTo(670, ccw.circleY);
+    this.optsCanvas.ctx.lineTo(665, (ccw.circleY - 15));
+    this.optsCanvas.ctx.stroke();
+
+    // clockwise circles
+    this.optsCanvas.ctx.beginPath();
+    this.optsCanvas.ctx.arc(100, cw.circleY, 30, Math.PI / 2, 0, false);
+    this.optsCanvas.ctx.lineWidth = 2;
+    this.optsCanvas.ctx.stroke();
+    this.optsCanvas.ctx.beginPath();
+    this.optsCanvas.ctx.moveTo(130, cw.circleY);
+    this.optsCanvas.ctx.lineTo(120, (cw.circleY - 10));
+    this.optsCanvas.ctx.stroke();
+    this.optsCanvas.ctx.moveTo(130, cw.circleY);
+    this.optsCanvas.ctx.lineTo(135, (cw.circleY - 15));
+    this.optsCanvas.ctx.stroke();
+
+    this.optsCanvas.ctx.beginPath();
+    this.optsCanvas.ctx.arc(700, cw.circleY, 30, Math.PI / 2, 0, false);
+    this.optsCanvas.ctx.lineWidth = 2;
+    this.optsCanvas.ctx.stroke();
+    this.optsCanvas.ctx.beginPath();
+    this.optsCanvas.ctx.moveTo(730, cw.circleY);
+    this.optsCanvas.ctx.lineTo(720, (cw.circleY - 10));
+    this.optsCanvas.ctx.stroke();
+    this.optsCanvas.ctx.moveTo(730, cw.circleY);
+    this.optsCanvas.ctx.lineTo(735, (cw.circleY - 15));
+    this.optsCanvas.ctx.stroke();
   }
 
   drawSwapMovementButton() {
@@ -210,6 +345,13 @@ class Field {
     this.optsCanvas.ctx.strokeRect(240,165,320,35);
     this.optsCanvas.ctx.font = "20px sf_alien_encountersitalic";
     this.optsCanvas.ctx.fillText("swap movement direction", 250, 190);
+  }
+
+  drawSwapFireButton() {
+    this.optsCanvas.ctx.strokeStyle = "white";
+    this.optsCanvas.ctx.strokeRect(290,255,225,35);
+    this.optsCanvas.ctx.font = "20px sf_alien_encountersitalic";
+    this.optsCanvas.ctx.fillText("move fire button", 300, 280);
   }
 
   drawGamePadToggleButton() {

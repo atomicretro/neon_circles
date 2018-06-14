@@ -69,6 +69,14 @@ h2 a:hover {
   z-index: 4;
 }
 
+#mobile-canvas {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -4;
+}
+
 #stats-canvas {
   display: block;
   border-left: solid 1px black;

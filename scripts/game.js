@@ -46,7 +46,13 @@ class Game {
       width: 800,
       height: 500
     }
-    if(mobileCanvas != null) {
+    if(mobileCanvas == null) {
+      this.isMobile = false;
+      this.firePosition = null;
+      this.mobileCanvas = { };
+      } else {
+      this.isMobile = true;
+      this.firePosition = 'standard';
       this.mobileCanvas = {
         canvas: mobileCanvas,
         ctx: mobileCanvas.getContext("2d"),
@@ -147,13 +153,19 @@ class Game {
       this.player,
       this.movementDirection,
       this.gameStatus,
-      this.mobileCanvas
+      this.mobileCanvas,
+      this.firePosition
     );
   }
 
   startGame() {
     this.field.drawStatusBar();
-    this.field.drawStartScreen();
+    this.drawStartScreen();
+  }
+
+  drawStartScreen() {
+    if(this.isMobile) this.field.drawMobileStartScreen();
+    else this.field.drawStandardStartScreen();
   }
 
   startRound() {
@@ -346,7 +358,7 @@ class Game {
       this.removeSpawnTimers();
       this.gameStatus = 'over';
       this.field.updateGameStatus(this.gameStatus);
-      this.field.drawStartScreen();
+      this.drawStartScreen();
     };
   }
 
@@ -427,9 +439,92 @@ class Game {
       let posX = touch.pageX - boundingRect.left;
       let posY = touch.pageY - boundingRect.top;
 
-      if(posY < 250) KEY_STATUS[KEY_MAP['touchFire']] = true;
-      if(posX < 400 && posY > 250) KEY_STATUS[KEY_MAP['touchLeft']] = true;
-      if(posX > 400 && posY > 250) KEY_STATUS[KEY_MAP['touchRight']] = true;
+      // this.optsCanvas.ctx.strokeStyle = "red";
+      // this.optsCanvas.ctx.strokeRect(0,0,200,166);
+      // this.optsCanvas.ctx.strokeRect(0,168,200,168);
+      // this.optsCanvas.ctx.strokeRect(0,334,200,166);
+      // this.optsCanvas.ctx.strokeRect(600,0,200,166);
+      // this.optsCanvas.ctx.strokeRect(600,168,200,168);
+      // this.optsCanvas.ctx.strokeRect(600,334,200,166);
+
+
+      if(
+        this.movementDirection === 'standard' && this.firePosition === 'standard'
+      ) {
+        if(
+          ((0 <= posX && posX <= 200) && (0 <= posY && posY <= 165)) ||
+          ((600 <= posX && posX <= 800) && (0 <= posY && posY <= 165))
+        ) {
+          KEY_STATUS[KEY_MAP['touchLeft']] = true;
+        } else if(
+          ((0 <= posX && posX <= 200) && (166 <= posY && posY <= 333)) ||
+          ((600 <= posX && posX <= 800) && (166 <= posY && posY <= 333))
+        ) {
+          KEY_STATUS[KEY_MAP['touchFire']] = true;
+        } else if(
+          ((0 <= posX && posX <= 200) && (334 <= posY && posY <= 500)) ||
+          ((600 <= posX && posX <= 800) && (334 <= posY && posY <= 500))
+        ) {
+          KEY_STATUS[KEY_MAP['touchRight']] = true;
+        };
+      } else if(
+        this.movementDirection === 'inverted' && this.firePosition === 'standard'
+      ) {
+        if(
+          ((0 <= posX && posX <= 200) && (0 <= posY && posY <= 165)) ||
+          ((600 <= posX && posX <= 800) && (0 <= posY && posY <= 165))
+        ) {
+          KEY_STATUS[KEY_MAP['touchRight']] = true;
+        } else if(
+          ((0 <= posX && posX <= 200) && (166 <= posY && posY <= 333)) ||
+          ((600 <= posX && posX <= 800) && (166 <= posY && posY <= 333))
+        ) {
+          KEY_STATUS[KEY_MAP['touchFire']] = true;
+        } else if(
+          ((0 <= posX && posX <= 200) && (334 <= posY && posY <= 500)) ||
+          ((600 <= posX && posX <= 800) && (334 <= posY && posY <= 500))
+        ) {
+          KEY_STATUS[KEY_MAP['touchLeft']] = true;
+        };
+      } else if(
+        this.movementDirection === 'standard' && this.firePosition === 'inverted'
+      ) {
+        if(
+          ((0 <= posX && posX <= 200) && (0 <= posY && posY <= 165)) ||
+          ((600 <= posX && posX <= 800) && (0 <= posY && posY <= 165))
+        ) {
+          KEY_STATUS[KEY_MAP['touchFire']] = true;
+        } else if(
+          ((0 <= posX && posX <= 200) && (166 <= posY && posY <= 333)) ||
+          ((600 <= posX && posX <= 800) && (166 <= posY && posY <= 333))
+        ) {
+          KEY_STATUS[KEY_MAP['touchLeft']] = true;
+        } else if(
+          ((0 <= posX && posX <= 200) && (334 <= posY && posY <= 500)) ||
+          ((600 <= posX && posX <= 800) && (334 <= posY && posY <= 500))
+        ) {
+          KEY_STATUS[KEY_MAP['touchRight']] = true;
+        };
+      } else if(
+        this.movementDirection === 'inverted' && this.firePosition === 'inverted'
+      ) {
+        if(
+          ((0 <= posX && posX <= 200) && (0 <= posY && posY <= 165)) ||
+          ((600 <= posX && posX <= 800) && (0 <= posY && posY <= 165))
+        ) {
+          KEY_STATUS[KEY_MAP['touchLeft']] = true;
+        } else if(
+          ((0 <= posX && posX <= 200) && (166 <= posY && posY <= 333)) ||
+          ((600 <= posX && posX <= 800) && (166 <= posY && posY <= 333))
+        ) {
+          KEY_STATUS[KEY_MAP['touchRight']] = true;
+        } else if(
+          ((0 <= posX && posX <= 200) && (334 <= posY && posY <= 500)) ||
+          ((600 <= posX && posX <= 800) && (334 <= posY && posY <= 500))
+        ) {
+          KEY_STATUS[KEY_MAP['touchFire']] = true;
+        };
+      };
 
       this.ongoingTouches.push(this.copyTouch(touches[i], posX, posY));
     };
@@ -443,9 +538,83 @@ class Game {
       let posX = touch.pageX - boundingRect.left;
       let posY = touch.pageY - boundingRect.top;
 
-      if(posY < 250) KEY_STATUS[KEY_MAP['touchFire']] = false;
-      if(posX < 400 && posY > 250) KEY_STATUS[KEY_MAP['touchLeft']] = false;
-      if(posX > 400 && posY > 250) KEY_STATUS[KEY_MAP['touchRight']] = false;
+      if(
+        this.movementDirection === 'standard' && this.firePosition === 'standard'
+      ) {
+        if(
+          ((0 <= posX && posX <= 200) && (0 <= posY && posY <= 165)) ||
+          ((600 <= posX && posX <= 800) && (0 <= posY && posY <= 165))
+        ) {
+          KEY_STATUS[KEY_MAP['touchLeft']] = false;
+        } else if(
+          ((0 <= posX && posX <= 200) && (166 <= posY && posY <= 333)) ||
+          ((600 <= posX && posX <= 800) && (166 <= posY && posY <= 333))
+        ) {
+          KEY_STATUS[KEY_MAP['touchFire']] = false;
+        } else if(
+          ((0 <= posX && posX <= 200) && (334 <= posY && posY <= 500)) ||
+          ((600 <= posX && posX <= 800) && (334 <= posY && posY <= 500))
+        ) {
+          KEY_STATUS[KEY_MAP['touchRight']] = false;
+        };
+      } else if(
+        this.movementDirection === 'inverted' && this.firePosition === 'standard'
+      ) {
+        if(
+          ((0 <= posX && posX <= 200) && (0 <= posY && posY <= 165)) ||
+          ((600 <= posX && posX <= 800) && (0 <= posY && posY <= 165))
+        ) {
+          KEY_STATUS[KEY_MAP['touchRight']] = false;
+        } else if(
+          ((0 <= posX && posX <= 200) && (166 <= posY && posY <= 333)) ||
+          ((600 <= posX && posX <= 800) && (166 <= posY && posY <= 333))
+        ) {
+          KEY_STATUS[KEY_MAP['touchFire']] = false;
+        } else if(
+          ((0 <= posX && posX <= 200) && (334 <= posY && posY <= 500)) ||
+          ((600 <= posX && posX <= 800) && (334 <= posY && posY <= 500))
+        ) {
+          KEY_STATUS[KEY_MAP['touchLeft']] = false;
+        };
+      } else if(
+        this.movementDirection === 'standard' && this.firePosition === 'inverted'
+      ) {
+        if(
+          ((0 <= posX && posX <= 200) && (0 <= posY && posY <= 165)) ||
+          ((600 <= posX && posX <= 800) && (0 <= posY && posY <= 165))
+        ) {
+          KEY_STATUS[KEY_MAP['touchFire']] = false;
+        } else if(
+          ((0 <= posX && posX <= 200) && (166 <= posY && posY <= 333)) ||
+          ((600 <= posX && posX <= 800) && (166 <= posY && posY <= 333))
+        ) {
+          KEY_STATUS[KEY_MAP['touchLeft']] = false;
+        } else if(
+          ((0 <= posX && posX <= 200) && (334 <= posY && posY <= 500)) ||
+          ((600 <= posX && posX <= 800) && (334 <= posY && posY <= 500))
+        ) {
+          KEY_STATUS[KEY_MAP['touchRight']] = false;
+        };
+      } else if(
+        this.movementDirection === 'inverted' && this.firePosition === 'inverted'
+      ) {
+        if(
+          ((0 <= posX && posX <= 200) && (0 <= posY && posY <= 165)) ||
+          ((600 <= posX && posX <= 800) && (0 <= posY && posY <= 165))
+        ) {
+          KEY_STATUS[KEY_MAP['touchLeft']] = false;
+        } else if(
+          ((0 <= posX && posX <= 200) && (166 <= posY && posY <= 333)) ||
+          ((600 <= posX && posX <= 800) && (166 <= posY && posY <= 333))
+        ) {
+          KEY_STATUS[KEY_MAP['touchRight']] = false;
+        } else if(
+          ((0 <= posX && posX <= 200) && (334 <= posY && posY <= 500)) ||
+          ((600 <= posX && posX <= 800) && (334 <= posY && posY <= 500))
+        ) {
+          KEY_STATUS[KEY_MAP['touchFire']] = false;
+        };
+      };
 
       let touchIdx = this.ongoingTouchIndexById(touch.identifier);
       this.ongoingTouches.splice(touchIdx, 1);
@@ -513,6 +682,12 @@ class Game {
     ) {
       this.gamePadToggle = this.gamePadToggle ? false : true;
       this.field.drawGamePadToggleButton();
+    } else if(
+      (290 <= clickPosX && clickPosX <= 515) &&
+      (255 <= clickPosY && clickPosY <= 290) &&
+      this.isMobile === true
+    ) {
+      this.moveFireButton();
     }
   }
 
@@ -538,7 +713,7 @@ class Game {
     } else if (!this.paused && this.gameStatus === 'playing') {
       this.paused = true;
       this.pauseSpawnTimers();
-      this.field.drawStartScreen();
+      this.drawStartScreen();
     };
   }
 
@@ -552,7 +727,7 @@ class Game {
 
   swapMovementDirection() {
     if(this.movementDirection === 'standard') {
-      this.movementDirection = 'reversed';
+      this.movementDirection = 'inverted';
       KEY_MAP[74] = 'right';
       KEY_MAP[76] = 'left';
       KEY_MAP[68] = 'left';
@@ -570,7 +745,14 @@ class Game {
     }
 
     this.field.updateMovementDirection(this.movementDirection);
-    this.field.drawStartScreen()
+    this.drawStartScreen()
+  }
+
+  moveFireButton() {
+    if(this.firePosition === 'standard') this.firePosition = 'inverted';
+    else this.firePosition = 'standard';
+    this.field.updateFirePosition(this.firePosition);
+    this.drawStartScreen()
   }
 
   mapGamePadButtons(e) {
@@ -591,7 +773,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let mobileCanvas = null;
 
   if(
-    (typeof window.orientation !== "undefined") ||
+    (typeof window.orientation === "undefined") ||
     (navigator.userAgent.indexOf('IEMobile') !== -1)
   ) {
     mobileCanvas = document.createElement("canvas");

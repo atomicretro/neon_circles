@@ -411,7 +411,7 @@ var _utilities = __webpack_require__(/*! ./utilities */ "./scripts/utilities.js"
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Field = function () {
-  function Field(fgCanvasObj, statsCanvasObj, pcCanvasObj, optsCanvasObj, AssetStore, demonBulletPool, pcBulletPool, lvl1DemonPool, lvl2DemonPool, player, movementDirection, gameStatus, mobileCanvasObj) {
+  function Field(fgCanvasObj, statsCanvasObj, pcCanvasObj, optsCanvasObj, AssetStore, demonBulletPool, pcBulletPool, lvl1DemonPool, lvl2DemonPool, player, movementDirection, gameStatus, mobileCanvasObj, firePosition) {
     _classCallCheck(this, Field);
 
     this.fgCanvas = fgCanvasObj;
@@ -428,6 +428,7 @@ var Field = function () {
 
     this.player = player;
     this.movementDirection = movementDirection;
+    this.firePosition = firePosition;
     this.gameStatus = gameStatus;
 
     this.lastTime = Date.now;
@@ -441,22 +442,50 @@ var Field = function () {
       this.movementDirection = newDirection;
     }
   }, {
+    key: 'updateFirePosition',
+    value: function updateFirePosition(newPosition) {
+      this.firePosition = newPosition;
+    }
+  }, {
     key: 'updateGameStatus',
     value: function updateGameStatus(gameStatus) {
       this.gameStatus = gameStatus;
     }
   }, {
-    key: 'drawStartScreen',
-    value: function drawStartScreen() {
-      this.optsCanvas.canvas.classList.remove('hidden');
-      this.clearOptsContext();
-      this.optsCanvas.ctx.fillStyle = "rgba(0, 0, 0, 0.8";
-      this.optsCanvas.ctx.fillRect(0, 0, 800, 500);
+    key: 'drawStandardStartScreen',
+    value: function drawStandardStartScreen() {
+      this.setupStartScreen();
 
-      this.optsCanvas.ctx.fillStyle = 'white';
+      var primaryText = void 0; // clockwise
+      var secondaryText = void 0; // counterclockwise
+      if (this.gameStatus === 'over') {
+        primaryText = {
+          text: "GAME OVER", size: "36px", x: 285, y: 70
+        };
+        secondaryText = {
+          text: "fight! fight! don't let demons win!", size: "22px", x: 176, y: 105
+        };
+      } else {
+        primaryText = {
+          text: "SHOOT ALL DEMONS!", size: "36px", x: 207, y: 70
+        };
+        secondaryText = {
+          text: "careful! demon power is strong!", size: "22px", x: 182, y: 105
+        };
+      };
+      this.drawStartScreenMessage(primaryText, secondaryText);
 
-      this.drawStartScreenMessage();
-      if (this.mobileCanvas == null) this.drawControls();else this.drawMobileControls();
+      var cw = void 0; // clockwise
+      var ccw = void 0; // counterclockwise
+      if (this.movementDirection === 'standard') {
+        ccw = { descX: 70,
+          circleX: 160 };
+        cw = { descX: 590, circleX: -640 };
+      } else {
+        ccw = { descX: 545, circleX: 640 };
+        cw = { descX: 109, circleX: -160 };
+      };
+      this.drawControls();
 
       // for checking centeredness of start screen items
       // this.optsCanvas.ctx.beginPath();
@@ -467,25 +496,55 @@ var Field = function () {
       // this.optsCanvas.ctx.moveTo(170,410);
       // this.optsCanvas.ctx.lineTo(170,490);
       // this.optsCanvas.ctx.stroke();
+    }
+  }, {
+    key: 'drawMobileStartScreen',
+    value: function drawMobileStartScreen() {
+      this.setupStartScreen();
 
+      var primaryText = void 0;
+      var secondaryText = void 0;
+      if (this.gameStatus === 'over') {
+        primaryText = {
+          text: "GAME OVER", size: "36px", x: 285, y: 70
+        };
+        secondaryText = {
+          text: "fight! fight! don't let demons win!", size: "19px", x: 204, y: 105
+        };
+      } else {
+        primaryText = {
+          text: "SHOOT ALL DEMONS!", size: "34px", x: 212, y: 70
+        };
+        secondaryText = {
+          text: "careful! demon power is strong!", size: "20px", x: 202, y: 105
+        };
+      };
+      this.drawStartScreenMessage(primaryText, secondaryText);
+
+      this.drawMobileControls();
+    }
+  }, {
+    key: 'setupStartScreen',
+    value: function setupStartScreen() {
+      this.optsCanvas.canvas.classList.remove('hidden');
+      this.clearOptsContext();
+      this.optsCanvas.ctx.fillStyle = "rgba(0, 0, 0, 0.8";
+      this.optsCanvas.ctx.fillRect(0, 0, 800, 500);
+
+      this.optsCanvas.ctx.fillStyle = 'white';
+      this.optsCanvas.ctx.strokeStyle = "white";
       this.optsCanvas.ctx.strokeRect(300, 385, 205, 87);
       this.optsCanvas.ctx.font = "60px sf_alien_encountersitalic";
       this.optsCanvas.ctx.fillText("PLAY", 320, 450);
     }
   }, {
     key: 'drawStartScreenMessage',
-    value: function drawStartScreenMessage() {
-      if (this.gameStatus === 'over') {
-        this.optsCanvas.ctx.font = "36px sf_alien_encountersitalic";
-        this.optsCanvas.ctx.fillText("GAME OVER", 285, 70);
-        this.optsCanvas.ctx.font = "22px sf_alien_encountersitalic";
-        this.optsCanvas.ctx.fillText("fight! fight! don't let demons win!", 176, 105);
-      } else {
-        this.optsCanvas.ctx.font = "36px sf_alien_encountersitalic";
-        this.optsCanvas.ctx.fillText("SHOOT ALL DEMONS", 207, 70);
-        this.optsCanvas.ctx.font = "22px sf_alien_encountersitalic";
-        this.optsCanvas.ctx.fillText("careful! demon power is strong!", 182, 105);
-      }
+    value: function drawStartScreenMessage(primaryText, secondaryText) {
+      this.optsCanvas.ctx.fillStyle = 'white';
+      this.optsCanvas.ctx.font = primaryText.size + ' sf_alien_encountersitalic';
+      this.optsCanvas.ctx.fillText(primaryText.text, primaryText.x, primaryText.y);
+      this.optsCanvas.ctx.font = secondaryText.size + ' sf_alien_encountersitalic';
+      this.optsCanvas.ctx.fillText(secondaryText.text, secondaryText.x, secondaryText.y);
     }
   }, {
     key: 'drawControls',
@@ -493,49 +552,66 @@ var Field = function () {
       var cw = void 0; // clockwise
       var ccw = void 0; // counterclockwise
       if (this.movementDirection === 'standard') {
-        ccw = { descX: 70, circleX: 160 };
-        cw = { descX: 590, circleX: -640 };
+        ccw = {
+          desc1X: 70, desc1Y: 250,
+          desc2X: 90, desc2Y: 280,
+          circleX: 160, circleY: 190
+        };
+        cw = {
+          desc1X: 590, desc1Y: 250,
+          desc2X: 566, desc2Y: 280,
+          circleX: -640, circleY: 190
+        };
       } else {
-        ccw = { descX: 545, circleX: 640 };
-        cw = { descX: 109, circleX: -160 };
+        ccw = {
+          desc1X: 545, desc1Y: 250,
+          desc2X: 90, desc2Y: 280,
+          circleX: 640, circleY: 190
+        };
+        cw = {
+          desc1X: 109, desc1Y: 250,
+          desc2X: 566, desc2Y: 280,
+          circleX: -160, circleY: 190
+        };
       };
 
       this.drawSwapMovementButton();
 
+      this.optsCanvas.ctx.fillStyle = 'white';
       this.optsCanvas.ctx.strokeStyle = "white";
 
       this.optsCanvas.ctx.font = "18px sf_alien_encountersitalic";
-      this.optsCanvas.ctx.fillText("counterclockwise", ccw.descX, 250);
+      this.optsCanvas.ctx.fillText("counterclockwise", ccw.desc1X, ccw.desc1Y);
       this.optsCanvas.ctx.font = "20px sf_alien_encountersitalic";
-      this.optsCanvas.ctx.fillText("a   j   left", 90, 280);
+      this.optsCanvas.ctx.fillText("a   j   left", ccw.desc2X, ccw.desc2Y);
 
       this.optsCanvas.ctx.beginPath();
-      this.optsCanvas.ctx.arc(ccw.circleX, 190, 30, Math.PI / 2, Math.PI, true);
+      this.optsCanvas.ctx.arc(ccw.circleX, ccw.circleY, 30, Math.PI / 2, Math.PI, true);
       this.optsCanvas.ctx.lineWidth = 2;
       this.optsCanvas.ctx.stroke();
       this.optsCanvas.ctx.beginPath();
-      this.optsCanvas.ctx.moveTo(Math.abs(ccw.circleX - 30), 190);
-      this.optsCanvas.ctx.lineTo(Math.abs(ccw.circleX - 20), 180);
+      this.optsCanvas.ctx.moveTo(Math.abs(ccw.circleX - 30), ccw.circleY);
+      this.optsCanvas.ctx.lineTo(Math.abs(ccw.circleX - 20), ccw.circleY - 10);
       this.optsCanvas.ctx.stroke();
-      this.optsCanvas.ctx.moveTo(Math.abs(ccw.circleX - 30), 190);
-      this.optsCanvas.ctx.lineTo(Math.abs(ccw.circleX - 35), 175);
+      this.optsCanvas.ctx.moveTo(Math.abs(ccw.circleX - 30), ccw.circleY);
+      this.optsCanvas.ctx.lineTo(Math.abs(ccw.circleX - 35), ccw.circleY - 15);
       this.optsCanvas.ctx.stroke();
 
       this.optsCanvas.ctx.font = "18px sf_alien_encountersitalic";
-      this.optsCanvas.ctx.fillText("clockwise", cw.descX, 250);
+      this.optsCanvas.ctx.fillText("clockwise", cw.desc1X, cw.desc1Y);
       this.optsCanvas.ctx.font = "20px sf_alien_encountersitalic";
-      this.optsCanvas.ctx.fillText("d   l   right", 566, 280);
+      this.optsCanvas.ctx.fillText("d   l   right", cw.desc2X, cw.desc2Y);
 
       this.optsCanvas.ctx.beginPath();
-      this.optsCanvas.ctx.arc(Math.abs(cw.circleX), 190, 30, Math.PI / 2, 0, false);
+      this.optsCanvas.ctx.arc(Math.abs(cw.circleX), cw.circleY, 30, Math.PI / 2, 0, false);
       this.optsCanvas.ctx.lineWidth = 2;
       this.optsCanvas.ctx.stroke();
       this.optsCanvas.ctx.beginPath();
-      this.optsCanvas.ctx.moveTo(Math.abs(cw.circleX - 30), 190);
-      this.optsCanvas.ctx.lineTo(Math.abs(cw.circleX - 20), 180);
+      this.optsCanvas.ctx.moveTo(Math.abs(cw.circleX - 30), cw.circleY);
+      this.optsCanvas.ctx.lineTo(Math.abs(cw.circleX - 20), cw.circleY - 10);
       this.optsCanvas.ctx.stroke();
-      this.optsCanvas.ctx.moveTo(Math.abs(cw.circleX - 30), 190);
-      this.optsCanvas.ctx.lineTo(Math.abs(cw.circleX - 35), 175);
+      this.optsCanvas.ctx.moveTo(Math.abs(cw.circleX - 30), cw.circleY);
+      this.optsCanvas.ctx.lineTo(Math.abs(cw.circleX - 35), cw.circleY - 15);
       this.optsCanvas.ctx.stroke();
 
       this.optsCanvas.ctx.font = "24px sf_alien_encountersitalic";
@@ -559,44 +635,95 @@ var Field = function () {
     value: function drawMobileControls() {
       var cw = void 0; // clockwise
       var ccw = void 0; // counterclockwise
-      if (this.movementDirection === 'standard') {
-        ccw = { descX: 70, circleX: 160 };
-        cw = { descX: 590, circleX: -640 };
-      } else {
-        ccw = { descX: 545, circleX: 640 };
-        cw = { descX: 109, circleX: -160 };
+      var firePos = void 0;
+      if (this.movementDirection === 'standard' && this.firePosition === 'standard') {
+        ccw = { descY: 130, circleY: 70 };
+        cw = { descY: 470, circleY: 410 };
+        firePos = 265;
+      } else if (this.movementDirection === 'inverted' && this.firePosition === 'standard') {
+        ccw = { descY: 470, circleY: 410 };
+        cw = { descY: 130, circleY: 70 };
+        firePos = 265;
+      } else if (this.movementDirection === 'standard' && this.firePosition === 'inverted') {
+        ccw = { descY: 296, circleY: 236 };
+        cw = { descY: 470, circleY: 410 };
+        firePos = 108;
+      } else if (this.movementDirection === 'inverted' && this.firePosition === 'inverted') {
+        ccw = { descY: 470, circleY: 410 };
+        cw = { descY: 296, circleY: 236 };
+        firePos = 108;
       };
 
       this.drawSwapMovementButton();
+      this.drawSwapFireButton();
 
+      this.optsCanvas.ctx.fillStyle = 'white';
       this.optsCanvas.ctx.strokeStyle = "white";
 
+      // counterclockwise description titles
+      this.optsCanvas.ctx.font = "18px sf_alien_encountersitalic";
+      this.optsCanvas.ctx.fillText("counterclockwise", 5, ccw.descY);
+      this.optsCanvas.ctx.fillText("counterclockwise", 605, ccw.descY);
+
+      // fire description titles
       this.optsCanvas.ctx.font = "42px sf_alien_encountersitalic";
-      this.optsCanvas.ctx.fillText("FIRE!", 46, 265);
-      this.optsCanvas.ctx.fillText("FIRE!", 650, 265);
+      this.optsCanvas.ctx.fillText("FIRE!", 46, firePos);
+      this.optsCanvas.ctx.fillText("FIRE!", 650, firePos);
 
-      this.optsCanvas.ctx.font = "20px sf_alien_encountersitalic";
-      this.optsCanvas.ctx.fillText("counterclockwise", ccw.descX, 280);
+      // clockwise description titles
+      this.optsCanvas.ctx.font = "18px sf_alien_encountersitalic";
+      this.optsCanvas.ctx.fillText("clockwise", 45, cw.descY);
+      this.optsCanvas.ctx.fillText("clockwise", 645, cw.descY);
 
+      // counterclockwise circles
       this.optsCanvas.ctx.beginPath();
-      this.optsCanvas.ctx.arc(ccw.circleX, 190, 30, Math.PI / 2, Math.PI, true);
+      this.optsCanvas.ctx.arc(100, ccw.circleY, 30, Math.PI / 2, Math.PI, true);
       this.optsCanvas.ctx.lineWidth = 2;
       this.optsCanvas.ctx.stroke();
       this.optsCanvas.ctx.beginPath();
-      this.optsCanvas.ctx.moveTo(Math.abs(ccw.circleX - 30), 190);
-      this.optsCanvas.ctx.lineTo(Math.abs(ccw.circleX - 20), 180);
+      this.optsCanvas.ctx.moveTo(70, ccw.circleY);
+      this.optsCanvas.ctx.lineTo(80, ccw.circleY - 10);
       this.optsCanvas.ctx.stroke();
-      this.optsCanvas.ctx.moveTo(Math.abs(ccw.circleX - 30), 190);
-      this.optsCanvas.ctx.lineTo(Math.abs(ccw.circleX - 35), 175);
+      this.optsCanvas.ctx.moveTo(70, ccw.circleY);
+      this.optsCanvas.ctx.lineTo(65, ccw.circleY - 15);
       this.optsCanvas.ctx.stroke();
 
-      this.optsCanvas.ctx.strokeStyle = "red";
-      this.optsCanvas.ctx.strokeRect(0, 400, 200, 100);
-      this.optsCanvas.ctx.strokeRect(0, 300, 200, 100);
-      this.optsCanvas.ctx.strokeRect(0, 200, 200, 100);
-      this.optsCanvas.ctx.strokeRect(600, 400, 200, 100);
-      this.optsCanvas.ctx.strokeRect(600, 300, 200, 100);
-      this.optsCanvas.ctx.strokeRect(600, 200, 200, 100);
+      this.optsCanvas.ctx.beginPath();
+      this.optsCanvas.ctx.arc(700, ccw.circleY, 30, Math.PI / 2, Math.PI, true);
+      this.optsCanvas.ctx.lineWidth = 2;
+      this.optsCanvas.ctx.stroke();
+      this.optsCanvas.ctx.beginPath();
+      this.optsCanvas.ctx.moveTo(670, ccw.circleY);
+      this.optsCanvas.ctx.lineTo(680, ccw.circleY - 10);
+      this.optsCanvas.ctx.stroke();
+      this.optsCanvas.ctx.moveTo(670, ccw.circleY);
+      this.optsCanvas.ctx.lineTo(665, ccw.circleY - 15);
+      this.optsCanvas.ctx.stroke();
+
+      // clockwise circles
+      this.optsCanvas.ctx.beginPath();
+      this.optsCanvas.ctx.arc(100, cw.circleY, 30, Math.PI / 2, 0, false);
+      this.optsCanvas.ctx.lineWidth = 2;
+      this.optsCanvas.ctx.stroke();
+      this.optsCanvas.ctx.beginPath();
+      this.optsCanvas.ctx.moveTo(130, cw.circleY);
+      this.optsCanvas.ctx.lineTo(120, cw.circleY - 10);
+      this.optsCanvas.ctx.stroke();
+      this.optsCanvas.ctx.moveTo(130, cw.circleY);
+      this.optsCanvas.ctx.lineTo(135, cw.circleY - 15);
+      this.optsCanvas.ctx.stroke();
+
+      this.optsCanvas.ctx.beginPath();
+      this.optsCanvas.ctx.arc(700, cw.circleY, 30, Math.PI / 2, 0, false);
+      this.optsCanvas.ctx.lineWidth = 2;
+      this.optsCanvas.ctx.stroke();
+      this.optsCanvas.ctx.beginPath();
+      this.optsCanvas.ctx.moveTo(730, cw.circleY);
+      this.optsCanvas.ctx.lineTo(720, cw.circleY - 10);
+      this.optsCanvas.ctx.stroke();
+      this.optsCanvas.ctx.moveTo(730, cw.circleY);
+      this.optsCanvas.ctx.lineTo(735, cw.circleY - 15);
+      this.optsCanvas.ctx.stroke();
     }
   }, {
     key: 'drawSwapMovementButton',
@@ -605,6 +732,14 @@ var Field = function () {
       this.optsCanvas.ctx.strokeRect(240, 165, 320, 35);
       this.optsCanvas.ctx.font = "20px sf_alien_encountersitalic";
       this.optsCanvas.ctx.fillText("swap movement direction", 250, 190);
+    }
+  }, {
+    key: 'drawSwapFireButton',
+    value: function drawSwapFireButton() {
+      this.optsCanvas.ctx.strokeStyle = "white";
+      this.optsCanvas.ctx.strokeRect(290, 255, 225, 35);
+      this.optsCanvas.ctx.font = "20px sf_alien_encountersitalic";
+      this.optsCanvas.ctx.fillText("move fire button", 300, 280);
     }
   }, {
     key: 'drawGamePadToggleButton',
@@ -863,7 +998,13 @@ var Game = function () {
       width: 800,
       height: 500
     };
-    if (mobileCanvas != null) {
+    if (mobileCanvas == null) {
+      this.isMobile = false;
+      this.firePosition = null;
+      this.mobileCanvas = {};
+    } else {
+      this.isMobile = true;
+      this.firePosition = 'standard';
       this.mobileCanvas = {
         canvas: mobileCanvas,
         ctx: mobileCanvas.getContext("2d"),
@@ -952,13 +1093,18 @@ var Game = function () {
   }, {
     key: 'setupNewField',
     value: function setupNewField() {
-      this.field = new _field2.default(this.fgCanvas, this.statsCanvas, this.pcCanvas, this.optsCanvas, this.AssetStore, this.demonBulletPool, this.pcBulletPool, this.lvl1DemonPool, this.lvl2DemonPool, this.player, this.movementDirection, this.gameStatus, this.mobileCanvas);
+      this.field = new _field2.default(this.fgCanvas, this.statsCanvas, this.pcCanvas, this.optsCanvas, this.AssetStore, this.demonBulletPool, this.pcBulletPool, this.lvl1DemonPool, this.lvl2DemonPool, this.player, this.movementDirection, this.gameStatus, this.mobileCanvas, this.firePosition);
     }
   }, {
     key: 'startGame',
     value: function startGame() {
       this.field.drawStatusBar();
-      this.field.drawStartScreen();
+      this.drawStartScreen();
+    }
+  }, {
+    key: 'drawStartScreen',
+    value: function drawStartScreen() {
+      if (this.isMobile) this.field.drawMobileStartScreen();else this.field.drawStandardStartScreen();
     }
   }, {
     key: 'startRound',
@@ -1165,7 +1311,7 @@ var Game = function () {
         this.removeSpawnTimers();
         this.gameStatus = 'over';
         this.field.updateGameStatus(this.gameStatus);
-        this.field.drawStartScreen();
+        this.drawStartScreen();
       };
     }
   }, {
@@ -1229,9 +1375,48 @@ var Game = function () {
         var posX = touch.pageX - boundingRect.left;
         var posY = touch.pageY - boundingRect.top;
 
-        if (posY < 250) KEY_STATUS[KEY_MAP['touchFire']] = true;
-        if (posX < 400 && posY > 250) KEY_STATUS[KEY_MAP['touchLeft']] = true;
-        if (posX > 400 && posY > 250) KEY_STATUS[KEY_MAP['touchRight']] = true;
+        // this.optsCanvas.ctx.strokeStyle = "red";
+        // this.optsCanvas.ctx.strokeRect(0,0,200,166);
+        // this.optsCanvas.ctx.strokeRect(0,168,200,168);
+        // this.optsCanvas.ctx.strokeRect(0,334,200,166);
+        // this.optsCanvas.ctx.strokeRect(600,0,200,166);
+        // this.optsCanvas.ctx.strokeRect(600,168,200,168);
+        // this.optsCanvas.ctx.strokeRect(600,334,200,166);
+
+
+        if (this.movementDirection === 'standard' && this.firePosition === 'standard') {
+          if (0 <= posX && posX <= 200 && 0 <= posY && posY <= 165 || 600 <= posX && posX <= 800 && 0 <= posY && posY <= 165) {
+            KEY_STATUS[KEY_MAP['touchLeft']] = true;
+          } else if (0 <= posX && posX <= 200 && 166 <= posY && posY <= 333 || 600 <= posX && posX <= 800 && 166 <= posY && posY <= 333) {
+            KEY_STATUS[KEY_MAP['touchFire']] = true;
+          } else if (0 <= posX && posX <= 200 && 334 <= posY && posY <= 500 || 600 <= posX && posX <= 800 && 334 <= posY && posY <= 500) {
+            KEY_STATUS[KEY_MAP['touchRight']] = true;
+          };
+        } else if (this.movementDirection === 'inverted' && this.firePosition === 'standard') {
+          if (0 <= posX && posX <= 200 && 0 <= posY && posY <= 165 || 600 <= posX && posX <= 800 && 0 <= posY && posY <= 165) {
+            KEY_STATUS[KEY_MAP['touchRight']] = true;
+          } else if (0 <= posX && posX <= 200 && 166 <= posY && posY <= 333 || 600 <= posX && posX <= 800 && 166 <= posY && posY <= 333) {
+            KEY_STATUS[KEY_MAP['touchFire']] = true;
+          } else if (0 <= posX && posX <= 200 && 334 <= posY && posY <= 500 || 600 <= posX && posX <= 800 && 334 <= posY && posY <= 500) {
+            KEY_STATUS[KEY_MAP['touchLeft']] = true;
+          };
+        } else if (this.movementDirection === 'standard' && this.firePosition === 'inverted') {
+          if (0 <= posX && posX <= 200 && 0 <= posY && posY <= 165 || 600 <= posX && posX <= 800 && 0 <= posY && posY <= 165) {
+            KEY_STATUS[KEY_MAP['touchFire']] = true;
+          } else if (0 <= posX && posX <= 200 && 166 <= posY && posY <= 333 || 600 <= posX && posX <= 800 && 166 <= posY && posY <= 333) {
+            KEY_STATUS[KEY_MAP['touchLeft']] = true;
+          } else if (0 <= posX && posX <= 200 && 334 <= posY && posY <= 500 || 600 <= posX && posX <= 800 && 334 <= posY && posY <= 500) {
+            KEY_STATUS[KEY_MAP['touchRight']] = true;
+          };
+        } else if (this.movementDirection === 'inverted' && this.firePosition === 'inverted') {
+          if (0 <= posX && posX <= 200 && 0 <= posY && posY <= 165 || 600 <= posX && posX <= 800 && 0 <= posY && posY <= 165) {
+            KEY_STATUS[KEY_MAP['touchLeft']] = true;
+          } else if (0 <= posX && posX <= 200 && 166 <= posY && posY <= 333 || 600 <= posX && posX <= 800 && 166 <= posY && posY <= 333) {
+            KEY_STATUS[KEY_MAP['touchRight']] = true;
+          } else if (0 <= posX && posX <= 200 && 334 <= posY && posY <= 500 || 600 <= posX && posX <= 800 && 334 <= posY && posY <= 500) {
+            KEY_STATUS[KEY_MAP['touchFire']] = true;
+          };
+        };
 
         this.ongoingTouches.push(this.copyTouch(touches[i], posX, posY));
       };
@@ -1246,9 +1431,39 @@ var Game = function () {
         var posX = touch.pageX - boundingRect.left;
         var posY = touch.pageY - boundingRect.top;
 
-        if (posY < 250) KEY_STATUS[KEY_MAP['touchFire']] = false;
-        if (posX < 400 && posY > 250) KEY_STATUS[KEY_MAP['touchLeft']] = false;
-        if (posX > 400 && posY > 250) KEY_STATUS[KEY_MAP['touchRight']] = false;
+        if (this.movementDirection === 'standard' && this.firePosition === 'standard') {
+          if (0 <= posX && posX <= 200 && 0 <= posY && posY <= 165 || 600 <= posX && posX <= 800 && 0 <= posY && posY <= 165) {
+            KEY_STATUS[KEY_MAP['touchLeft']] = false;
+          } else if (0 <= posX && posX <= 200 && 166 <= posY && posY <= 333 || 600 <= posX && posX <= 800 && 166 <= posY && posY <= 333) {
+            KEY_STATUS[KEY_MAP['touchFire']] = false;
+          } else if (0 <= posX && posX <= 200 && 334 <= posY && posY <= 500 || 600 <= posX && posX <= 800 && 334 <= posY && posY <= 500) {
+            KEY_STATUS[KEY_MAP['touchRight']] = false;
+          };
+        } else if (this.movementDirection === 'inverted' && this.firePosition === 'standard') {
+          if (0 <= posX && posX <= 200 && 0 <= posY && posY <= 165 || 600 <= posX && posX <= 800 && 0 <= posY && posY <= 165) {
+            KEY_STATUS[KEY_MAP['touchRight']] = false;
+          } else if (0 <= posX && posX <= 200 && 166 <= posY && posY <= 333 || 600 <= posX && posX <= 800 && 166 <= posY && posY <= 333) {
+            KEY_STATUS[KEY_MAP['touchFire']] = false;
+          } else if (0 <= posX && posX <= 200 && 334 <= posY && posY <= 500 || 600 <= posX && posX <= 800 && 334 <= posY && posY <= 500) {
+            KEY_STATUS[KEY_MAP['touchLeft']] = false;
+          };
+        } else if (this.movementDirection === 'standard' && this.firePosition === 'inverted') {
+          if (0 <= posX && posX <= 200 && 0 <= posY && posY <= 165 || 600 <= posX && posX <= 800 && 0 <= posY && posY <= 165) {
+            KEY_STATUS[KEY_MAP['touchFire']] = false;
+          } else if (0 <= posX && posX <= 200 && 166 <= posY && posY <= 333 || 600 <= posX && posX <= 800 && 166 <= posY && posY <= 333) {
+            KEY_STATUS[KEY_MAP['touchLeft']] = false;
+          } else if (0 <= posX && posX <= 200 && 334 <= posY && posY <= 500 || 600 <= posX && posX <= 800 && 334 <= posY && posY <= 500) {
+            KEY_STATUS[KEY_MAP['touchRight']] = false;
+          };
+        } else if (this.movementDirection === 'inverted' && this.firePosition === 'inverted') {
+          if (0 <= posX && posX <= 200 && 0 <= posY && posY <= 165 || 600 <= posX && posX <= 800 && 0 <= posY && posY <= 165) {
+            KEY_STATUS[KEY_MAP['touchLeft']] = false;
+          } else if (0 <= posX && posX <= 200 && 166 <= posY && posY <= 333 || 600 <= posX && posX <= 800 && 166 <= posY && posY <= 333) {
+            KEY_STATUS[KEY_MAP['touchRight']] = false;
+          } else if (0 <= posX && posX <= 200 && 334 <= posY && posY <= 500 || 600 <= posX && posX <= 800 && 334 <= posY && posY <= 500) {
+            KEY_STATUS[KEY_MAP['touchFire']] = false;
+          };
+        };
 
         var touchIdx = this.ongoingTouchIndexById(touch.identifier);
         this.ongoingTouches.splice(touchIdx, 1);
@@ -1305,6 +1520,8 @@ var Game = function () {
       } else if (20 <= clickPosX && clickPosX <= 170 && 410 <= clickPosY && clickPosY <= 490) {
         this.gamePadToggle = this.gamePadToggle ? false : true;
         this.field.drawGamePadToggleButton();
+      } else if (290 <= clickPosX && clickPosX <= 515 && 255 <= clickPosY && clickPosY <= 290 && this.isMobile === true) {
+        this.moveFireButton();
       }
     }
   }, {
@@ -1332,7 +1549,7 @@ var Game = function () {
       } else if (!this.paused && this.gameStatus === 'playing') {
         this.paused = true;
         this.pauseSpawnTimers();
-        this.field.drawStartScreen();
+        this.drawStartScreen();
       };
     }
   }, {
@@ -1348,7 +1565,7 @@ var Game = function () {
     key: 'swapMovementDirection',
     value: function swapMovementDirection() {
       if (this.movementDirection === 'standard') {
-        this.movementDirection = 'reversed';
+        this.movementDirection = 'inverted';
         KEY_MAP[74] = 'right';
         KEY_MAP[76] = 'left';
         KEY_MAP[68] = 'left';
@@ -1366,7 +1583,14 @@ var Game = function () {
       }
 
       this.field.updateMovementDirection(this.movementDirection);
-      this.field.drawStartScreen();
+      this.drawStartScreen();
+    }
+  }, {
+    key: 'moveFireButton',
+    value: function moveFireButton() {
+      if (this.firePosition === 'standard') this.firePosition = 'inverted';else this.firePosition = 'standard';
+      this.field.updateFirePosition(this.firePosition);
+      this.drawStartScreen();
     }
   }, {
     key: 'mapGamePadButtons',
@@ -1390,7 +1614,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var optionsCanvas = document.getElementById("options-canvas");
   var mobileCanvas = null;
 
-  if (typeof window.orientation !== "undefined" || navigator.userAgent.indexOf('IEMobile') !== -1) {
+  if (typeof window.orientation === "undefined" || navigator.userAgent.indexOf('IEMobile') !== -1) {
     mobileCanvas = document.createElement("canvas");
     mobileCanvas.id = "mobile-canvas";
     mobileCanvas.width = "800";
