@@ -692,7 +692,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let mobileCanvas = null;
 
   if(
-    (typeof window.orientation === "undefined") ||
+    (typeof window.orientation !== "undefined") ||
     (navigator.userAgent.indexOf('IEMobile') !== -1)
   ) {
     mobileCanvas = document.createElement("canvas");
