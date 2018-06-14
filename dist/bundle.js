@@ -637,21 +637,36 @@ var Field = function () {
       var ccw = void 0; // counterclockwise
       var firePos = void 0;
       if (this.movementDirection === 'standard' && this.firePosition === 'standard') {
-        ccw = { descY: 130, circleY: 70 };
-        cw = { descY: 470, circleY: 410 };
-        firePos = 265;
+        ccw = { descX: 5, descY: 185, circleX: 100, circleY: 125 };
+        cw = { descX: 45, descY: 405, circleX: 100, circleY: 345 };
+        firePos = { x: 650, y: 265 };
+        this.optsCanvas.ctx.strokeStyle = "white";
+        this.optsCanvas.ctx.strokeRect(2, 2, 196, 246);
+        this.optsCanvas.ctx.strokeRect(2, 252, 196, 246);
+        this.optsCanvas.ctx.strokeRect(602, 2, 196, 496);
       } else if (this.movementDirection === 'inverted' && this.firePosition === 'standard') {
-        ccw = { descY: 470, circleY: 410 };
-        cw = { descY: 130, circleY: 70 };
-        firePos = 265;
+        ccw = { descX: 5, descY: 405, circleX: 100, circleY: 345 };
+        cw = { descX: 45, descY: 185, circleX: 100, circleY: 125 };
+        firePos = { x: 650, y: 265 };
+        this.optsCanvas.ctx.strokeStyle = "white";
+        this.optsCanvas.ctx.strokeRect(2, 2, 196, 246);
+        this.optsCanvas.ctx.strokeRect(2, 252, 196, 246);
+        this.optsCanvas.ctx.strokeRect(602, 2, 196, 496);
       } else if (this.movementDirection === 'standard' && this.firePosition === 'inverted') {
-        ccw = { descY: 296, circleY: 236 };
-        cw = { descY: 470, circleY: 410 };
-        firePos = 108;
+        ccw = { descX: 605, descY: 185, circleX: 700, circleY: 125 };
+        cw = { descX: 645, descY: 405, circleX: 700, circleY: 345 };
+        firePos = { x: 43, y: 265 };
+        this.optsCanvas.ctx.strokeStyle = "white";
+        this.optsCanvas.ctx.strokeRect(602, 2, 196, 246);
+        this.optsCanvas.ctx.strokeRect(602, 252, 196, 246);
+        this.optsCanvas.ctx.strokeRect(2, 2, 196, 496);
       } else if (this.movementDirection === 'inverted' && this.firePosition === 'inverted') {
-        ccw = { descY: 470, circleY: 410 };
-        cw = { descY: 296, circleY: 236 };
-        firePos = 108;
+        ccw = { descX: 605, descY: 405, circleX: 700, circleY: 345 };
+        cw = { descX: 645, descY: 185, circleX: 700, circleY: 125 };
+        firePos = { x: 43, y: 265 };
+        this.optsCanvas.ctx.strokeRect(602, 2, 196, 246);
+        this.optsCanvas.ctx.strokeRect(602, 252, 196, 246);
+        this.optsCanvas.ctx.strokeRect(2, 2, 196, 496);
       };
 
       this.drawSwapMovementButton();
@@ -662,67 +677,40 @@ var Field = function () {
 
       // counterclockwise description titles
       this.optsCanvas.ctx.font = "18px sf_alien_encountersitalic";
-      this.optsCanvas.ctx.fillText("counterclockwise", 5, ccw.descY);
-      this.optsCanvas.ctx.fillText("counterclockwise", 605, ccw.descY);
+      this.optsCanvas.ctx.fillText("counterclockwise", ccw.descX, ccw.descY);
 
       // fire description titles
       this.optsCanvas.ctx.font = "42px sf_alien_encountersitalic";
-      this.optsCanvas.ctx.fillText("FIRE!", 46, firePos);
-      this.optsCanvas.ctx.fillText("FIRE!", 650, firePos);
+      this.optsCanvas.ctx.fillText("FIRE!", firePos.x, firePos.y);
 
       // clockwise description titles
       this.optsCanvas.ctx.font = "18px sf_alien_encountersitalic";
-      this.optsCanvas.ctx.fillText("clockwise", 45, cw.descY);
-      this.optsCanvas.ctx.fillText("clockwise", 645, cw.descY);
+      this.optsCanvas.ctx.fillText("clockwise", cw.descX, cw.descY);
 
       // counterclockwise circles
       this.optsCanvas.ctx.beginPath();
-      this.optsCanvas.ctx.arc(100, ccw.circleY, 30, Math.PI / 2, Math.PI, true);
+      this.optsCanvas.ctx.arc(ccw.circleX, ccw.circleY, 30, Math.PI / 2, Math.PI, true);
       this.optsCanvas.ctx.lineWidth = 2;
       this.optsCanvas.ctx.stroke();
       this.optsCanvas.ctx.beginPath();
-      this.optsCanvas.ctx.moveTo(70, ccw.circleY);
-      this.optsCanvas.ctx.lineTo(80, ccw.circleY - 10);
+      this.optsCanvas.ctx.moveTo(ccw.circleX - 30, ccw.circleY);
+      this.optsCanvas.ctx.lineTo(ccw.circleX - 20, ccw.circleY - 10);
       this.optsCanvas.ctx.stroke();
-      this.optsCanvas.ctx.moveTo(70, ccw.circleY);
-      this.optsCanvas.ctx.lineTo(65, ccw.circleY - 15);
-      this.optsCanvas.ctx.stroke();
-
-      this.optsCanvas.ctx.beginPath();
-      this.optsCanvas.ctx.arc(700, ccw.circleY, 30, Math.PI / 2, Math.PI, true);
-      this.optsCanvas.ctx.lineWidth = 2;
-      this.optsCanvas.ctx.stroke();
-      this.optsCanvas.ctx.beginPath();
-      this.optsCanvas.ctx.moveTo(670, ccw.circleY);
-      this.optsCanvas.ctx.lineTo(680, ccw.circleY - 10);
-      this.optsCanvas.ctx.stroke();
-      this.optsCanvas.ctx.moveTo(670, ccw.circleY);
-      this.optsCanvas.ctx.lineTo(665, ccw.circleY - 15);
+      this.optsCanvas.ctx.moveTo(ccw.circleX - 30, ccw.circleY);
+      this.optsCanvas.ctx.lineTo(ccw.circleX - 35, ccw.circleY - 15);
       this.optsCanvas.ctx.stroke();
 
       // clockwise circles
       this.optsCanvas.ctx.beginPath();
-      this.optsCanvas.ctx.arc(100, cw.circleY, 30, Math.PI / 2, 0, false);
+      this.optsCanvas.ctx.arc(cw.circleX, cw.circleY, 30, Math.PI / 2, 0, false);
       this.optsCanvas.ctx.lineWidth = 2;
       this.optsCanvas.ctx.stroke();
       this.optsCanvas.ctx.beginPath();
-      this.optsCanvas.ctx.moveTo(130, cw.circleY);
-      this.optsCanvas.ctx.lineTo(120, cw.circleY - 10);
+      this.optsCanvas.ctx.moveTo(cw.circleX + 30, cw.circleY);
+      this.optsCanvas.ctx.lineTo(cw.circleX + 20, cw.circleY - 10);
       this.optsCanvas.ctx.stroke();
-      this.optsCanvas.ctx.moveTo(130, cw.circleY);
-      this.optsCanvas.ctx.lineTo(135, cw.circleY - 15);
-      this.optsCanvas.ctx.stroke();
-
-      this.optsCanvas.ctx.beginPath();
-      this.optsCanvas.ctx.arc(700, cw.circleY, 30, Math.PI / 2, 0, false);
-      this.optsCanvas.ctx.lineWidth = 2;
-      this.optsCanvas.ctx.stroke();
-      this.optsCanvas.ctx.beginPath();
-      this.optsCanvas.ctx.moveTo(730, cw.circleY);
-      this.optsCanvas.ctx.lineTo(720, cw.circleY - 10);
-      this.optsCanvas.ctx.stroke();
-      this.optsCanvas.ctx.moveTo(730, cw.circleY);
-      this.optsCanvas.ctx.lineTo(735, cw.circleY - 15);
+      this.optsCanvas.ctx.moveTo(cw.circleX + 30, cw.circleY);
+      this.optsCanvas.ctx.lineTo(cw.circleX + 35, cw.circleY - 15);
       this.optsCanvas.ctx.stroke();
     }
   }, {
@@ -1375,45 +1363,36 @@ var Game = function () {
         var posX = touch.pageX - boundingRect.left;
         var posY = touch.pageY - boundingRect.top;
 
-        // this.optsCanvas.ctx.strokeStyle = "red";
-        // this.optsCanvas.ctx.strokeRect(0,0,200,166);
-        // this.optsCanvas.ctx.strokeRect(0,168,200,168);
-        // this.optsCanvas.ctx.strokeRect(0,334,200,166);
-        // this.optsCanvas.ctx.strokeRect(600,0,200,166);
-        // this.optsCanvas.ctx.strokeRect(600,168,200,168);
-        // this.optsCanvas.ctx.strokeRect(600,334,200,166);
-
-
         if (this.movementDirection === 'standard' && this.firePosition === 'standard') {
-          if (0 <= posX && posX <= 200 && 0 <= posY && posY <= 165 || 600 <= posX && posX <= 800 && 0 <= posY && posY <= 165) {
+          if (0 <= posX && posX <= 200 && 0 <= posY && posY <= 249) {
             KEY_STATUS[KEY_MAP['touchLeft']] = true;
-          } else if (0 <= posX && posX <= 200 && 166 <= posY && posY <= 333 || 600 <= posX && posX <= 800 && 166 <= posY && posY <= 333) {
-            KEY_STATUS[KEY_MAP['touchFire']] = true;
-          } else if (0 <= posX && posX <= 200 && 334 <= posY && posY <= 500 || 600 <= posX && posX <= 800 && 334 <= posY && posY <= 500) {
+          } else if (0 <= posX && posX <= 200 && 250 <= posY && posY <= 500) {
             KEY_STATUS[KEY_MAP['touchRight']] = true;
+          } else if (600 <= posX && posX <= 800 && 0 <= posY && posY <= 500) {
+            KEY_STATUS[KEY_MAP['touchFire']] = true;
           };
         } else if (this.movementDirection === 'inverted' && this.firePosition === 'standard') {
-          if (0 <= posX && posX <= 200 && 0 <= posY && posY <= 165 || 600 <= posX && posX <= 800 && 0 <= posY && posY <= 165) {
+          if (0 <= posX && posX <= 200 && 0 <= posY && posY <= 249) {
             KEY_STATUS[KEY_MAP['touchRight']] = true;
-          } else if (0 <= posX && posX <= 200 && 166 <= posY && posY <= 333 || 600 <= posX && posX <= 800 && 166 <= posY && posY <= 333) {
-            KEY_STATUS[KEY_MAP['touchFire']] = true;
-          } else if (0 <= posX && posX <= 200 && 334 <= posY && posY <= 500 || 600 <= posX && posX <= 800 && 334 <= posY && posY <= 500) {
+          } else if (0 <= posX && posX <= 200 && 250 <= posY && posY <= 500) {
             KEY_STATUS[KEY_MAP['touchLeft']] = true;
+          } else if (600 <= posX && posX <= 800 && 0 <= posY && posY <= 500) {
+            KEY_STATUS[KEY_MAP['touchFire']] = true;
           };
         } else if (this.movementDirection === 'standard' && this.firePosition === 'inverted') {
-          if (0 <= posX && posX <= 200 && 0 <= posY && posY <= 165 || 600 <= posX && posX <= 800 && 0 <= posY && posY <= 165) {
-            KEY_STATUS[KEY_MAP['touchFire']] = true;
-          } else if (0 <= posX && posX <= 200 && 166 <= posY && posY <= 333 || 600 <= posX && posX <= 800 && 166 <= posY && posY <= 333) {
+          if (600 <= posX && posX <= 800 && 0 <= posY && posY <= 249) {
             KEY_STATUS[KEY_MAP['touchLeft']] = true;
-          } else if (0 <= posX && posX <= 200 && 334 <= posY && posY <= 500 || 600 <= posX && posX <= 800 && 334 <= posY && posY <= 500) {
+          } else if (600 <= posX && posX <= 800 && 250 <= posY && posY <= 500) {
             KEY_STATUS[KEY_MAP['touchRight']] = true;
+          } else if (0 <= posX && posX <= 200 && 0 <= posY && posY <= 500) {
+            KEY_STATUS[KEY_MAP['touchFire']] = true;
           };
         } else if (this.movementDirection === 'inverted' && this.firePosition === 'inverted') {
-          if (0 <= posX && posX <= 200 && 0 <= posY && posY <= 165 || 600 <= posX && posX <= 800 && 0 <= posY && posY <= 165) {
+          if (600 <= posX && posX <= 800 && 0 <= posY && posY <= 249) {
             KEY_STATUS[KEY_MAP['touchLeft']] = true;
-          } else if (0 <= posX && posX <= 200 && 166 <= posY && posY <= 333 || 600 <= posX && posX <= 800 && 166 <= posY && posY <= 333) {
+          } else if (600 <= posX && posX <= 800 && 250 <= posY && posY <= 500) {
             KEY_STATUS[KEY_MAP['touchRight']] = true;
-          } else if (0 <= posX && posX <= 200 && 334 <= posY && posY <= 500 || 600 <= posX && posX <= 800 && 334 <= posY && posY <= 500) {
+          } else if (0 <= posX && posX <= 200 && 0 <= posY && posY <= 500) {
             KEY_STATUS[KEY_MAP['touchFire']] = true;
           };
         };
@@ -1432,35 +1411,35 @@ var Game = function () {
         var posY = touch.pageY - boundingRect.top;
 
         if (this.movementDirection === 'standard' && this.firePosition === 'standard') {
-          if (0 <= posX && posX <= 200 && 0 <= posY && posY <= 165 || 600 <= posX && posX <= 800 && 0 <= posY && posY <= 165) {
+          if (0 <= posX && posX <= 200 && 0 <= posY && posY <= 249) {
             KEY_STATUS[KEY_MAP['touchLeft']] = false;
-          } else if (0 <= posX && posX <= 200 && 166 <= posY && posY <= 333 || 600 <= posX && posX <= 800 && 166 <= posY && posY <= 333) {
-            KEY_STATUS[KEY_MAP['touchFire']] = false;
-          } else if (0 <= posX && posX <= 200 && 334 <= posY && posY <= 500 || 600 <= posX && posX <= 800 && 334 <= posY && posY <= 500) {
+          } else if (0 <= posX && posX <= 200 && 250 <= posY && posY <= 500) {
             KEY_STATUS[KEY_MAP['touchRight']] = false;
+          } else if (600 <= posX && posX <= 800 && 0 <= posY && posY <= 500) {
+            KEY_STATUS[KEY_MAP['touchFire']] = false;
           };
         } else if (this.movementDirection === 'inverted' && this.firePosition === 'standard') {
-          if (0 <= posX && posX <= 200 && 0 <= posY && posY <= 165 || 600 <= posX && posX <= 800 && 0 <= posY && posY <= 165) {
+          if (0 <= posX && posX <= 200 && 0 <= posY && posY <= 249) {
             KEY_STATUS[KEY_MAP['touchRight']] = false;
-          } else if (0 <= posX && posX <= 200 && 166 <= posY && posY <= 333 || 600 <= posX && posX <= 800 && 166 <= posY && posY <= 333) {
-            KEY_STATUS[KEY_MAP['touchFire']] = false;
-          } else if (0 <= posX && posX <= 200 && 334 <= posY && posY <= 500 || 600 <= posX && posX <= 800 && 334 <= posY && posY <= 500) {
+          } else if (0 <= posX && posX <= 200 && 250 <= posY && posY <= 500) {
             KEY_STATUS[KEY_MAP['touchLeft']] = false;
+          } else if (600 <= posX && posX <= 800 && 0 <= posY && posY <= 500) {
+            KEY_STATUS[KEY_MAP['touchFire']] = false;
           };
         } else if (this.movementDirection === 'standard' && this.firePosition === 'inverted') {
-          if (0 <= posX && posX <= 200 && 0 <= posY && posY <= 165 || 600 <= posX && posX <= 800 && 0 <= posY && posY <= 165) {
-            KEY_STATUS[KEY_MAP['touchFire']] = false;
-          } else if (0 <= posX && posX <= 200 && 166 <= posY && posY <= 333 || 600 <= posX && posX <= 800 && 166 <= posY && posY <= 333) {
+          if (600 <= posX && posX <= 800 && 0 <= posY && posY <= 249) {
             KEY_STATUS[KEY_MAP['touchLeft']] = false;
-          } else if (0 <= posX && posX <= 200 && 334 <= posY && posY <= 500 || 600 <= posX && posX <= 800 && 334 <= posY && posY <= 500) {
+          } else if (600 <= posX && posX <= 800 && 250 <= posY && posY <= 500) {
             KEY_STATUS[KEY_MAP['touchRight']] = false;
+          } else if (0 <= posX && posX <= 200 && 0 <= posY && posY <= 500) {
+            KEY_STATUS[KEY_MAP['touchFire']] = false;
           };
         } else if (this.movementDirection === 'inverted' && this.firePosition === 'inverted') {
-          if (0 <= posX && posX <= 200 && 0 <= posY && posY <= 165 || 600 <= posX && posX <= 800 && 0 <= posY && posY <= 165) {
+          if (600 <= posX && posX <= 800 && 0 <= posY && posY <= 249) {
             KEY_STATUS[KEY_MAP['touchLeft']] = false;
-          } else if (0 <= posX && posX <= 200 && 166 <= posY && posY <= 333 || 600 <= posX && posX <= 800 && 166 <= posY && posY <= 333) {
+          } else if (600 <= posX && posX <= 800 && 250 <= posY && posY <= 500) {
             KEY_STATUS[KEY_MAP['touchRight']] = false;
-          } else if (0 <= posX && posX <= 200 && 334 <= posY && posY <= 500 || 600 <= posX && posX <= 800 && 334 <= posY && posY <= 500) {
+          } else if (0 <= posX && posX <= 200 && 0 <= posY && posY <= 500) {
             KEY_STATUS[KEY_MAP['touchFire']] = false;
           };
         };
@@ -1614,7 +1593,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var optionsCanvas = document.getElementById("options-canvas");
   var mobileCanvas = null;
 
-  if (typeof window.orientation !== "undefined" || navigator.userAgent.indexOf('IEMobile') !== -1) {
+  if (typeof window.orientation === "undefined" || navigator.userAgent.indexOf('IEMobile') !== -1) {
     mobileCanvas = document.createElement("canvas");
     mobileCanvas.id = "mobile-canvas";
     mobileCanvas.width = "800";

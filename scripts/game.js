@@ -439,89 +439,44 @@ class Game {
       let posX = touch.pageX - boundingRect.left;
       let posY = touch.pageY - boundingRect.top;
 
-      // this.optsCanvas.ctx.strokeStyle = "red";
-      // this.optsCanvas.ctx.strokeRect(0,0,200,166);
-      // this.optsCanvas.ctx.strokeRect(0,168,200,168);
-      // this.optsCanvas.ctx.strokeRect(0,334,200,166);
-      // this.optsCanvas.ctx.strokeRect(600,0,200,166);
-      // this.optsCanvas.ctx.strokeRect(600,168,200,168);
-      // this.optsCanvas.ctx.strokeRect(600,334,200,166);
-
-
       if(
         this.movementDirection === 'standard' && this.firePosition === 'standard'
       ) {
-        if(
-          ((0 <= posX && posX <= 200) && (0 <= posY && posY <= 165)) ||
-          ((600 <= posX && posX <= 800) && (0 <= posY && posY <= 165))
-        ) {
+        if((0 <= posX && posX <= 200) && (0 <= posY && posY <= 249)) {
           KEY_STATUS[KEY_MAP['touchLeft']] = true;
-        } else if(
-          ((0 <= posX && posX <= 200) && (166 <= posY && posY <= 333)) ||
-          ((600 <= posX && posX <= 800) && (166 <= posY && posY <= 333))
-        ) {
-          KEY_STATUS[KEY_MAP['touchFire']] = true;
-        } else if(
-          ((0 <= posX && posX <= 200) && (334 <= posY && posY <= 500)) ||
-          ((600 <= posX && posX <= 800) && (334 <= posY && posY <= 500))
-        ) {
+        } else if((0 <= posX && posX <= 200) && (250 <= posY && posY <= 500)) {
           KEY_STATUS[KEY_MAP['touchRight']] = true;
+        } else if((600 <= posX && posX <= 800) && (0 <= posY && posY <= 500)) {
+          KEY_STATUS[KEY_MAP['touchFire']] = true;
         };
       } else if(
         this.movementDirection === 'inverted' && this.firePosition === 'standard'
       ) {
-        if(
-          ((0 <= posX && posX <= 200) && (0 <= posY && posY <= 165)) ||
-          ((600 <= posX && posX <= 800) && (0 <= posY && posY <= 165))
-        ) {
+        if((0 <= posX && posX <= 200) && (0 <= posY && posY <= 249)) {
           KEY_STATUS[KEY_MAP['touchRight']] = true;
-        } else if(
-          ((0 <= posX && posX <= 200) && (166 <= posY && posY <= 333)) ||
-          ((600 <= posX && posX <= 800) && (166 <= posY && posY <= 333))
-        ) {
-          KEY_STATUS[KEY_MAP['touchFire']] = true;
-        } else if(
-          ((0 <= posX && posX <= 200) && (334 <= posY && posY <= 500)) ||
-          ((600 <= posX && posX <= 800) && (334 <= posY && posY <= 500))
-        ) {
+        } else if((0 <= posX && posX <= 200) && (250 <= posY && posY <= 500)) {
           KEY_STATUS[KEY_MAP['touchLeft']] = true;
+        } else if((600 <= posX && posX <= 800) && (0 <= posY && posY <= 500)) {
+          KEY_STATUS[KEY_MAP['touchFire']] = true;
         };
       } else if(
         this.movementDirection === 'standard' && this.firePosition === 'inverted'
       ) {
-        if(
-          ((0 <= posX && posX <= 200) && (0 <= posY && posY <= 165)) ||
-          ((600 <= posX && posX <= 800) && (0 <= posY && posY <= 165))
-        ) {
-          KEY_STATUS[KEY_MAP['touchFire']] = true;
-        } else if(
-          ((0 <= posX && posX <= 200) && (166 <= posY && posY <= 333)) ||
-          ((600 <= posX && posX <= 800) && (166 <= posY && posY <= 333))
-        ) {
+        if((600 <= posX && posX <= 800) && (0 <= posY && posY <= 249)) {
           KEY_STATUS[KEY_MAP['touchLeft']] = true;
-        } else if(
-          ((0 <= posX && posX <= 200) && (334 <= posY && posY <= 500)) ||
-          ((600 <= posX && posX <= 800) && (334 <= posY && posY <= 500))
-        ) {
+        } else if((600 <= posX && posX <= 800) && (250 <= posY && posY <= 500)) {
           KEY_STATUS[KEY_MAP['touchRight']] = true;
+        } else if((0 <= posX && posX <= 200) && (0 <= posY && posY <= 500)) {
+          KEY_STATUS[KEY_MAP['touchFire']] = true;
         };
       } else if(
         this.movementDirection === 'inverted' && this.firePosition === 'inverted'
       ) {
-        if(
-          ((0 <= posX && posX <= 200) && (0 <= posY && posY <= 165)) ||
-          ((600 <= posX && posX <= 800) && (0 <= posY && posY <= 165))
-        ) {
+        if((600 <= posX && posX <= 800) && (0 <= posY && posY <= 249)) {
           KEY_STATUS[KEY_MAP['touchLeft']] = true;
-        } else if(
-          ((0 <= posX && posX <= 200) && (166 <= posY && posY <= 333)) ||
-          ((600 <= posX && posX <= 800) && (166 <= posY && posY <= 333))
-        ) {
+        } else if((600 <= posX && posX <= 800) && (250 <= posY && posY <= 500)) {
           KEY_STATUS[KEY_MAP['touchRight']] = true;
-        } else if(
-          ((0 <= posX && posX <= 200) && (334 <= posY && posY <= 500)) ||
-          ((600 <= posX && posX <= 800) && (334 <= posY && posY <= 500))
-        ) {
+        } else if((0 <= posX && posX <= 200) && (0 <= posY && posY <= 500)) {
           KEY_STATUS[KEY_MAP['touchFire']] = true;
         };
       };
@@ -541,77 +496,41 @@ class Game {
       if(
         this.movementDirection === 'standard' && this.firePosition === 'standard'
       ) {
-        if(
-          ((0 <= posX && posX <= 200) && (0 <= posY && posY <= 165)) ||
-          ((600 <= posX && posX <= 800) && (0 <= posY && posY <= 165))
-        ) {
+        if((0 <= posX && posX <= 200) && (0 <= posY && posY <= 249)) {
           KEY_STATUS[KEY_MAP['touchLeft']] = false;
-        } else if(
-          ((0 <= posX && posX <= 200) && (166 <= posY && posY <= 333)) ||
-          ((600 <= posX && posX <= 800) && (166 <= posY && posY <= 333))
-        ) {
-          KEY_STATUS[KEY_MAP['touchFire']] = false;
-        } else if(
-          ((0 <= posX && posX <= 200) && (334 <= posY && posY <= 500)) ||
-          ((600 <= posX && posX <= 800) && (334 <= posY && posY <= 500))
-        ) {
+        } else if((0 <= posX && posX <= 200) && (250 <= posY && posY <= 500)) {
           KEY_STATUS[KEY_MAP['touchRight']] = false;
+        } else if((600 <= posX && posX <= 800) && (0 <= posY && posY <= 500)) {
+          KEY_STATUS[KEY_MAP['touchFire']] = false;
         };
       } else if(
         this.movementDirection === 'inverted' && this.firePosition === 'standard'
       ) {
-        if(
-          ((0 <= posX && posX <= 200) && (0 <= posY && posY <= 165)) ||
-          ((600 <= posX && posX <= 800) && (0 <= posY && posY <= 165))
-        ) {
+        if((0 <= posX && posX <= 200) && (0 <= posY && posY <= 249)) {
           KEY_STATUS[KEY_MAP['touchRight']] = false;
-        } else if(
-          ((0 <= posX && posX <= 200) && (166 <= posY && posY <= 333)) ||
-          ((600 <= posX && posX <= 800) && (166 <= posY && posY <= 333))
-        ) {
-          KEY_STATUS[KEY_MAP['touchFire']] = false;
-        } else if(
-          ((0 <= posX && posX <= 200) && (334 <= posY && posY <= 500)) ||
-          ((600 <= posX && posX <= 800) && (334 <= posY && posY <= 500))
-        ) {
+        } else if((0 <= posX && posX <= 200) && (250 <= posY && posY <= 500)) {
           KEY_STATUS[KEY_MAP['touchLeft']] = false;
+        } else if((600 <= posX && posX <= 800) && (0 <= posY && posY <= 500)) {
+          KEY_STATUS[KEY_MAP['touchFire']] = false;
         };
       } else if(
         this.movementDirection === 'standard' && this.firePosition === 'inverted'
       ) {
-        if(
-          ((0 <= posX && posX <= 200) && (0 <= posY && posY <= 165)) ||
-          ((600 <= posX && posX <= 800) && (0 <= posY && posY <= 165))
-        ) {
-          KEY_STATUS[KEY_MAP['touchFire']] = false;
-        } else if(
-          ((0 <= posX && posX <= 200) && (166 <= posY && posY <= 333)) ||
-          ((600 <= posX && posX <= 800) && (166 <= posY && posY <= 333))
-        ) {
+        if((600 <= posX && posX <= 800) && (0 <= posY && posY <= 249)) {
           KEY_STATUS[KEY_MAP['touchLeft']] = false;
-        } else if(
-          ((0 <= posX && posX <= 200) && (334 <= posY && posY <= 500)) ||
-          ((600 <= posX && posX <= 800) && (334 <= posY && posY <= 500))
-        ) {
+        } else if((600 <= posX && posX <= 800) && (250 <= posY && posY <= 500)) {
           KEY_STATUS[KEY_MAP['touchRight']] = false;
+        } else if((0 <= posX && posX <= 200) && (0 <= posY && posY <= 500)) {
+          KEY_STATUS[KEY_MAP['touchFire']] = false;
         };
       } else if(
         this.movementDirection === 'inverted' && this.firePosition === 'inverted'
       ) {
-        if(
-          ((0 <= posX && posX <= 200) && (0 <= posY && posY <= 165)) ||
-          ((600 <= posX && posX <= 800) && (0 <= posY && posY <= 165))
-        ) {
+        if((600 <= posX && posX <= 800) && (0 <= posY && posY <= 249)) {
           KEY_STATUS[KEY_MAP['touchLeft']] = false;
-        } else if(
-          ((0 <= posX && posX <= 200) && (166 <= posY && posY <= 333)) ||
-          ((600 <= posX && posX <= 800) && (166 <= posY && posY <= 333))
-        ) {
+        } else if((600 <= posX && posX <= 800) && (250 <= posY && posY <= 500)) {
           KEY_STATUS[KEY_MAP['touchRight']] = false;
-        } else if(
-          ((0 <= posX && posX <= 200) && (334 <= posY && posY <= 500)) ||
-          ((600 <= posX && posX <= 800) && (334 <= posY && posY <= 500))
-        ) {
+        } else if((0 <= posX && posX <= 200) && (0 <= posY && posY <= 500)) {
           KEY_STATUS[KEY_MAP['touchFire']] = false;
         };
       };
@@ -773,7 +692,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let mobileCanvas = null;
 
   if(
-    (typeof window.orientation !== "undefined") ||
+    (typeof window.orientation === "undefined") ||
     (navigator.userAgent.indexOf('IEMobile') !== -1)
   ) {
     mobileCanvas = document.createElement("canvas");
