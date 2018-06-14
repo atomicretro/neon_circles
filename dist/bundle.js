@@ -1614,7 +1614,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var optionsCanvas = document.getElementById("options-canvas");
   var mobileCanvas = null;
 
-  if (typeof window.orientation === "undefined" || navigator.userAgent.indexOf('IEMobile') !== -1) {
+  if (typeof window.orientation !== "undefined" || navigator.userAgent.indexOf('IEMobile') !== -1) {
     mobileCanvas = document.createElement("canvas");
     mobileCanvas.id = "mobile-canvas";
     mobileCanvas.width = "800";
