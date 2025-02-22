@@ -50,8 +50,8 @@ h2 a:hover {
 #options-canvas {
   display: block;
   position: absolute;
-  top: 1;
-  left: 1;
+  top: 1px;
+  left: 1px;
   z-index: 10;
 }
 
@@ -65,8 +65,8 @@ h2 a:hover {
 #player-canvas {
   display: block;
   position: absolute;
-  top: 175;
-  left: 325;
+  top: 175px;
+  left: 325px;
   z-index: 4;
 }
 
