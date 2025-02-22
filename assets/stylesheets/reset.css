@@ -1,7 +1,7 @@
 ul, li, strong, main, button, i,
 section, img, div, h2, p, form,
 fieldset, label, input, textarea,
-span, article, time, small, a {
+span, article, time, small, a, body {
   margin: 0;
   padding: 0;
   border: 0;
@@ -26,19 +26,4 @@ img {
 
 a:link {
   text-decoration: none;
-}
-
-input[type="password"],
-input[type="email"],
-input[type="text"],
-input[type="submit"],
-textarea,
-button {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-}
-
-button,
-input[type="submit"] {
-  cursor: pointer;
 }

@@ -1,9 +1,14 @@
 @font-face {
-    font-family: 'sf_alien_encountersitalic';
-    src: url('sfalienencounters-italic-webfont.woff2') format('woff2'),
-         url('sfalienencounters-italic-webfont.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
+  font-family: 'sf_alien_encountersitalic';
+  src:
+    url('sfalienencounters-italic-webfont.woff2') format('woff2'),
+    url('sfalienencounters-italic-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+html {
+  padding: 20px;
 }
 
 body {
@@ -11,23 +16,22 @@ body {
   background-position: center top;
   display: flex;
   flex-direction: column;
+  align-items: center;
   font-family: sf_alien_encountersitalic;
 }
 
 h1 {
   font-size: 48px;
   font-weight: normal;
+  margin: 0 0 10px 0;
   padding: 0;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 10px;
-  margin-bottom: 0;
 }
 
 h2 {
+  font-size: 24px;
   font-weight: normal;
-  padding: 0;
   margin: 0;
+  padding: 0;
 }
 
 h2 a:hover {
@@ -39,10 +43,7 @@ h2 a:hover {
   height: 550px;
   width: 800px;;
   display: block;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 10px;
-  margin-bottom: 50px;
+  margin: 0 0 50px 0;
   padding: 0;
 }
 
@@ -88,19 +89,11 @@ h2 a:hover {
 .info-area {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  margin-bottom: 30px;
-}
-
-.info-background {
-  display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 140px;
-  width: 300px;
+  background-color: rgba(255, 255, 255, 0.8);
   border-radius: 25px;
-  background-color: rgba(255,255,255,0.8);
+  padding: 20px;
 }
 
 .info-area a {
@@ -110,42 +103,6 @@ h2 a:hover {
 
 .info-area a:hover {
   text-decoration: none;
-}
-
-.name-area {
-  font-size: 24px;
-}
-
-.icon-area {
-  padding: 15px 0 20px 0;
-}
-
-.icon-area a {
-  font-size: 36px;
-  padding-left: 20px;
-  padding-right: 20px;
-}
-
-.icon-area a:hover {
-  color: purple;
-}
-
-.info-background span {
-  font-size: 12px;
-}
-
-.info-background span a:hover {
-  color: purple;
-}
-
-.farewell {
-  margin: auto;
-}
-
-.farewell h6 {
-  color: white;
-  font-size: 30px;
-  margin: 0;
 }
 
 .hidden {
