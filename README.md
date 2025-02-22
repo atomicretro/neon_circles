@@ -9,4 +9,4 @@ Neon Circles is a claustrophobic shoot-em-up in the likeness of Space Invaders a
 
 
 ### Acknowledgements
-* Music by [Pedro Santiago]("http://freemusicarchive.org/music/Pedro_Santiago/Constellations/Pedro_Santiago_-_10_-_Breeze) (dead link).
+* Music by [Pedro Santiago](http://freemusicarchive.org/music/Pedro_Santiago/Constellations/Pedro_Santiago_-_10_-_Breeze) (dead link).
