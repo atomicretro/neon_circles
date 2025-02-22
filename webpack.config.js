@@ -2,6 +2,7 @@ const path = require('path');
 
 module.exports = {
   context: __dirname,
+  devtool: 'source-map',
   entry: './scripts/game.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -13,15 +14,15 @@ module.exports = {
   module: {
     rules: [
       {
-        exclude: /(node_modules)/,
+        test: /\.m?js$/,
+        exclude: /node_modules/,
         use: {
-          loader: 'babel-loader',
-          query: {
-            presets: ['env']
+          loader: "babel-loader",
+          options: {
+            presets: ['@babel/preset-env']
           }
-        },
+        }
       }
     ]
   },
-  devtool: 'source-map'
 };
