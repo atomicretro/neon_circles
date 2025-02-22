@@ -8,9 +8,11 @@ class Field {
     optsCanvasObj,
     AssetStore,
     demonBulletPool,
+    bossBulletPool,
     pcBulletPool,
     lvl1DemonPool,
     lvl2DemonPool,
+    lvl3DemonPool,
     pickupsPool,
     player,
     movementDirection,
@@ -26,9 +28,11 @@ class Field {
 
     this.AssetStore = AssetStore;
     this.demonBulletPool = demonBulletPool;
+    this.bossBulletPool = bossBulletPool;
     this.pcBulletPool = pcBulletPool;
     this.lvl1DemonPool = lvl1DemonPool;
     this.lvl2DemonPool = lvl2DemonPool;
+    this.lvl3DemonPool = lvl3DemonPool;
     this.pickupsPool = pickupsPool;
 
     this.player = player;
@@ -219,7 +223,11 @@ class Field {
 
     this.optsCanvas.ctx.font = "16px sf_alien_encountersitalic";
     this.optsCanvas.ctx.fillText(
-      "HP EVERY 1000 Pts!", 310, 280,
+      "HP EVERY 1000 PTS!", 310, 250,
+    );
+    this.optsCanvas.ctx.font = "16px sf_alien_encountersitalic";
+    this.optsCanvas.ctx.fillText(
+      "BOSS EVERY 2500 PTS!", 294, 280,
     );
 
     this.optsCanvas.ctx.font = "24px sf_alien_encountersitalic";
@@ -371,9 +379,11 @@ class Field {
     this.player.draw();
     this.lvl1DemonPool.draw();
     this.lvl2DemonPool.draw();
+    this.lvl3DemonPool.draw();
     this.pickupsPool.draw();
     this.pcBulletPool.draw('player');
     this.demonBulletPool.draw();
+    this.bossBulletPool.draw();
   }
 
   drawStatusBar() {
@@ -429,12 +439,9 @@ class Field {
     }
   }
 
-  updatePlayerScore(demon) {
-    if (demon === 'mouthDemon' || demon === 'eyeDemon') {
-      this.playerScore += 100;
-    } else if (demon === 'faceDemon') {
-      this.playerScore += 150;
-    }
+  updatePlayerScore(points) {
+    this.playerScore += points;
+
     this.statsCanvas.ctx.clearRect(45, 20, 150, 40);
     this.statsCanvas.ctx.fillStyle = "rgba(255, 255, 255, 0.8";
     this.statsCanvas.ctx.fillRect(45, 20, 150, 40);

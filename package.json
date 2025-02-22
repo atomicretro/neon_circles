@@ -1,6 +1,6 @@
 {
   "name": "neon_circles",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Neon Circles is a 2D, on-rails shoot-em-up where movement player is locked to the inside of a circle.",
   "main": "index.js",
   "scripts": {

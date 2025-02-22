@@ -11,7 +11,7 @@ class Player {
     this.radius = 50; // The 'track' the player moves along
     this.fireCharge = 0;
     this.fireCooldown = 25;
-    this.invincibilityFrames = 50;
+    this.invincibilityFrames = 0;
     this.invincibilityColor = 'white';
     this.life = 3;
 
@@ -53,8 +53,12 @@ class Player {
   }
 
   move(keyStatus) {
-    this.fireCharge++; // increments once every frame
-    this.invincibilityFrames++; // increments once every frame
+    if (this.fireCharge < this.fireCooldown) {
+      this.fireCharge++; // increments once every frame
+    }
+    if (this.invincibilityFrames > 0) {
+      this.invincibilityFrames--; // decrements once every frame
+    }
     if (keyStatus.left) {
       if (this.velocity <= this.maxSpeed) {
         this.velocity += this.acceleration;
@@ -93,7 +97,7 @@ class Player {
     this.computeAllVerticies();
     this.ctx.beginPath();
 
-    if (this.invincibilityFrames < 50) {
+    if (this.invincibilityFrames > 0) {
       this.ctx.fillStyle = this.invincibilityColor;
     }
     else this.ctx.fillStyle = 'white';
@@ -106,14 +110,14 @@ class Player {
 
   isHit() {
     this.life -= 1;
-    this.invincibilityFrames = 0;
+    this.invincibilityFrames = 50;
     this.invincibilityColor = 'red';
   }
 
   isHealed() {
     if (this.life < 3) {
       this.life += 1;
-      this.invincibilityFrames = 0;
+      this.invincibilityFrames = 50;
       this.invincibilityColor = 'lawngreen';
     }
   }

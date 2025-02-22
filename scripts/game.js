@@ -71,7 +71,8 @@ class Game {
 
     this.gamePadConnected = false;
     this.gamePadToggle = false;
-    this.nextHpSpawnScore = 500;
+    this.nextHpSpawnScore = 1000;
+    this.nextBossSpawnScore = 2500;
 
     this.drawLoadingScreen();
     this.setupEventListners(fgCanvas, statsCanvas, optsCanvas);
@@ -116,6 +117,7 @@ class Game {
 
   setupNewGame() {
     this.demonBulletPool = new BulletPool(3, this.fgCanvas, 'demonBullet');
+    this.bossBulletPool = new BulletPool(3, this.fgCanvas, 'demonBullet');
     this.pcBulletPool = new BulletPool(4, this.fgCanvas, 'player');
     this.setupDemonPools();
     this.pickupsPool = new PickupsPool(this.fgCanvas.ctx, this.AssetStore);
@@ -139,6 +141,11 @@ class Game {
     this.lvl2DemonPool = new DemonPool(
       lvl2Demons, this.fgCanvas.ctx, this.AssetStore, this.demonBulletPool,
     );
+
+    const lvl3Demons = ['bossDemon'];
+    this.lvl3DemonPool = new DemonPool(
+      lvl3Demons, this.fgCanvas.ctx, this.AssetStore, this.bossBulletPool,
+    );
   }
 
   setupNewField() {
@@ -149,9 +156,11 @@ class Game {
       this.optsCanvas,
       this.AssetStore,
       this.demonBulletPool,
+      this.bossBulletPool,
       this.pcBulletPool,
       this.lvl1DemonPool,
       this.lvl2DemonPool,
+      this.lvl3DemonPool,
       this.pickupsPool,
       this.player,
       this.movementDirection,
@@ -218,8 +227,9 @@ class Game {
     const now = Date.now();
 
     this.checkLevel1Demons();
-    this.field.render();
+    this.spawnLvl3Demons();
     this.spawnHp();
+    this.field.render();
 
     if (!this.paused) {
       setTimeout(() => {
@@ -275,7 +285,22 @@ class Game {
     this.lvl2Timer = new Timer(() => { this.spawnLvl2Demons() }, 15000);
   }
 
-  checkNumHpPickups() {
+  spawnLvl3Demons() {
+    let spawnedLvl3 = 0;
+    for (let i = 0; i < this.lvl3DemonPool.pool.length; i++) {
+      const demon = this.lvl3DemonPool.pool[i];
+      if (demon.type === 'bossDemon' && demon.spawned) {
+        spawnedLvl3++;
+      };
+    }
+    
+    if (this.field.playerScore > this.nextBossSpawnScore && spawnedLvl3 < 1) {
+      this.lvl3DemonPool.get('bossDemon');
+      this.nextBossSpawnScore += 3000;
+    }
+  }
+
+  spawnHp() {
     let spawnedHp = 0;
     for (let i = 0; i < this.pickupsPool.pool.length; i++) {
       const pickup = this.pickupsPool.pool[i];
@@ -283,11 +308,8 @@ class Game {
         spawnedHp++;
       };
     }
-    return spawnedHp;
-  }
 
-  spawnHp() {
-    if (this.field.playerScore > this.nextHpSpawnScore && this.checkNumHpPickups() < 1) {
+    if (this.field.playerScore > this.nextHpSpawnScore && spawnedHp < 1) {
       this.pickupsPool.get('hp');
       this.nextHpSpawnScore += 1000;
     }
@@ -311,12 +333,11 @@ class Game {
   }
 
   checkPlayerCollision(spawnedPCBullets) {
-    const spawnedDemonBullets = this.demonBulletPool.pool.filter((bullet) => bullet.spawned);
     const hitbox = {
       x: this.player.hitboxCenter.x,
       y: this.player.hitboxCenter.y,
-      radius: 12
-    }
+      radius: 12,
+    };
 
     for (let bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
       const bullet = spawnedPCBullets[bullIdx];
@@ -324,20 +345,23 @@ class Game {
         (
           this.bulletHitsPC(this.player, hitbox, bullet.startPoint)
           || this.bulletHitsPC(this.player, hitbox, bullet.endPoint)
-        ) && this.player.invincibilityFrames > 50
+        ) && this.player.invincibilityFrames <= 0
       ) {
         this.player.isHit();
         this.field.drawPlayerHearts();
       };
     }
 
-    for (let bullIdx = 0; bullIdx < spawnedDemonBullets.length; bullIdx++) {
-      const bullet = spawnedDemonBullets[bullIdx];
+    const spawnedDemonBullets = this.demonBulletPool.pool.filter((bullet) => bullet.spawned);
+    const spawnedBossBullets = this.bossBulletPool.pool.filter((bullet) => bullet.spawned);
+    const spawnedBullets = spawnedDemonBullets.concat(spawnedBossBullets);
+    for (let bullIdx = 0; bullIdx < spawnedBullets.length; bullIdx++) {
+      const bullet = spawnedBullets[bullIdx];
       if (
         (
           this.bulletHitsPC(this.player, hitbox, bullet.startPoint)
           || this.bulletHitsPC(this.player, hitbox, bullet.endPoint)
-        ) && this.player.invincibilityFrames > 50
+        ) && this.player.invincibilityFrames <= 0
       ) {
         this.player.isHit();
         this.field.drawPlayerHearts();
@@ -358,7 +382,8 @@ class Game {
   checkDemonCollision(spawnedPCBullets) {
     const spawnedlvl1Demons = this.lvl1DemonPool.pool.filter((demon) => demon.spawned);
     const spawnedlvl2Demons = this.lvl2DemonPool.pool.filter((demon) => demon.spawned);
-    const spawnedDemons = spawnedlvl1Demons.concat(spawnedlvl2Demons);
+    const spawnedlvl3Demons = this.lvl3DemonPool.pool.filter((demon) => demon.spawned);
+    const spawnedDemons = spawnedlvl1Demons.concat(spawnedlvl2Demons).concat(spawnedlvl3Demons);
 
     for (let demonIdx = 0; demonIdx < spawnedDemons.length; demonIdx++) {
       const demon = spawnedDemons[demonIdx];
@@ -369,10 +394,22 @@ class Game {
           (
             this.pcBulletHitsObject(demon, drawPoint, bullet.startPoint)
             || this.pcBulletHitsObject(demon, drawPoint, bullet.endPoint)
-          ) && demon.invincibilityFrames > 50
+          ) && demon.invincibilityFrames <= 0
         ) {
-          this.field.updatePlayerScore(demon.type);
           demon.isHit();
+          let points = 0;
+          switch (demon.type) {
+            case 'bossDemon':
+              points = demon.life > 0 ? 50 : 500;
+              break;
+            case 'faceDemon':
+              points = 150;
+              break;
+            default:
+              points = 100;
+              break;
+          }
+          this.field.updatePlayerScore(points);
         };
       }
     }
@@ -392,7 +429,7 @@ class Game {
           (
             this.pcBulletHitsObject(hp, drawPoint, bullet.startPoint)
             || this.pcBulletHitsObject(hp, drawPoint, bullet.endPoint)
-          ) && hp.invincibilityFrames > 50
+          ) && hp.invincibilityFrames <= 0
         ) {
           if (this.player.life < 3) {
             this.player.isHealed();

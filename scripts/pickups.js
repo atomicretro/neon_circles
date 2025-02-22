@@ -45,7 +45,9 @@ class Pickup {
   }
 
   draw() {
-    this.invincibilityFrames++;
+    if (this.invincibilityFrames > 0) {
+      this.invincibilityFrames--;
+    }
     this.theta -= this.speed;
     this.drawPoint = this.computeDrawPoint();
     this.sprite.draw(this.drawPoint.x, this.drawPoint.y);
@@ -76,7 +78,7 @@ class Pickup {
 
   isHit() {
     this.life -= 1;
-    this.invincibilityFrames = 0;
+    this.invincibilityFrames = 50;
   }
 
   setDefaultValues() {
@@ -87,7 +89,7 @@ class Pickup {
     this.speed = (getRandNum(4, 7) / 1000) * speedMultiplier;
     this.radius = getRandNum(200, 400); // The 'track' the pickup moves along
     this.life = 1;
-    this.invincibilityFrames = 50;
+    this.invincibilityFrames = 0;
     this.spawned = false;
     this.drawPoint = { x: 400, y: 250 };
   }

@@ -48,20 +48,25 @@ class Demon {
       } else {
         this.speed = this.endSpeed;
       }
-    };
+    }
 
-    this.invincibilityFrames++;
+    if (this.invincibilityFrames > 0) {
+      this.invincibilityFrames--;
+    }
     this.theta -= this.speed;
     this.drawPoint = this.computeDrawPoint();
 
-    if (this.type === 'faceDemon' && this.invincibilityFrames < 50) {
+    if (
+      this.type === 'faceDemon' && this.invincibilityFrames > 0
+      || this.type === 'bossDemon' && this.invincibilityFrames > 0
+    ) {
       this.hurtSprite.draw(this.drawPoint.x, this.drawPoint.y);
     } else {
       this.sprite.draw(this.drawPoint.x, this.drawPoint.y);
     }
 
     this.chanceToFire = Math.floor(Math.random() * 101)
-    if (this.chanceToFire/100 < this.fireThreshold) {
+    if (this.chanceToFire / 100 < this.fireThreshold) {
       this.fire(BulletPool);
     }
   }
@@ -105,7 +110,11 @@ class Demon {
 
   isHit() {
     this.life -= 1;
-    this.invincibilityFrames = 0;
+    if (this.type === 'bossDemon') {
+      this.invincibilityFrames = 100;
+    } else {
+      this.invincibilityFrames = 50;
+    }
   }
 
   setDefaultValues() {
@@ -135,9 +144,21 @@ class Demon {
         0,
       );
     } else if (this.type === 'bossDemon') {
-      this.speed = 0.4;
+      this.theta = (Math.PI / 2) * thetaMultiplier;
+      this.speed = (getRandNum(4, 6) / 1000) * speedMultiplier;
+      this.radius = getRandNum(200, 300);
+      this.life =  5 ;
+      this.fireThreshold = 0.05;
+      this.hurtSprite = new Sprite(
+        this.ctx,
+        this.image,
+        this.width,
+        this.height,
+        51,
+        0,
+      );
     }
-    this.invincibilityFrames = 50;
+    this.invincibilityFrames = 0;
     this.chanceToFire = 0;
     this.spawned = false;
     this.drawPoint = { x: 400, y: 250 };
