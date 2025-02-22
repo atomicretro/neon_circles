@@ -29,28 +29,28 @@ class Game {
     this.fgCanvas = {
       ctx: fgCanvas.getContext('2d'),
       width: 800,
-      height: 500
+      height: 500,
     };
     this.statsCanvas = {
       ctx: statsCanvas.getContext('2d'),
       width: 800,
-      height: 50
+      height: 50,
     };
     this.pcCanvas = {
       ctx: pcCanvas.getContext('2d'),
       width: 150,
-      height: 150
+      height: 150,
     };
     this.optsCanvas = {
       canvas: optsCanvas,
       ctx: optsCanvas.getContext('2d'),
       width: 800,
-      height: 500
+      height: 500,
     };
     if (mobileCanvas === null) {
       this.isMobile = false;
       this.firePosition = null;
-      this.mobileCanvas = { };
+      this.mobileCanvas = {};
     } else {
       this.isMobile = true;
       this.firePosition = 'standard';
@@ -60,7 +60,7 @@ class Game {
         width: 800,
         height: 500,
       };
-    };
+    }
 
     this.play = this.play.bind(this);
     this.startRound = this.startRound.bind(this);
@@ -263,7 +263,7 @@ class Game {
     if (this.checkLevel1Demons() < maxDemons) {
       const toGet = Math.random() < 0.5 ? 'mouthDemon' : 'eyeDemon';
       this.lvl1DemonPool.get(toGet);
-    };
+    }
 
     this.lvl1Timer = new Timer(() => { this.spawnLvl1Demons() }, 5000);
   }
@@ -274,8 +274,8 @@ class Game {
       const demon = this.lvl2DemonPool.pool[i];
       if (demon.type === 'faceDemon' && demon.spawned) {
         spawnedLvl2++
-      };
-    };
+      }
+    }
 
     const maxDemons = this.getMaxDemons('lvl2');
     if (spawnedLvl2 < maxDemons) {
@@ -291,7 +291,7 @@ class Game {
       const demon = this.lvl3DemonPool.pool[i];
       if (demon.type === 'bossDemon' && demon.spawned) {
         spawnedLvl3++;
-      };
+      }
     }
     
     if (this.field.playerScore > this.nextBossSpawnScore && spawnedLvl3 < 1) {
@@ -306,7 +306,7 @@ class Game {
       const pickup = this.pickupsPool.pool[i];
       if (pickup.type === 'hp' && pickup.spawned) {
         spawnedHp++;
-      };
+      }
     }
 
     if (this.field.playerScore > this.nextHpSpawnScore && spawnedHp < 1) {
@@ -317,12 +317,12 @@ class Game {
 
   getMaxDemons(level) {
     if (this.lastTime - this.startTime < 40000) {
-      if (level === 'lvl1') { return 4 };
-      if (level === 'lvl2') { return 1 };
+      if (level === 'lvl1') { return 4 }
+      if (level === 'lvl2') { return 1 }
     } else {
-      if (level === 'lvl1') { return 6 };
-      if (level === 'lvl2') { return 2 };
-    };
+      if (level === 'lvl1') { return 6 }
+      if (level === 'lvl2') { return 2 }
+    }
   }
 
   checkCollisions() {
@@ -349,7 +349,7 @@ class Game {
       ) {
         this.player.isHit();
         this.field.drawPlayerHearts();
-      };
+      }
     }
 
     const spawnedDemonBullets = this.demonBulletPool.pool.filter((bullet) => bullet.spawned);
@@ -365,7 +365,7 @@ class Game {
       ) {
         this.player.isHit();
         this.field.drawPlayerHearts();
-      };
+      }
     }
   }
 
@@ -410,7 +410,7 @@ class Game {
               break;
           }
           this.field.updatePlayerScore(points);
-        };
+        }
       }
     }
   }
@@ -436,7 +436,7 @@ class Game {
             hp.isHit();
             this.field.drawPlayerHearts();
           }
-        };
+        }
       }
     }
   }
@@ -455,7 +455,7 @@ class Game {
       this.gameStatus = 'over';
       this.field.updateGameStatus(this.gameStatus);
       this.drawStartScreen();
-    };
+    }
   }
 
   buttonDown() {
@@ -473,7 +473,7 @@ class Game {
       || navigator.getGamepads()[0].axes[0] > 0.1
     ) {
       KEY_STATUS[KEY_MAP['controllerRight']] = true;
-    };
+    }
     if (
       navigator.getGamepads()[0].buttons[0].pressed
       || navigator.getGamepads()[0].buttons[1].pressed
@@ -483,7 +483,7 @@ class Game {
       || navigator.getGamepads()[0].buttons[5].pressed
     ) {
       KEY_STATUS[KEY_MAP['controllerFire']] = true;
-    };
+    }
   }
 
   buttonUp() {
@@ -495,7 +495,7 @@ class Game {
     }
     if (!navigator.getGamepads()[0].buttons[15].pressed) {
       KEY_STATUS[KEY_MAP['controllerRight']] = false;
-    };
+    }
     if (
       !navigator.getGamepads()[0].buttons[0].pressed
       && !navigator.getGamepads()[0].buttons[1].pressed
@@ -505,7 +505,7 @@ class Game {
       && !navigator.getGamepads()[0].buttons[5].pressed
     ) {
       KEY_STATUS[KEY_MAP['controllerFire']] = false;
-    };
+    }
   }
 
   keydown(e) {
@@ -550,7 +550,7 @@ class Game {
           KEY_STATUS[KEY_MAP['touchRight']] = true;
         } else if ((600 <= posX && posX <= 800) && (0 <= posY && posY <= 500)) {
           KEY_STATUS[KEY_MAP['touchFire']] = true;
-        };
+        }
       } else if (
         this.movementDirection === 'inverted' && this.firePosition === 'standard'
       ) {
@@ -560,7 +560,7 @@ class Game {
           KEY_STATUS[KEY_MAP['touchLeft']] = true;
         } else if ((600 <= posX && posX <= 800) && (0 <= posY && posY <= 500)) {
           KEY_STATUS[KEY_MAP['touchFire']] = true;
-        };
+        }
       } else if (
         this.movementDirection === 'standard' && this.firePosition === 'inverted'
       ) {
@@ -570,7 +570,7 @@ class Game {
           KEY_STATUS[KEY_MAP['touchRight']] = true;
         } else if ((0 <= posX && posX <= 200) && (0 <= posY && posY <= 500)) {
           KEY_STATUS[KEY_MAP['touchFire']] = true;
-        };
+        }
       } else if (
         this.movementDirection === 'inverted' && this.firePosition === 'inverted'
       ) {
@@ -580,11 +580,11 @@ class Game {
           KEY_STATUS[KEY_MAP['touchRight']] = true;
         } else if ((0 <= posX && posX <= 200) && (0 <= posY && posY <= 500)) {
           KEY_STATUS[KEY_MAP['touchFire']] = true;
-        };
-      };
+        }
+      }
 
       this.ongoingTouches.push(this.copyTouch(touches[i], posX, posY));
-    };
+    }
   }
 
   handleEnd(e, boundingRect) {
@@ -604,7 +604,7 @@ class Game {
           KEY_STATUS[KEY_MAP['touchRight']] = false;
         } else if ((600 <= posX && posX <= 800) && (0 <= posY && posY <= 500)) {
           KEY_STATUS[KEY_MAP['touchFire']] = false;
-        };
+        }
       } else if (
         this.movementDirection === 'inverted' && this.firePosition === 'standard'
       ) {
@@ -614,7 +614,7 @@ class Game {
           KEY_STATUS[KEY_MAP['touchLeft']] = false;
         } else if ((600 <= posX && posX <= 800) && (0 <= posY && posY <= 500)) {
           KEY_STATUS[KEY_MAP['touchFire']] = false;
-        };
+        }
       } else if (
         this.movementDirection === 'standard' && this.firePosition === 'inverted'
       ) {
@@ -624,7 +624,7 @@ class Game {
           KEY_STATUS[KEY_MAP['touchRight']] = false;
         } else if ((0 <= posX && posX <= 200) && (0 <= posY && posY <= 500)) {
           KEY_STATUS[KEY_MAP['touchFire']] = false;
-        };
+        }
       } else if (
         this.movementDirection === 'inverted' && this.firePosition === 'inverted'
       ) {
@@ -634,12 +634,12 @@ class Game {
           KEY_STATUS[KEY_MAP['touchRight']] = false;
         } else if ((0 <= posX && posX <= 200) && (0 <= posY && posY <= 500)) {
           KEY_STATUS[KEY_MAP['touchFire']] = false;
-        };
-      };
+        }
+      }
 
       const touchIdx = this.ongoingTouchIndexById(touch.identifier);
       this.ongoingTouches.splice(touchIdx, 1);
-    };
+    }
   }
 
   copyTouch(touch, posX, posY) {
@@ -655,7 +655,7 @@ class Game {
       const id = this.ongoingTouches[i].identifier;
       if (id == idToFind) {
         return i
-      };
+      }
     }
     return -1; // not found
   }
@@ -737,7 +737,7 @@ class Game {
       this.paused = true;
       this.pauseSpawnTimers();
       this.drawStartScreen();
-    };
+    }
   }
 
   newGame() {
@@ -791,23 +791,22 @@ class Game {
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  const foregroundCanvas = document.getElementById("foreground-canvas");
-  const playerCanvas = document.getElementById("player-canvas");
-  const statsCanvas = document.getElementById("stats-canvas");
-  const optionsCanvas = document.getElementById("options-canvas");
-  const mobileCanvas = null;
+document.addEventListener('DOMContentLoaded', () => {
+  const foregroundCanvas = document.getElementById('foreground-canvas');
+  const playerCanvas = document.getElementById('player-canvas');
+  const statsCanvas = document.getElementById('stats-canvas');
+  const optionsCanvas = document.getElementById('options-canvas');
+  let mobileCanvas = null;
 
-  if (
-    (typeof window.orientation !== "undefined")
-    || (navigator.userAgent.indexOf('IEMobile') !== -1)
-  ) {
-    mobileCanvas = document.createElement("canvas");
-    mobileCanvas.id = "mobile-canvas";
-    mobileCanvas.width = "800";
-    mobileCanvas.height = "500";
-    document.getElementsByClassName("game-area")[0].appendChild(mobileCanvas);
-  };
+  if (window.screen.width  < 769) {
+    mobileCanvas = document.createElement('canvas');
+    mobileCanvas.id = 'mobile-canvas';
+    mobileCanvas.width = '600';
+    mobileCanvas.height = '400';
+
+    const gameArea = document.querySelectorAll('.game-area')[0];
+    gameArea.appendChild(mobileCanvas);
+  }
 
   new Game(
     foregroundCanvas,

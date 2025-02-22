@@ -24,7 +24,7 @@ export class ObjectPool {
       }
     }
   }
-};
+}
 
 export class Sprite {
   constructor(context, image, srcWidth, srcHeight, srcX, srcY) {
@@ -51,7 +51,7 @@ export class Sprite {
       this.srcHeight,  // drawn image height, same as src
     );
   }
-};
+}
 
 export class AssetStore {
   constructor(game) {
@@ -130,9 +130,9 @@ export class AssetStore {
     this.numLoaded++;
     if (this.numLoaded === this.numAssets) {
       this.game.startGame();
-    };
+    }
   }
-};
+}
 
 export function Timer(callback, delay) {
   var timerId, start, remaining = delay;

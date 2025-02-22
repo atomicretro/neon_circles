@@ -80,7 +80,7 @@ class Field {
       secondaryText = {
         text: "careful! demon power is strong!", size: "22px", x: 182, y: 105,
       };
-    };
+    }
     this.drawStartScreenMessage(primaryText, secondaryText);
 
     this.drawControls();
@@ -115,7 +115,7 @@ class Field {
       secondaryText = {
         text: "careful! demon power is strong!", size: "20px", x: 202, y: 105,
       };
-    };
+    }
     this.drawStartScreenMessage(primaryText, secondaryText);
 
     this.drawMobileControls();
@@ -171,7 +171,7 @@ class Field {
         desc2X: 566, desc2Y: 280,
         circleX: -160, circleY: 190,
       };
-    };
+    }
 
     this.drawSwapMovementButton();
 
@@ -292,7 +292,7 @@ class Field {
       this.optsCanvas.ctx.strokeRect(602,2,196,246);
       this.optsCanvas.ctx.strokeRect(602,252,196,246);
       this.optsCanvas.ctx.strokeRect(2,2,196,496);
-    };
+    }
 
     this.drawSwapMovementButton();
     this.drawSwapFireButton();
@@ -368,7 +368,7 @@ class Field {
       this.optsCanvas.ctx.font = "12px sf_alien_encountersitalic";
       this.optsCanvas.ctx.fillText("click here to toggle", 20, 460);
       this.optsCanvas.ctx.fillText("gamepad input!", 20, 480);
-    };
+    }
   }
 
   render()  {

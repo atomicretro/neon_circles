@@ -14,7 +14,7 @@ export default class DemonPool extends ObjectPool {
       this.pool.push(demon);
     }
   }
-};
+}
 
 class Demon {
   constructor(ctx, type, AssetStore) {
@@ -163,4 +163,4 @@ class Demon {
     this.spawned = false;
     this.drawPoint = { x: 400, y: 250 };
   }
-};
+}

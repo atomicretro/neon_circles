@@ -17,7 +17,7 @@ export default class PickupsPool extends ObjectPool {
       this.pool.push(pickup);
     }
   }
-};
+}
 
 class Pickup {
   constructor(ctx, type, AssetStore) {
@@ -56,7 +56,7 @@ class Pickup {
   resetable() {
     if (this.life <= 0) {
       return true
-    };
+    }
     return false;
   }
 
@@ -93,4 +93,4 @@ class Pickup {
     this.spawned = false;
     this.drawPoint = { x: 400, y: 250 };
   }
-};
+}

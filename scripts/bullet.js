@@ -9,7 +9,7 @@ export default class BulletPool extends ObjectPool {
       this.pool.push(bullet);
     }
   }
-};
+}
 
 class Bullet {
   constructor(fgCanvas, type) {
@@ -50,7 +50,7 @@ class Bullet {
       return false;
     } else {
       return true;
-    };
+    }
   }
 
   clear() {
@@ -90,4 +90,4 @@ class Bullet {
     this.speed = 0;
     this.spawned = false;
   }
-};
+}
