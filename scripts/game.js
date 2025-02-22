@@ -294,7 +294,7 @@ class Game {
       }
     }
     
-    if (this.field.playerScore > this.nextBossSpawnScore && spawnedLvl3 < 1) {
+    if (this.field.playerScore >= this.nextBossSpawnScore && spawnedLvl3 < 1) {
       this.lvl3DemonPool.get('bossDemon');
       this.nextBossSpawnScore += 3000;
     }
@@ -309,7 +309,7 @@ class Game {
       }
     }
 
-    if (this.field.playerScore > this.nextHpSpawnScore && spawnedHp < 1) {
+    if (this.field.playerScore >= this.nextHpSpawnScore && spawnedHp < 1) {
       this.pickupsPool.get('hp');
       this.nextHpSpawnScore += 1000;
     }
