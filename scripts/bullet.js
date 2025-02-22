@@ -4,10 +4,10 @@ export default class BulletPool extends ObjectPool {
   constructor(size, fgCanvas, type) {
     super(size);
 
-    for(let i = 0; i < size; i++) {
+    for (let i = 0; i < size; i++) {
       let bullet = new Bullet(fgCanvas, type);
       this.pool.push(bullet);
-    };
+    }
   }
 };
 
@@ -41,15 +41,15 @@ class Bullet {
   }
 
   resetable() {
-    if(
-        (this.startPoint.y > -5 || this.endPoint.y > -5) &&
-        (this.startPoint.y < this.resetY || this.endPoint.y < this.resetY) &&
-        (this.startPoint.x > -5 || this.endPoint.x > -5) &&
-        (this.startPoint.x < this.resetX || this.endPoint.x < this.resetX)
-      ) {
-        return false;
+    if (
+      (this.startPoint.y > -5 || this.endPoint.y > -5)
+      && (this.startPoint.y < this.resetY || this.endPoint.y < this.resetY)
+      && (this.startPoint.x > -5 || this.endPoint.x > -5)
+      && (this.startPoint.x < this.resetX || this.endPoint.x < this.resetX)
+    ) {
+      return false;
     } else {
-        return true;
+      return true;
     };
   }
 
@@ -57,12 +57,12 @@ class Bullet {
     let startX;
     let startY;
 
-    if(this.startPoint.x > this.endPoint.x) {
+    if (this.startPoint.x > this.endPoint.x) {
       startX = this.endPoint.x;
     } else {
       startX = this.startPoint.x;
     }
-    if(this.startPoint.y > this.endPoint.y) {
+    if (this.startPoint.y > this.endPoint.y) {
       startY = this.endPoint.y;
     } else {
       startY = this.startPoint.y;
@@ -77,8 +77,8 @@ class Bullet {
     // when pc is on bottom right of circle drawpoint needs to be in *topleft*
     return ({
       x: Math.cos(this.pathAngle) * -radius + this.xOffset - 5,
-      y: Math.sin(this.pathAngle) * -radius + this.yOffset - 5
-    })
+      y: Math.sin(this.pathAngle) * -radius + this.yOffset - 5,
+    });
   }
 
   setDefaultValues(type) {

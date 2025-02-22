@@ -1,4 +1,4 @@
-import { AssetStore, Sprite } from './utilities';
+import { Sprite } from './utilities';
 
 class Field {
   constructor(
@@ -11,11 +11,12 @@ class Field {
     pcBulletPool,
     lvl1DemonPool,
     lvl2DemonPool,
+    pickupsPool,
     player,
     movementDirection,
     gameStatus,
     mobileCanvasObj,
-    firePosition
+    firePosition,
   ) {
     this.fgCanvas = fgCanvasObj;
     this.statsCanvas = statsCanvasObj;
@@ -28,6 +29,7 @@ class Field {
     this.pcBulletPool = pcBulletPool;
     this.lvl1DemonPool = lvl1DemonPool;
     this.lvl2DemonPool = lvl2DemonPool;
+    this.pickupsPool = pickupsPool;
 
     this.player = player;
     this.movementDirection = movementDirection;
@@ -39,7 +41,7 @@ class Field {
     this.heart = new Sprite(
       this.statsCanvas.ctx,
       this.AssetStore.heart.image,
-      13, 13, 0, 0
+      13, 13, 0, 0,
     );
   }
 
@@ -58,35 +60,25 @@ class Field {
   drawStandardStartScreen() {
     this.setupStartScreen();
 
-    let primaryText;     // clockwise
+    let primaryText;      // clockwise
     let secondaryText;    // counterclockwise
-    if(this.gameStatus === 'over') {
+    if (this.gameStatus === 'over') {
       primaryText = {
-        text: "GAME OVER", size: "36px", x: 285, y: 70
+        text: "GAME OVER", size: "36px", x: 285, y: 70,
       };
       secondaryText = {
-        text: "fight! fight! don't let demons win!", size: "22px", x: 176, y: 105
+        text: "fight! fight! don't let demons win!", size: "22px", x: 176, y: 105,
       };
     } else {
       primaryText = {
-        text: "SHOOT ALL DEMONS!", size: "36px", x: 207, y: 70
+        text: "SHOOT ALL DEMONS!", size: "36px", x: 207, y: 70,
       };
       secondaryText = {
-        text: "careful! demon power is strong!", size: "22px", x: 182, y: 105
+        text: "careful! demon power is strong!", size: "22px", x: 182, y: 105,
       };
     };
     this.drawStartScreenMessage(primaryText, secondaryText);
 
-    let cw;     // clockwise
-    let ccw;    // counterclockwise
-    if(this.movementDirection === 'standard') {
-      ccw = { descX: 70,
-            circleX: 160 };
-      cw = { descX: 590, circleX: -640 };
-    } else {
-      ccw = { descX: 545, circleX: 640 };
-      cw = { descX: 109, circleX: -160 };
-    };
     this.drawControls();
 
     // for checking centeredness of start screen items
@@ -105,19 +97,19 @@ class Field {
 
     let primaryText;
     let secondaryText;
-    if(this.gameStatus === 'over') {
+    if (this.gameStatus === 'over') {
       primaryText = {
-        text: "GAME OVER", size: "36px", x: 285, y: 70
+        text: "GAME OVER", size: "36px", x: 285, y: 70,
       };
       secondaryText = {
-        text: "fight! fight! don't let demons win!", size: "19px", x: 204, y: 105
+        text: "fight! fight! don't let demons win!", size: "19px", x: 204, y: 105,
       };
     } else {
       primaryText = {
-        text: "SHOOT ALL DEMONS!", size: "34px", x: 212, y: 70
+        text: "SHOOT ALL DEMONS!", size: "34px", x: 212, y: 70,
       };
       secondaryText = {
-        text: "careful! demon power is strong!", size: "20px", x: 202, y: 105
+        text: "careful! demon power is strong!", size: "20px", x: 202, y: 105,
       };
     };
     this.drawStartScreenMessage(primaryText, secondaryText);
@@ -128,12 +120,12 @@ class Field {
   setupStartScreen() {
     this.optsCanvas.canvas.classList.remove('hidden');
     this.clearOptsContext();
-    this.optsCanvas.ctx.fillStyle = "rgba(0, 0, 0, 0.8";
-    this.optsCanvas.ctx.fillRect(0,0,800,500);
+    this.optsCanvas.ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+    this.optsCanvas.ctx.fillRect(0, 0, 800, 500);
 
     this.optsCanvas.ctx.fillStyle = 'white';
     this.optsCanvas.ctx.strokeStyle = "white";
-    this.optsCanvas.ctx.strokeRect(300,385,205,87);
+    this.optsCanvas.ctx.strokeRect(300, 385, 205, 87);
     this.optsCanvas.ctx.font = "60px sf_alien_encountersitalic";
     this.optsCanvas.ctx.fillText("PLAY", 320, 450);
   }
@@ -142,37 +134,38 @@ class Field {
     this.optsCanvas.ctx.fillStyle = 'white';
     this.optsCanvas.ctx.font = `${primaryText.size} sf_alien_encountersitalic`;
     this.optsCanvas.ctx.fillText(
-      primaryText.text, primaryText.x, primaryText.y);
+      primaryText.text, primaryText.x, primaryText.y,
+    );
     this.optsCanvas.ctx.font = `${secondaryText.size} sf_alien_encountersitalic`;
     this.optsCanvas.ctx.fillText(
-      secondaryText.text, secondaryText.x, secondaryText.y
+      secondaryText.text, secondaryText.x, secondaryText.y,
     );
   }
 
   drawControls() {
     let cw;     // clockwise
     let ccw;    // counterclockwise
-    if(this.movementDirection === 'standard') {
+    if (this.movementDirection === 'standard') {
       ccw = {
         desc1X: 70, desc1Y: 250,
         desc2X: 90, desc2Y: 280,
-        circleX: 160, circleY: 190
+        circleX: 160, circleY: 190,
       };
       cw = {
         desc1X: 590, desc1Y: 250,
         desc2X: 566, desc2Y: 280,
-        circleX: -640, circleY: 190
+        circleX: -640, circleY: 190,
       };
     } else {
       ccw = {
         desc1X: 545, desc1Y: 250,
         desc2X: 90, desc2Y: 280,
-        circleX: 640, circleY: 190
+        circleX: 640, circleY: 190,
       };
       cw = {
         desc1X: 109, desc1Y: 250,
         desc2X: 566, desc2Y: 280,
-        circleX: -160, circleY: 190
+        circleX: -160, circleY: 190,
       };
     };
 
@@ -188,7 +181,12 @@ class Field {
 
     this.optsCanvas.ctx.beginPath();
     this.optsCanvas.ctx.arc(
-      ccw.circleX, ccw.circleY, 30, Math.PI / 2, Math.PI, true
+      ccw.circleX,
+      ccw.circleY,
+      30,
+      Math.PI / 2,
+      Math.PI,
+      true,
     );
     this.optsCanvas.ctx.lineWidth = 2;
     this.optsCanvas.ctx.stroke();
@@ -219,13 +217,18 @@ class Field {
     this.optsCanvas.ctx.lineTo(Math.abs(cw.circleX - 35), (cw.circleY - 15));
     this.optsCanvas.ctx.stroke();
 
+    this.optsCanvas.ctx.font = "16px sf_alien_encountersitalic";
+    this.optsCanvas.ctx.fillText(
+      "HP EVERY 1000 Pts!", 310, 280,
+    );
+
     this.optsCanvas.ctx.font = "24px sf_alien_encountersitalic";
     this.optsCanvas.ctx.fillText(
-      "SPACE TO FIRE WHEN POWER IS FULL!", 148, 340
+      "SPACE TO FIRE WHEN POWER IS FULL", 148, 340,
     );
     this.optsCanvas.ctx.beginPath();
-    this.optsCanvas.ctx.moveTo(148,347);
-    this.optsCanvas.ctx.lineTo(650,347);
+    this.optsCanvas.ctx.moveTo(145, 347);
+    this.optsCanvas.ctx.lineTo(635, 347);
     this.optsCanvas.ctx.stroke();
 
     this.drawGamePadToggleButton();
@@ -233,7 +236,7 @@ class Field {
     this.optsCanvas.ctx.font = "12px sf_alien_encountersitalic";
     this.optsCanvas.ctx.fillText("m to mute!", 705, 440);
     this.optsCanvas.ctx.fillText("p to pause!", 700, 460);
-    if(this.gameStatus !== 'playing') {
+    if (this.gameStatus !== 'playing') {
       this.optsCanvas.ctx.fillText("enter to start!", 670, 480);
     }
   }
@@ -242,7 +245,7 @@ class Field {
     let cw;     // clockwise
     let ccw;    // counterclockwise
     let firePos;
-    if(
+    if (
       this.movementDirection === 'standard' && this.firePosition === 'standard'
     ) {
       ccw = { descX: 5, descY: 185, circleX: 100, circleY: 125 };
@@ -252,7 +255,7 @@ class Field {
       this.optsCanvas.ctx.strokeRect(2,2,196,246);
       this.optsCanvas.ctx.strokeRect(2,252,196,246);
       this.optsCanvas.ctx.strokeRect(602,2,196,496);
-    } else if(
+    } else if (
       this.movementDirection === 'inverted' && this.firePosition === 'standard'
     ) {
       ccw = { descX: 5, descY: 405, circleX: 100, circleY: 345 };
@@ -262,7 +265,7 @@ class Field {
       this.optsCanvas.ctx.strokeRect(2,2,196,246);
       this.optsCanvas.ctx.strokeRect(2,252,196,246);
       this.optsCanvas.ctx.strokeRect(602,2,196,496);
-    } else if(
+    } else if (
       this.movementDirection === 'standard' && this.firePosition === 'inverted'
     ) {
       ccw = { descX: 605, descY: 185, circleX: 700, circleY: 125 };
@@ -272,7 +275,7 @@ class Field {
       this.optsCanvas.ctx.strokeRect(602,2,196,246);
       this.optsCanvas.ctx.strokeRect(602,252,196,246);
       this.optsCanvas.ctx.strokeRect(2,2,196,496);
-    } else if(
+    } else if (
       this.movementDirection === 'inverted' && this.firePosition === 'inverted'
     ) {
       ccw = { descX: 605, descY: 405, circleX: 700, circleY: 345 };
@@ -343,14 +346,17 @@ class Field {
   }
 
   drawGamePadToggleButton() {
-    if(this.gamePadConnected) {
+    if (this.gamePadConnected) {
       this.optsCanvas.ctx.clearRect(20,410,150,80);
       this.optsCanvas.ctx.fillStyle = "rgba(0, 0, 0, 0.8";
       this.optsCanvas.ctx.fillRect(20,410,150,80);
       this.optsCanvas.ctx.fillStyle = "white";
       this.optsCanvas.ctx.font = "24px sf_alien_encountersitalic";
-      if(this.gamePadToggle) this.optsCanvas.ctx.fillText("gamepad", 33, 435);
-      else this.optsCanvas.ctx.fillText("keyboard", 27, 435);
+      if (this.gamePadToggle) {
+        this.optsCanvas.ctx.fillText("gamepad", 33, 435);
+      } else {
+        this.optsCanvas.ctx.fillText("keyboard", 27, 435);
+      }
       this.optsCanvas.ctx.font = "12px sf_alien_encountersitalic";
       this.optsCanvas.ctx.fillText("click here to toggle", 20, 460);
       this.optsCanvas.ctx.fillText("gamepad input!", 20, 480);
@@ -365,6 +371,7 @@ class Field {
     this.player.draw();
     this.lvl1DemonPool.draw();
     this.lvl2DemonPool.draw();
+    this.pickupsPool.draw();
     this.pcBulletPool.draw('player');
     this.demonBulletPool.draw();
   }
@@ -372,7 +379,10 @@ class Field {
   drawStatusBar() {
     this.statsCanvas.ctx.fillStyle = "rgba(255, 255, 255, 0.8";
     this.statsCanvas.ctx.fillRect(
-      0, 0, this.statsCanvas.width, this.statsCanvas.height
+      0,
+      0,
+      this.statsCanvas.width,
+      this.statsCanvas.height,
     );
 
     // Charge container
@@ -414,14 +424,17 @@ class Field {
     this.statsCanvas.ctx.clearRect(200, 20, 140, 40);
     this.statsCanvas.ctx.fillStyle = "rgba(255, 255, 255, 0.8";
     this.statsCanvas.ctx.fillRect(200, 20, 140, 40);
-    for(let i = 0; i < this.player.life; i++) {
+    for (let i = 0; i < this.player.life; i++) {
       this.heart.draw(205 + (i * 20), 30)
     }
   }
 
   updatePlayerScore(demon) {
-    if(demon === 'mouthDemon' || demon === 'eyeDemon') this.playerScore += 100;
-    else if(demon === 'faceDemon') this.playerScore += 150;
+    if (demon === 'mouthDemon' || demon === 'eyeDemon') {
+      this.playerScore += 100;
+    } else if (demon === 'faceDemon') {
+      this.playerScore += 150;
+    }
     this.statsCanvas.ctx.clearRect(45, 20, 150, 40);
     this.statsCanvas.ctx.fillStyle = "rgba(255, 255, 255, 0.8";
     this.statsCanvas.ctx.fillRect(45, 20, 150, 40);
@@ -431,11 +444,11 @@ class Field {
   }
 
   updatePlayerCharge() {
-    if(this.player.fireCharge === 0) {
+    if (this.player.fireCharge === 0) {
       this.statsCanvas.ctx.clearRect(353, 31, 95, 11);
       this.statsCanvas.ctx.fillStyle = "rgba(255, 255, 255, 0.8";
       this.statsCanvas.ctx.fillRect(353, 31, 95, 11);
-    } else if(this.player.fireCharge < 20) {
+    } else if (this.player.fireCharge < 20) {
       this.statsCanvas.ctx.fillStyle = '#6816e0';
       this.statsCanvas.ctx.fillRect(353, 31, this.player.fireCharge * 5, 11);
     }
@@ -445,7 +458,7 @@ class Field {
     this.statsCanvas.ctx.clearRect(532, 12, 96, 26);
     this.statsCanvas.ctx.fillStyle = "rgba(255, 255, 255, 0.8";
     this.statsCanvas.ctx.fillRect(532, 12, 96, 26);
-    if(muted === true) {
+    if (muted === true) {
       this.statsCanvas.ctx.fillStyle = 'black';
       this.statsCanvas.ctx.font = "20px sf_alien_encountersitalic";
       this.statsCanvas.ctx.fillText("UNMUTE", 537, 32);
@@ -457,9 +470,9 @@ class Field {
   }
 
   drawPlayerRails(shape) {
-    let xCenter = this.pcCanvas.width / 2;
-    let yCenter = this.pcCanvas.height / 2;
-    if(this.player.fireCharge < 20) {
+    const xCenter = this.pcCanvas.width / 2;
+    const yCenter = this.pcCanvas.height / 2;
+    if (this.player.fireCharge < 20) {
       this.pcCanvas.ctx.strokeStyle = "white";
     } else {
       this.pcCanvas.ctx.strokeStyle = "#6816e0";
@@ -477,7 +490,7 @@ class Field {
 
   undrawFGContext() {
     this.fgCanvas.ctx.fillStyle = "rgba(0, 0, 0, 0.1";
-    this.fgCanvas.ctx.fillRect(0,0,800,500);
+    this.fgCanvas.ctx.fillRect(0, 0, 800, 500);
   }
 
   clearFGContext() {
@@ -486,7 +499,10 @@ class Field {
 
   clearStatsContext() {
     this.statsCanvas.ctx.clearRect(
-      0,0,this.statsCanvas.width,this.statsCanvas.height
+      0,
+      0,
+      this.statsCanvas.width,
+      this.statsCanvas.height,
     );
   }
 
@@ -499,7 +515,7 @@ class Field {
       0,
       0,
       this.optsCanvas.width,
-      this.optsCanvas.height
+      this.optsCanvas.height,
     );
   }
 

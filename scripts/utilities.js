@@ -5,22 +5,22 @@ export class ObjectPool {
   }
 
   get(objectData) {
-    if(!this.pool[this.size - 1].spawned) {
+    if (!this.pool[this.size - 1].spawned) {
       this.pool[this.size - 1].spawn(objectData);
       this.pool.unshift(this.pool.pop());
     }
   }
 
   draw(type) {
-    for(let i = 0; i < this.size; i++) {
-      if(this.pool[i].spawned) {
+    for (let i = 0; i < this.size; i++) {
+      if (this.pool[i].spawned) {
         this.pool[i].draw(this.BulletPool);
-        if(this.pool[i].resetable()) {
+        if (this.pool[i].resetable()) {
           this.pool[i].setDefaultValues(type);
           this.pool.push((this.pool.splice(i, 1))[0]);
         }
       } else {
-          break;
+        break;
       }
     }
   }
@@ -48,8 +48,8 @@ export class Sprite {
       drawPointX,
       drawPointY,
       this.srcWidth,  // drawn image width, same as src
-      this.srcHeight  // drawn image height, same as src
-    )
+      this.srcHeight,  // drawn image height, same as src
+    );
   }
 };
 
@@ -57,7 +57,7 @@ export class AssetStore {
   constructor(game) {
     this.game = game;
 
-    this.backgroundMusic = new Audio("assets/sounds/background_music.mp3");
+    this.backgroundMusic = new Audio('assets/sounds/background_music.mp3');
     this.backgroundMusic.loop = true;
     this.backgroundMusic.volume = 0.25;
     this.backgroundMusic.load();
@@ -70,38 +70,45 @@ export class AssetStore {
       height: 30,
       srcX: 0,
       srcY: 0
-    }
+    };
     this.eyeDemon = {
       image: new Image(),
       width: 30,
       height: 30,
       srcX: 0,
       srcY: 0
-    }
+    };
     this.faceDemon = {
       image: new Image(),
       width: 30,
       height: 40,
       srcX: 0,
       srcY: 0
-    }
+    };
     this.faceDemonHurt = {
       image: new Image(),
       width: 30,
       height: 40,
       srcX: 0,
       srcY: 0
-    }
+    };
     this.bossDemon = {
       image: new Image(),
       width: 50,
       height: 54,
       srcX: 0,
       srcY: 0
-    }
-    this.heart = { image: new Image() }
+    };
+    this.heart = { image: new Image() };
+    this.hp = {
+      image: new Image(),
+      width: 25,
+      height: 25,
+      srcX: 0,
+      srcY: 0
+    };
 
-    this.numAssets = 7;
+    this.numAssets = 8;
     this.numLoaded = 0;
 
     this.mouthDemon.image.onload = () => { this.assetLoaded(); }
@@ -110,6 +117,7 @@ export class AssetStore {
     this.faceDemonHurt.image.onload = () => { this.assetLoaded(); }
     this.bossDemon.image.onload = () => { this.assetLoaded(); }
     this.heart.image.onload = () => { this.assetLoaded(); }
+    this.hp.image.onload = () => { this.assetLoaded(); }
 
     this.mouthDemon.image.src = 'assets/sprites/mouth_demon.png';
     this.eyeDemon.image.src = 'assets/sprites/eye_demon.png';
@@ -117,10 +125,11 @@ export class AssetStore {
     this.faceDemonHurt.image.src = 'assets/sprites/face_demon_hurt.png';
     this.bossDemon.image.src = 'assets/sprites/boss_demon.png';
     this.heart.image.src = 'assets/sprites/heart.png';
+    this.hp.image.src = 'assets/sprites/hp.png';
   }
 
   checkReadyState() {
-    if(this.backgroundMusic.readyState === 4) {
+    if (this.backgroundMusic.readyState === 4) {
       window.clearInterval(this.checkAudio);
       this.assetLoaded();
     }
@@ -128,27 +137,33 @@ export class AssetStore {
 
   assetLoaded() {
     this.numLoaded++;
-    if(this.numLoaded === this.numAssets) this.game.startGame();
+    if (this.numLoaded === this.numAssets) {
+      this.game.startGame();
+    };
   }
 };
 
 export function Timer(callback, delay) {
-    var timerId, start, remaining = delay;
+  var timerId, start, remaining = delay;
 
-    this.pause = () => {
-      window.clearTimeout(timerId);
-      remaining -= new Date() - start;
-    };
+  this.pause = () => {
+    window.clearTimeout(timerId);
+    remaining -= new Date() - start;
+  };
 
-    this.resume = () => {
-      start = new Date();
-      window.clearTimeout(timerId);
-      timerId = window.setTimeout(callback, remaining);
-    };
+  this.resume = () => {
+    start = new Date();
+    window.clearTimeout(timerId);
+    timerId = window.setTimeout(callback, remaining);
+  };
 
-    this.clear = () => {
-      window.clearTimeout(timerId);
-    };
+  this.clear = () => {
+    window.clearTimeout(timerId);
+  };
 
-    this.resume();
+  this.resume();
 }
+
+export const getRandNum = (min, max) => {
+  return Math.floor(Math.random() * (max - min + 1) ) + min;
+};

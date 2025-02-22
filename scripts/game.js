@@ -1,8 +1,9 @@
-import Field from './field';
-import Player from './player';
-import { AssetStore, Sprite, Timer } from './utilities';
-import DemonPool from './demon';
 import BulletPool from './bullet';
+import DemonPool from './demon';
+import Field from './field';
+import PickupsPool from './pickups';
+import Player from './player';
+import { AssetStore, Timer } from './utilities';
 
 const KEY_MAP = {
   74: 'left',     // j
@@ -15,7 +16,7 @@ const KEY_MAP = {
   13: 'start',    // enter
   touchLeft: 'left',
   touchRight: 'right',
-  touchFire: 'fire'
+  touchFire: 'fire',
 };
 
 const KEY_STATUS = {};
@@ -26,39 +27,39 @@ for (let code in KEY_MAP) {
 class Game {
   constructor(fgCanvas, statsCanvas, pcCanvas, optsCanvas, mobileCanvas) {
     this.fgCanvas = {
-      ctx: fgCanvas.getContext("2d"),
+      ctx: fgCanvas.getContext('2d'),
       width: 800,
       height: 500
-    }
+    };
     this.statsCanvas = {
-      ctx: statsCanvas.getContext("2d"),
+      ctx: statsCanvas.getContext('2d'),
       width: 800,
       height: 50
-    }
+    };
     this.pcCanvas = {
-      ctx: pcCanvas.getContext("2d"),
+      ctx: pcCanvas.getContext('2d'),
       width: 150,
       height: 150
-    }
+    };
     this.optsCanvas = {
       canvas: optsCanvas,
-      ctx: optsCanvas.getContext("2d"),
+      ctx: optsCanvas.getContext('2d'),
       width: 800,
       height: 500
-    }
-    if(mobileCanvas == null) {
+    };
+    if (mobileCanvas === null) {
       this.isMobile = false;
       this.firePosition = null;
       this.mobileCanvas = { };
-      } else {
+    } else {
       this.isMobile = true;
       this.firePosition = 'standard';
       this.mobileCanvas = {
         canvas: mobileCanvas,
         ctx: mobileCanvas.getContext("2d"),
         width: 800,
-        height: 500
-      }
+        height: 500,
+      };
     };
 
     this.play = this.play.bind(this);
@@ -70,6 +71,7 @@ class Game {
 
     this.gamePadConnected = false;
     this.gamePadToggle = false;
+    this.nextHpSpawnScore = 500;
 
     this.drawLoadingScreen();
     this.setupEventListners(fgCanvas, statsCanvas, optsCanvas);
@@ -100,7 +102,6 @@ class Game {
       this.handleEnd(e, fgCanvas.getBoundingClientRect());
     }, false);
     fgCanvas.addEventListener("touchcancel", this.handleCancel, false);
-    // fgCanvas.addEventListener("touchmove", this.handleMove, false);
     this.ongoingTouches = [];
 
     window.addEventListener("gamepadconnected", (e) => {
@@ -117,6 +118,7 @@ class Game {
     this.demonBulletPool = new BulletPool(3, this.fgCanvas, 'demonBullet');
     this.pcBulletPool = new BulletPool(4, this.fgCanvas, 'player');
     this.setupDemonPools();
+    this.pickupsPool = new PickupsPool(this.fgCanvas.ctx, this.AssetStore);
     this.player = new Player(this.pcCanvas, this.pcBulletPool);
     this.movementDirection = 'standard';
     this.muted = false;
@@ -125,17 +127,17 @@ class Game {
   }
 
   setupDemonPools() {
-    let lvl1Demons = [
+    const lvl1Demons = [
       'mouthDemon', 'mouthDemon', 'mouthDemon',
-      'eyeDemon', 'eyeDemon', 'eyeDemon'
+      'eyeDemon', 'eyeDemon', 'eyeDemon',
     ];
     this.lvl1DemonPool = new DemonPool(
-      lvl1Demons, this.fgCanvas.ctx, this.AssetStore, this.demonBulletPool
+      lvl1Demons, this.fgCanvas.ctx, this.AssetStore, this.demonBulletPool,
     );
 
-    let lvl2Demons = ['faceDemon', 'faceDemon']
+    const lvl2Demons = ['faceDemon', 'faceDemon'];
     this.lvl2DemonPool = new DemonPool(
-      lvl2Demons, this.fgCanvas.ctx, this.AssetStore, this.demonBulletPool
+      lvl2Demons, this.fgCanvas.ctx, this.AssetStore, this.demonBulletPool,
     );
   }
 
@@ -150,11 +152,12 @@ class Game {
       this.pcBulletPool,
       this.lvl1DemonPool,
       this.lvl2DemonPool,
+      this.pickupsPool,
       this.player,
       this.movementDirection,
       this.gameStatus,
       this.mobileCanvas,
-      this.firePosition
+      this.firePosition,
     );
   }
 
@@ -164,8 +167,11 @@ class Game {
   }
 
   drawStartScreen() {
-    if(this.isMobile) this.field.drawMobileStartScreen();
-    else this.field.drawStandardStartScreen();
+    if (this.isMobile) {
+      this.field.drawMobileStartScreen();
+    } else {
+      this.field.drawStandardStartScreen();
+    }
   }
 
   startRound() {
@@ -201,18 +207,21 @@ class Game {
   play() {
     this.checkGameOver();
     this.checkCollisions();
-    if(this.gamePadToggle) this.buttonDown();
+    if (this.gamePadToggle) {
+      this.buttonDown();
+    }
     this.player.move(KEY_STATUS);
-    if(this.gamePadToggle) this.buttonUp();
+    if (this.gamePadToggle) {
+      this.buttonUp();
+    }
 
-    let now = Date.now();
-    let dt = (now - this.lastTime) / 1000.0;
+    const now = Date.now();
 
-    // update(dt);
     this.checkLevel1Demons();
     this.field.render();
+    this.spawnHp();
 
-    if(!this.paused) {
+    if (!this.paused) {
       setTimeout(() => {
         this.lastTime = now;
         requestAnimationFrame(this.play);
@@ -222,13 +231,16 @@ class Game {
 
   checkLevel1Demons() {
     let spawnedLvl1 = 0;
-    for(let i = 0; i < this.lvl1DemonPool.pool.length; i++) {
-      let demon = this.lvl1DemonPool.pool[i];
-      if(demon.type === 'mouthDemon' && demon.spawned) spawnedLvl1++;
-      else if(demon.type === 'eyeDemon' && demon.spawned) spawnedLvl1++;
+    for (let i = 0; i < this.lvl1DemonPool.pool.length; i++) {
+      const demon = this.lvl1DemonPool.pool[i];
+      if (demon.type === 'mouthDemon' && demon.spawned) {
+        spawnedLvl1++;
+      } else if (demon.type === 'eyeDemon' && demon.spawned) {
+        spawnedLvl1++;
+      }
     }
 
-    if(spawnedLvl1 < 1) {
+    if (spawnedLvl1 < 1) {
       this.lvl1DemonPool.get('mouthDemon');
       this.lvl1DemonPool.get('eyeDemon');
     }
@@ -237,9 +249,9 @@ class Game {
   }
 
   spawnLvl1Demons() {
-    let maxDemons = this.getMaxDemons('lvl1');
-    if(this.checkLevel1Demons() < maxDemons) {
-      let toGet = Math.random() < 0.5 ? 'mouthDemon' : 'eyeDemon';
+    const maxDemons = this.getMaxDemons('lvl1');
+    if (this.checkLevel1Demons() < maxDemons) {
+      const toGet = Math.random() < 0.5 ? 'mouthDemon' : 'eyeDemon';
       this.lvl1DemonPool.get(toGet);
     };
 
@@ -248,62 +260,84 @@ class Game {
 
   spawnLvl2Demons() {
     let spawnedLvl2 = 0;
-    for(let i = 0; i < this.lvl2DemonPool.pool.length; i++) {
-      let demon = this.lvl2DemonPool.pool[i];
-      if(demon.type === 'faceDemon' && demon.spawned) spawnedLvl2++;
+    for (let i = 0; i < this.lvl2DemonPool.pool.length; i++) {
+      const demon = this.lvl2DemonPool.pool[i];
+      if (demon.type === 'faceDemon' && demon.spawned) {
+        spawnedLvl2++
+      };
     };
 
-    let maxDemons = this.getMaxDemons('lvl2');
-    if(spawnedLvl2 < maxDemons) this.lvl2DemonPool.get('faceDemon');
+    const maxDemons = this.getMaxDemons('lvl2');
+    if (spawnedLvl2 < maxDemons) {
+      this.lvl2DemonPool.get('faceDemon');
+    }
 
     this.lvl2Timer = new Timer(() => { this.spawnLvl2Demons() }, 15000);
   }
 
+  checkNumHpPickups() {
+    let spawnedHp = 0;
+    for (let i = 0; i < this.pickupsPool.pool.length; i++) {
+      const pickup = this.pickupsPool.pool[i];
+      if (pickup.type === 'hp' && pickup.spawned) {
+        spawnedHp++;
+      };
+    }
+    return spawnedHp;
+  }
+
+  spawnHp() {
+    if (this.field.playerScore > this.nextHpSpawnScore && this.checkNumHpPickups() < 1) {
+      this.pickupsPool.get('hp');
+      this.nextHpSpawnScore += 1000;
+    }
+  }
+
   getMaxDemons(level) {
-    if(this.lastTime - this.startTime < 40000) {
-      if(level === 'lvl1') return 4;
-      if(level === 'lvl2') return 1;
+    if (this.lastTime - this.startTime < 40000) {
+      if (level === 'lvl1') { return 4 };
+      if (level === 'lvl2') { return 1 };
     } else {
-      if(level === 'lvl1') return 6;
-      if(level === 'lvl2') return 2;
+      if (level === 'lvl1') { return 6 };
+      if (level === 'lvl2') { return 2 };
     };
   }
 
   checkCollisions() {
-    let spawnedPCBullets = this.pcBulletPool.pool.filter(
-      (bullet) => bullet.spawned );
+    const spawnedPCBullets = this.pcBulletPool.pool.filter((bullet) => bullet.spawned);
     this.checkPlayerCollision(spawnedPCBullets);
     this.checkDemonCollision(spawnedPCBullets);
+    this.checkHpCollision(spawnedPCBullets);
   }
 
   checkPlayerCollision(spawnedPCBullets) {
-    let spawnedDemonBullets = this.demonBulletPool.pool.filter(
-      (bullet) => bullet.spawned );
-
-    let hitbox = {
+    const spawnedDemonBullets = this.demonBulletPool.pool.filter((bullet) => bullet.spawned);
+    const hitbox = {
       x: this.player.hitboxCenter.x,
       y: this.player.hitboxCenter.y,
       radius: 12
     }
 
-    for(let bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
-      let bullet = spawnedPCBullets[bullIdx];
-      if(
-        (this.bulletHitsPC(this.player, hitbox, bullet.startPoint) ||
-        this.bulletHitsPC(this.player, hitbox, bullet.endPoint)) &&
-        this.player.invincibilityFrames > 50
+    for (let bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
+      const bullet = spawnedPCBullets[bullIdx];
+      if (
+        (
+          this.bulletHitsPC(this.player, hitbox, bullet.startPoint)
+          || this.bulletHitsPC(this.player, hitbox, bullet.endPoint)
+        ) && this.player.invincibilityFrames > 50
       ) {
         this.player.isHit();
         this.field.drawPlayerHearts();
       };
     }
 
-    for(let bullIdx = 0; bullIdx < spawnedDemonBullets.length; bullIdx++) {
-      let bullet = spawnedDemonBullets[bullIdx];
-      if(
-        (this.bulletHitsPC(this.player, hitbox, bullet.startPoint) ||
-        this.bulletHitsPC(this.player, hitbox, bullet.endPoint)) &&
-        this.player.invincibilityFrames > 50
+    for (let bullIdx = 0; bullIdx < spawnedDemonBullets.length; bullIdx++) {
+      const bullet = spawnedDemonBullets[bullIdx];
+      if (
+        (
+          this.bulletHitsPC(this.player, hitbox, bullet.startPoint)
+          || this.bulletHitsPC(this.player, hitbox, bullet.endPoint)
+        ) && this.player.invincibilityFrames > 50
       ) {
         this.player.isHit();
         this.field.drawPlayerHearts();
@@ -312,50 +346,73 @@ class Game {
   }
 
   bulletHitsPC(player, hitbox, bullet) {
-    let newX = hitbox.x - player.pcFieldWidth / 2 + this.fgCanvas.width / 2;
-    let newY = hitbox.y - player.pcFieldHeight / 2 + this.fgCanvas.height / 2;
-    let distanceFromHitboxToBullet =
-      Math.sqrt(
-        Math.pow(newX - bullet.x, 2) + Math.pow(newY - bullet.y, 2)
-      );
+    const newX = hitbox.x - player.pcFieldWidth / 2 + this.fgCanvas.width / 2;
+    const newY = hitbox.y - player.pcFieldHeight / 2 + this.fgCanvas.height / 2;
+    const distanceFromHitboxToBullet = Math.sqrt(
+      Math.pow(newX - bullet.x, 2) + Math.pow(newY - bullet.y, 2)
+    );
 
-    return distanceFromHitboxToBullet <= hitbox.radius
+    return distanceFromHitboxToBullet <= hitbox.radius;
   }
 
   checkDemonCollision(spawnedPCBullets) {
-    let spawnedlvl1Demons = this.lvl1DemonPool.pool.filter(
-      (demon) => demon.spawned );
-    let spawnedlvl2Demons = this.lvl2DemonPool.pool.filter(
-      (demon) => demon.spawned );
+    const spawnedlvl1Demons = this.lvl1DemonPool.pool.filter((demon) => demon.spawned);
+    const spawnedlvl2Demons = this.lvl2DemonPool.pool.filter((demon) => demon.spawned);
+    const spawnedDemons = spawnedlvl1Demons.concat(spawnedlvl2Demons);
 
-    let spawnedDemons = spawnedlvl1Demons.concat(spawnedlvl2Demons);
-
-    for(let demonIdx = 0; demonIdx < spawnedDemons.length; demonIdx++) {
-      let demon = spawnedDemons[demonIdx];
-      for(let bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
-        let bullet = spawnedPCBullets[bullIdx];
-        let drawPoint = demon.drawPoint;
-        if(
-          (this.pcBulletHitsDemon(demon, drawPoint, bullet.startPoint) ||
-          this.pcBulletHitsDemon(demon, drawPoint, bullet.endPoint)) &&
-          demon.invincibilityFrames > 50
+    for (let demonIdx = 0; demonIdx < spawnedDemons.length; demonIdx++) {
+      const demon = spawnedDemons[demonIdx];
+      for (let bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
+        const bullet = spawnedPCBullets[bullIdx];
+        const drawPoint = demon.drawPoint;
+        if (
+          (
+            this.pcBulletHitsObject(demon, drawPoint, bullet.startPoint)
+            || this.pcBulletHitsObject(demon, drawPoint, bullet.endPoint)
+          ) && demon.invincibilityFrames > 50
         ) {
           this.field.updatePlayerScore(demon.type);
           demon.isHit();
         };
-      };
-    };
+      }
+    }
   }
 
-  pcBulletHitsDemon(demon, drawPoint, bullet) {
+  checkHpCollision(spawnedPCBullets) {
+    const spawnedHp = this.pickupsPool.pool.filter((pickup) => (
+      pickup.type === 'hp' && pickup.spawned
+    ));
+
+    for (let hpIdx = 0; hpIdx < spawnedHp.length; hpIdx++) {
+      const hp = spawnedHp[hpIdx];
+      for (let bullIdx = 0; bullIdx < spawnedPCBullets.length; bullIdx++) {
+        const bullet = spawnedPCBullets[bullIdx];
+        const drawPoint = hp.drawPoint;
+        if (
+          (
+            this.pcBulletHitsObject(hp, drawPoint, bullet.startPoint)
+            || this.pcBulletHitsObject(hp, drawPoint, bullet.endPoint)
+          ) && hp.invincibilityFrames > 50
+        ) {
+          if (this.player.life < 3) {
+            this.player.isHealed();
+            hp.isHit();
+            this.field.drawPlayerHearts();
+          }
+        };
+      }
+    }
+  }
+
+  pcBulletHitsObject(object, drawPoint, bullet) {
     return (
-      (drawPoint.x <= bullet.x && bullet.x <= drawPoint.x + demon.width) &&
-      (drawPoint.y <= bullet.y && bullet.y <= drawPoint.y + demon.height)
+      (drawPoint.x <= bullet.x && bullet.x <= drawPoint.x + object.width)
+      && (drawPoint.y <= bullet.y && bullet.y <= drawPoint.y + object.height)
     )
   }
 
   checkGameOver() {
-    if(this.player.life <= 0) {
+    if (this.player.life <= 0) {
       this.paused = true;
       this.removeSpawnTimers();
       this.gameStatus = 'over';
@@ -365,69 +422,75 @@ class Game {
   }
 
   buttonDown() {
-    let gamepads = navigator.getGamepads ? navigator.getGamepads() :
-      (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
+    // let gamepads = navigator.getGamepads ? navigator.getGamepads() :
+    //   (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
 
-    if(
-      navigator.getGamepads()[0].buttons[14].pressed ||
-      navigator.getGamepads()[0].axes[0] < -0.1
+    if (
+      navigator.getGamepads()[0].buttons[14].pressed
+      || navigator.getGamepads()[0].axes[0] < -0.1
     ) {
       KEY_STATUS[KEY_MAP['controllerLeft']] = true;
     }
-    if(
-      navigator.getGamepads()[0].buttons[15].pressed ||
-      navigator.getGamepads()[0].axes[0] > 0.1) {
+    if (
+      navigator.getGamepads()[0].buttons[15].pressed
+      || navigator.getGamepads()[0].axes[0] > 0.1
+    ) {
       KEY_STATUS[KEY_MAP['controllerRight']] = true;
     };
-    if(
-      navigator.getGamepads()[0].buttons[0].pressed ||
-      navigator.getGamepads()[0].buttons[1].pressed ||
-      navigator.getGamepads()[0].buttons[2].pressed ||
-      navigator.getGamepads()[0].buttons[3].pressed ||
-      navigator.getGamepads()[0].buttons[4].pressed ||
-      navigator.getGamepads()[0].buttons[5].pressed
-
+    if (
+      navigator.getGamepads()[0].buttons[0].pressed
+      || navigator.getGamepads()[0].buttons[1].pressed
+      || navigator.getGamepads()[0].buttons[2].pressed
+      || navigator.getGamepads()[0].buttons[3].pressed
+      || navigator.getGamepads()[0].buttons[4].pressed
+      || navigator.getGamepads()[0].buttons[5].pressed
     ) {
       KEY_STATUS[KEY_MAP['controllerFire']] = true;
     };
   }
 
   buttonUp() {
-    let gamepads = navigator.getGamepads ? navigator.getGamepads() :
-      (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
+    // let gamepads = navigator.getGamepads ? navigator.getGamepads() :
+    //   (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
 
-    if(!navigator.getGamepads()[0].buttons[14].pressed) {
+    if (!navigator.getGamepads()[0].buttons[14].pressed) {
       KEY_STATUS[KEY_MAP['controllerLeft']] = false;
     }
-    if(!navigator.getGamepads()[0].buttons[15].pressed) {
+    if (!navigator.getGamepads()[0].buttons[15].pressed) {
       KEY_STATUS[KEY_MAP['controllerRight']] = false;
     };
-    if(
-      !navigator.getGamepads()[0].buttons[0].pressed &&
-      !navigator.getGamepads()[0].buttons[1].pressed &&
-      !navigator.getGamepads()[0].buttons[2].pressed &&
-      !navigator.getGamepads()[0].buttons[3].pressed &&
-      !navigator.getGamepads()[0].buttons[4].pressed &&
-      !navigator.getGamepads()[0].buttons[5].pressed
+    if (
+      !navigator.getGamepads()[0].buttons[0].pressed
+      && !navigator.getGamepads()[0].buttons[1].pressed
+      && !navigator.getGamepads()[0].buttons[2].pressed
+      && !navigator.getGamepads()[0].buttons[3].pressed
+      && !navigator.getGamepads()[0].buttons[4].pressed
+      && !navigator.getGamepads()[0].buttons[5].pressed
     ) {
       KEY_STATUS[KEY_MAP['controllerFire']] = false;
     };
   }
 
   keydown(e) {
-    let keyCode = e.which || e.keyCode || 0;
-    if(keyCode === 13 && this.gameStatus !== 'playing') this.newGame();
-    if(keyCode === 77) this.clickMute();
-    if(keyCode === 80) this.clickPause();
-    if(KEY_MAP[keyCode]) {
+    const keyCode = e.which || e.keyCode || 0;
+    if (keyCode === 13 && this.gameStatus !== 'playing') {
+      this.newGame();
+    }
+    if (keyCode === 77) {
+      this.clickMute();
+    }
+    if (keyCode === 80) {
+      this.clickPause();
+    }
+    if (KEY_MAP[keyCode]) {
       e.preventDefault();
       KEY_STATUS[KEY_MAP[keyCode]] = true;
     }
   }
 
   keyup(e) {
-    let keyCode = e.which || e.keyCode || 0;
-    if(KEY_MAP[keyCode]) {
+    const keyCode = e.which || e.keyCode || 0;
+    if (KEY_MAP[keyCode]) {
       e.preventDefault();
       KEY_STATUS[KEY_MAP[keyCode]] = false;
     }
@@ -435,51 +498,50 @@ class Game {
 
   handleStart(e, boundingRect) {
     e.preventDefault();
-    let touches = e.changedTouches;
+    const touches = e.changedTouches;
     for (let i = 0; i < touches.length; i++) {
-      let touch = touches[i];
-      let posX = touch.pageX - boundingRect.left;
-      let posY = touch.pageY - boundingRect.top;
+      const touch = touches[i];
+      const posX = touch.pageX - boundingRect.left;
+      const posY = touch.pageY - boundingRect.top;
 
-      if(
+      if (
         this.movementDirection === 'standard' && this.firePosition === 'standard'
       ) {
-        if((0 <= posX && posX <= 200) && (0 <= posY && posY <= 299)) {
-          console.log('here');
+        if ((0 <= posX && posX <= 200) && (0 <= posY && posY <= 299)) {
           KEY_STATUS[KEY_MAP['touchLeft']] = true;
-        } else if((0 <= posX && posX <= 200) && (300 <= posY && posY <= 500)) {
+        } else if ((0 <= posX && posX <= 200) && (300 <= posY && posY <= 500)) {
           KEY_STATUS[KEY_MAP['touchRight']] = true;
-        } else if((600 <= posX && posX <= 800) && (0 <= posY && posY <= 500)) {
+        } else if ((600 <= posX && posX <= 800) && (0 <= posY && posY <= 500)) {
           KEY_STATUS[KEY_MAP['touchFire']] = true;
         };
-      } else if(
+      } else if (
         this.movementDirection === 'inverted' && this.firePosition === 'standard'
       ) {
-        if((0 <= posX && posX <= 200) && (0 <= posY && posY <= 299)) {
+        if ((0 <= posX && posX <= 200) && (0 <= posY && posY <= 299)) {
           KEY_STATUS[KEY_MAP['touchRight']] = true;
-        } else if((0 <= posX && posX <= 200) && (300 <= posY && posY <= 500)) {
+        } else if ((0 <= posX && posX <= 200) && (300 <= posY && posY <= 500)) {
           KEY_STATUS[KEY_MAP['touchLeft']] = true;
-        } else if((600 <= posX && posX <= 800) && (0 <= posY && posY <= 500)) {
+        } else if ((600 <= posX && posX <= 800) && (0 <= posY && posY <= 500)) {
           KEY_STATUS[KEY_MAP['touchFire']] = true;
         };
-      } else if(
+      } else if (
         this.movementDirection === 'standard' && this.firePosition === 'inverted'
       ) {
-        if((600 <= posX && posX <= 800) && (0 <= posY && posY <= 299)) {
+        if ((600 <= posX && posX <= 800) && (0 <= posY && posY <= 299)) {
           KEY_STATUS[KEY_MAP['touchLeft']] = true;
-        } else if((600 <= posX && posX <= 800) && (300 <= posY && posY <= 500)) {
+        } else if ((600 <= posX && posX <= 800) && (300 <= posY && posY <= 500)) {
           KEY_STATUS[KEY_MAP['touchRight']] = true;
-        } else if((0 <= posX && posX <= 200) && (0 <= posY && posY <= 500)) {
+        } else if ((0 <= posX && posX <= 200) && (0 <= posY && posY <= 500)) {
           KEY_STATUS[KEY_MAP['touchFire']] = true;
         };
-      } else if(
+      } else if (
         this.movementDirection === 'inverted' && this.firePosition === 'inverted'
       ) {
-        if((600 <= posX && posX <= 800) && (0 <= posY && posY <= 299)) {
+        if ((600 <= posX && posX <= 800) && (0 <= posY && posY <= 299)) {
           KEY_STATUS[KEY_MAP['touchLeft']] = true;
-        } else if((600 <= posX && posX <= 800) && (300 <= posY && posY <= 500)) {
+        } else if ((600 <= posX && posX <= 800) && (300 <= posY && posY <= 500)) {
           KEY_STATUS[KEY_MAP['touchRight']] = true;
-        } else if((0 <= posX && posX <= 200) && (0 <= posY && posY <= 500)) {
+        } else if ((0 <= posX && posX <= 200) && (0 <= posY && posY <= 500)) {
           KEY_STATUS[KEY_MAP['touchFire']] = true;
         };
       };
@@ -490,55 +552,55 @@ class Game {
 
   handleEnd(e, boundingRect) {
     e.preventDefault();
-    let touches = e.changedTouches;
+    const touches = e.changedTouches;
     for (let i = 0; i < touches.length; i++) {
-      let touch = touches[i];
-      let posX = touch.pageX - boundingRect.left;
-      let posY = touch.pageY - boundingRect.top;
+      const touch = touches[i];
+      const posX = touch.pageX - boundingRect.left;
+      const posY = touch.pageY - boundingRect.top;
 
-      if(
+      if (
         this.movementDirection === 'standard' && this.firePosition === 'standard'
       ) {
-        if((0 <= posX && posX <= 200) && (0 <= posY && posY <= 299)) {
+        if ((0 <= posX && posX <= 200) && (0 <= posY && posY <= 299)) {
           KEY_STATUS[KEY_MAP['touchLeft']] = false;
-        } else if((0 <= posX && posX <= 200) && (300 <= posY && posY <= 500)) {
+        } else if ((0 <= posX && posX <= 200) && (300 <= posY && posY <= 500)) {
           KEY_STATUS[KEY_MAP['touchRight']] = false;
-        } else if((600 <= posX && posX <= 800) && (0 <= posY && posY <= 500)) {
+        } else if ((600 <= posX && posX <= 800) && (0 <= posY && posY <= 500)) {
           KEY_STATUS[KEY_MAP['touchFire']] = false;
         };
-      } else if(
+      } else if (
         this.movementDirection === 'inverted' && this.firePosition === 'standard'
       ) {
-        if((0 <= posX && posX <= 200) && (0 <= posY && posY <= 299)) {
+        if ((0 <= posX && posX <= 200) && (0 <= posY && posY <= 299)) {
           KEY_STATUS[KEY_MAP['touchRight']] = false;
-        } else if((0 <= posX && posX <= 200) && (300 <= posY && posY <= 500)) {
+        } else if ((0 <= posX && posX <= 200) && (300 <= posY && posY <= 500)) {
           KEY_STATUS[KEY_MAP['touchLeft']] = false;
-        } else if((600 <= posX && posX <= 800) && (0 <= posY && posY <= 500)) {
+        } else if ((600 <= posX && posX <= 800) && (0 <= posY && posY <= 500)) {
           KEY_STATUS[KEY_MAP['touchFire']] = false;
         };
-      } else if(
+      } else if (
         this.movementDirection === 'standard' && this.firePosition === 'inverted'
       ) {
-        if((600 <= posX && posX <= 800) && (0 <= posY && posY <= 299)) {
+        if ((600 <= posX && posX <= 800) && (0 <= posY && posY <= 299)) {
           KEY_STATUS[KEY_MAP['touchLeft']] = false;
-        } else if((600 <= posX && posX <= 800) && (300 <= posY && posY <= 500)) {
+        } else if ((600 <= posX && posX <= 800) && (300 <= posY && posY <= 500)) {
           KEY_STATUS[KEY_MAP['touchRight']] = false;
-        } else if((0 <= posX && posX <= 200) && (0 <= posY && posY <= 500)) {
+        } else if ((0 <= posX && posX <= 200) && (0 <= posY && posY <= 500)) {
           KEY_STATUS[KEY_MAP['touchFire']] = false;
         };
-      } else if(
+      } else if (
         this.movementDirection === 'inverted' && this.firePosition === 'inverted'
       ) {
-        if((600 <= posX && posX <= 800) && (0 <= posY && posY <= 299)) {
+        if ((600 <= posX && posX <= 800) && (0 <= posY && posY <= 299)) {
           KEY_STATUS[KEY_MAP['touchLeft']] = false;
-        } else if((600 <= posX && posX <= 800) && (300 <= posY && posY <= 500)) {
+        } else if ((600 <= posX && posX <= 800) && (300 <= posY && posY <= 500)) {
           KEY_STATUS[KEY_MAP['touchRight']] = false;
-        } else if((0 <= posX && posX <= 200) && (0 <= posY && posY <= 500)) {
+        } else if ((0 <= posX && posX <= 200) && (0 <= posY && posY <= 500)) {
           KEY_STATUS[KEY_MAP['touchFire']] = false;
         };
       };
 
-      let touchIdx = this.ongoingTouchIndexById(touch.identifier);
+      const touchIdx = this.ongoingTouchIndexById(touch.identifier);
       this.ongoingTouches.splice(touchIdx, 1);
     };
   }
@@ -547,31 +609,33 @@ class Game {
     return {
       identifier: touch.identifier,
       posX,
-      posY
+      posY,
     };
   }
 
   ongoingTouchIndexById(idToFind) {
-    for(let i = 0; i < this.ongoingTouches.length; i++) {
-      let id = this.ongoingTouches[i].identifier;
-      if(id == idToFind) return i;
+    for (let i = 0; i < this.ongoingTouches.length; i++) {
+      const id = this.ongoingTouches[i].identifier;
+      if (id == idToFind) {
+        return i
+      };
     }
-    return -1;    // not found
+    return -1; // not found
   }
 
   statsCanvasCheckClick(e, boundingRect) {
     e.preventDefault();
-    let clickPosX = e.clientX - boundingRect.left;
-    let clickPosY = e.clientY - boundingRect.top;
+    const clickPosX = e.clientX - boundingRect.left;
+    const clickPosY = e.clientY - boundingRect.top;
 
-    if(
-      (530 <= clickPosX && clickPosX <= 630) &&
-      (10 <= clickPosY && clickPosY <= 40)
+    if (
+      (530 <= clickPosX && clickPosX <= 630)
+      && (10 <= clickPosY && clickPosY <= 40)
     ) {
       this.clickMute();
     } else if (
-      (650 <= clickPosX && clickPosX <= 750) &&
-      (10 <= clickPosY && clickPosY <= 40)
+      (650 <= clickPosX && clickPosX <= 750)
+      && (10 <= clickPosY && clickPosY <= 40)
     ) {
       this.clickPause();
     }
@@ -579,42 +643,42 @@ class Game {
 
   optsCanvasCheckClick(e, boundingRect) {
     e.preventDefault();
-    let clickPosX = e.clientX - boundingRect.left;
-    let clickPosY = e.clientY - boundingRect.top;
+    const clickPosX = e.clientX - boundingRect.left;
+    const clickPosY = e.clientY - boundingRect.top;
 
-    if(
-      (240 <= clickPosX && clickPosX <= 560) &&
-      (165 <= clickPosY && clickPosY <= 200)
+    if (
+      (240 <= clickPosX && clickPosX <= 560)
+      && (165 <= clickPosY && clickPosY <= 200)
     ) {
       this.swapMovementDirection();
-    } else if(
-      (300 <= clickPosX && clickPosX <= 505) &&
-      (385 <= clickPosY && clickPosY <= 472)
+    } else if (
+      (300 <= clickPosX && clickPosX <= 505)
+      && (385 <= clickPosY && clickPosY <= 472)
     ) {
-      if(this.gameStatus === 'unbegun') {
+      if (this.gameStatus === 'unbegun') {
         this.startRound();
-      } else if(this.gameStatus === 'playing') {
+      } else if (this.gameStatus === 'playing') {
         this.clickPause();
-      } else if(this.gameStatus === 'over') {
+      } else if (this.gameStatus === 'over') {
         this.newGame();
       }
-    } else if(
-      (20 <= clickPosX && clickPosX <= 170) &&
-      (410 <= clickPosY && clickPosY <= 490)
+    } else if (
+      (20 <= clickPosX && clickPosX <= 170)
+      && (410 <= clickPosY && clickPosY <= 490)
     ) {
       this.gamePadToggle = this.gamePadToggle ? false : true;
       this.field.drawGamePadToggleButton();
-    } else if(
-      (290 <= clickPosX && clickPosX <= 515) &&
-      (255 <= clickPosY && clickPosY <= 290) &&
-      this.isMobile === true
+    } else if (
+      (290 <= clickPosX && clickPosX <= 515)
+      && (255 <= clickPosY && clickPosY <= 290)
+      && this.isMobile === true
     ) {
       this.moveFireButton();
     }
   }
 
   clickMute() {
-    if(this.muted === true) {
+    if (this.muted === true) {
       this.muted = false;
       this.AssetStore.backgroundMusic.volume = 0.25;
     } else {
@@ -626,7 +690,7 @@ class Game {
   }
 
   clickPause() {
-    if(this.paused && this.gameStatus === 'playing') {
+    if (this.paused && this.gameStatus === 'playing') {
       this.paused = false;
       this.resumeSpawnTimers();
       this.field.clearOptsContext();
@@ -648,7 +712,7 @@ class Game {
   }
 
   swapMovementDirection() {
-    if(this.movementDirection === 'standard') {
+    if (this.movementDirection === 'standard') {
       this.movementDirection = 'inverted';
       KEY_MAP[74] = 'right';
       KEY_MAP[76] = 'left';
@@ -667,14 +731,17 @@ class Game {
     }
 
     this.field.updateMovementDirection(this.movementDirection);
-    this.drawStartScreen()
+    this.drawStartScreen();
   }
 
   moveFireButton() {
-    if(this.firePosition === 'standard') this.firePosition = 'inverted';
-    else this.firePosition = 'standard';
+    if (this.firePosition === 'standard') {
+      this.firePosition = 'inverted';
+    } else {
+      this.firePosition = 'standard';
+    }
     this.field.updateFirePosition(this.firePosition);
-    this.drawStartScreen()
+    this.drawStartScreen();
   }
 
   mapGamePadButtons(e) {
@@ -688,15 +755,15 @@ class Game {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  let foregroundCanvas = document.getElementById("foreground-canvas");
-  let playerCanvas = document.getElementById("player-canvas");
-  let statsCanvas = document.getElementById("stats-canvas");
-  let optionsCanvas = document.getElementById("options-canvas");
-  let mobileCanvas = null;
+  const foregroundCanvas = document.getElementById("foreground-canvas");
+  const playerCanvas = document.getElementById("player-canvas");
+  const statsCanvas = document.getElementById("stats-canvas");
+  const optionsCanvas = document.getElementById("options-canvas");
+  const mobileCanvas = null;
 
-  if(
-    (typeof window.orientation !== "undefined") ||
-    (navigator.userAgent.indexOf('IEMobile') !== -1)
+  if (
+    (typeof window.orientation !== "undefined")
+    || (navigator.userAgent.indexOf('IEMobile') !== -1)
   ) {
     mobileCanvas = document.createElement("canvas");
     mobileCanvas.id = "mobile-canvas";
@@ -705,11 +772,11 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementsByClassName("game-area")[0].appendChild(mobileCanvas);
   };
 
-  let game = new Game(
+  new Game(
     foregroundCanvas,
     statsCanvas,
     playerCanvas,
     optionsCanvas,
-    mobileCanvas
+    mobileCanvas,
   );
 });

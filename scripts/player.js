@@ -12,6 +12,7 @@ class Player {
     this.fireCharge = 0;
     this.fireCooldown = 25;
     this.invincibilityFrames = 50;
+    this.invincibilityColor = 'white';
     this.life = 3;
 
     this.portTheta = -1.23;
@@ -33,34 +34,38 @@ class Player {
   computeStarboardVertex() {
     return ({
       x: Math.cos(this.starboardTheta) * this.radius + this.pcFieldWidth / 2,
-      y: -Math.sin(this.starboardTheta) * this.radius + this.pcFieldHeight / 2
-    })
+      y: -Math.sin(this.starboardTheta) * this.radius + this.pcFieldHeight / 2,
+    });
   }
 
   computePortVertex() {
     return ({
       x: Math.cos(this.portTheta) * this.radius  + this.pcFieldWidth / 2,
-      y: Math.sin(this.portTheta) * this.radius  + this.pcFieldHeight / 2
-    })
+      y: Math.sin(this.portTheta) * this.radius  + this.pcFieldHeight / 2,
+    });
   }
 
   computeCenterPoints(radius) {
     return ({
       x: Math.cos(this.bowTheta) * radius  + this.pcFieldWidth / 2,
-      y: Math.sin(this.bowTheta) * radius  + this.pcFieldHeight / 2
-    })
+      y: Math.sin(this.bowTheta) * radius  + this.pcFieldHeight / 2,
+    });
   }
 
   move(keyStatus) {
     this.fireCharge++; // increments once every frame
     this.invincibilityFrames++; // increments once every frame
-    if(keyStatus.left) {
-      if(this.velocity <= this.maxSpeed) this.velocity += this.acceleration;
+    if (keyStatus.left) {
+      if (this.velocity <= this.maxSpeed) {
+        this.velocity += this.acceleration;
+      }
       this.starboardTheta += this.velocity;
       this.portTheta -= this.velocity;
       this.bowTheta -= this.velocity;
-    } else if(keyStatus.right) {
-      if(this.velocity <= this.maxSpeed) this.velocity += this.acceleration;
+    } else if (keyStatus.right) {
+      if (this.velocity <= this.maxSpeed) {
+        this.velocity += this.acceleration;
+      }
       this.starboardTheta -= this.velocity;
       this.portTheta += this.velocity;
       this.bowTheta += this.velocity;
@@ -68,17 +73,19 @@ class Player {
       this.velocity = 0;
     }
 
-    if(keyStatus.fire && this.fireCharge >= this.fireCooldown) this.fire();
+    if (keyStatus.fire && this.fireCharge >= this.fireCooldown) {
+      this.fire();
+    }
   }
 
   fire() {
     this.fireCharge = 0;
-    let bulletData = {
+    const bulletData = {
       theta: this.bowTheta,
       startRadius: 12,
       endRadius: -8,
-      speed: 6
-    }
+      speed: 6,
+    };
     this.BulletPool.get(bulletData);
   }
 
@@ -86,7 +93,9 @@ class Player {
     this.computeAllVerticies();
     this.ctx.beginPath();
 
-    if(this.invincibilityFrames < 50) this.ctx.fillStyle = 'red';
+    if (this.invincibilityFrames < 50) {
+      this.ctx.fillStyle = this.invincibilityColor;
+    }
     else this.ctx.fillStyle = 'white';
 
     this.ctx.moveTo(this.starboardVertex.x, this.starboardVertex.y);
@@ -98,6 +107,15 @@ class Player {
   isHit() {
     this.life -= 1;
     this.invincibilityFrames = 0;
+    this.invincibilityColor = 'red';
+  }
+
+  isHealed() {
+    if (this.life < 3) {
+      this.life += 1;
+      this.invincibilityFrames = 0;
+      this.invincibilityColor = 'lawngreen';
+    }
   }
 }
 
