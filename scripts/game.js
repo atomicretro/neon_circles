@@ -213,8 +213,10 @@ class Game {
     this.field.render();
 
     if(!this.paused) {
-      this.lastTime = now;
-      requestAnimationFrame(this.play);
+      setTimeout(() => {
+        this.lastTime = now;
+        requestAnimationFrame(this.play);
+      }, 15); // caps fps at ~60
     }
   }
 
